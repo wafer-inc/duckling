@@ -2,6 +2,8 @@ pub mod en;
 
 use crate::types::ResolvedValue;
 
+/// Time grain, ordered from smallest to largest (Second < Minute < ... < Year).
+/// Ordering matches Haskell Duckling's derived Ord.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Grain {
     Second,
@@ -26,6 +28,51 @@ impl Grain {
             Grain::Quarter => "quarter",
             Grain::Year => "year",
         }
+    }
+
+    fn order(&self) -> u8 {
+        match self {
+            Grain::Second => 0,
+            Grain::Minute => 1,
+            Grain::Hour => 2,
+            Grain::Day => 3,
+            Grain::Week => 4,
+            Grain::Month => 5,
+            Grain::Quarter => 6,
+            Grain::Year => 7,
+        }
+    }
+
+    /// Number of seconds in `n` units of this grain.
+    /// Matches Haskell Duckling's `inSeconds`.
+    pub fn in_seconds(&self, n: i64) -> i64 {
+        match self {
+            Grain::Second => n,
+            Grain::Minute => n * 60,
+            Grain::Hour => n * 3600,
+            Grain::Day => n * 86400,
+            Grain::Week => n * 604800,
+            Grain::Month => n * 2592000,    // 30 days
+            Grain::Quarter => n * 7776000,  // 90 days
+            Grain::Year => n * 31536000,    // 365 days
+        }
+    }
+
+    /// Number of seconds in one unit of this grain, as f64.
+    pub fn one_in_seconds_f64(&self) -> f64 {
+        self.in_seconds(1) as f64
+    }
+}
+
+impl PartialOrd for Grain {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Grain {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.order().cmp(&other.order())
     }
 }
 

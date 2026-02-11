@@ -4,45 +4,46 @@ use crate::types::{Rule, TokenData};
 use super::Grain;
 
 pub fn rules() -> Vec<Rule> {
+    // Regex patterns match Haskell Duckling's TimeGrain/EN/Rules.hs
     vec![
         Rule {
-            name: "grain (second)".to_string(),
-            pattern: vec![regex(r#"seconds?"#)],
+            name: "second (grain)".to_string(),
+            pattern: vec![regex(r#"sec(ond)?s?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Second))),
         },
         Rule {
-            name: "grain (minute)".to_string(),
-            pattern: vec![regex(r#"minutes?"#)],
+            name: "minute (grain)".to_string(),
+            pattern: vec![regex(r#"m(in(ute)?s?)?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Minute))),
         },
         Rule {
-            name: "grain (hour)".to_string(),
-            pattern: vec![regex(r#"hours?"#)],
+            name: "hour (grain)".to_string(),
+            pattern: vec![regex(r#"h(((ou)?rs?)|r)?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Hour))),
         },
         Rule {
-            name: "grain (day)".to_string(),
+            name: "day (grain)".to_string(),
             pattern: vec![regex(r#"days?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Day))),
         },
         Rule {
-            name: "grain (week)".to_string(),
+            name: "week (grain)".to_string(),
             pattern: vec![regex(r#"weeks?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Week))),
         },
         Rule {
-            name: "grain (month)".to_string(),
+            name: "month (grain)".to_string(),
             pattern: vec![regex(r#"months?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Month))),
         },
         Rule {
-            name: "grain (quarter)".to_string(),
-            pattern: vec![regex(r#"quarters?"#)],
+            name: "quarter (grain)".to_string(),
+            pattern: vec![regex(r#"(quarter|qtr)s?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Quarter))),
         },
         Rule {
-            name: "grain (year)".to_string(),
-            pattern: vec![regex(r#"years?"#)],
+            name: "year (grain)".to_string(),
+            pattern: vec![regex(r#"y(ea)?rs?"#)],
             production: Box::new(|_nodes| Some(TokenData::TimeGrain(Grain::Year))),
         },
     ]

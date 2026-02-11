@@ -19,6 +19,15 @@ pub fn is_integer(token: &TokenData) -> bool {
     }
 }
 
+/// Matches positive integers (v > 0 and v is integer).
+/// Equivalent to Haskell Duckling's `isNatural`.
+pub fn is_natural(token: &TokenData) -> bool {
+    match token {
+        TokenData::Numeral(data) => data.value > 0.0 && data.value == data.value.floor(),
+        _ => false,
+    }
+}
+
 pub fn number_between(low: f64, high: f64) -> Box<dyn Fn(&TokenData) -> bool + Send + Sync> {
     Box::new(move |token: &TokenData| {
         if let TokenData::Numeral(data) = token {
