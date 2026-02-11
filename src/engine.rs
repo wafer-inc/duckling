@@ -233,6 +233,7 @@ fn match_remaining(
         PatternItem::Regex(re) => {
             // Try to match regex starting near after_pos
             let text = doc.lower();
+            let original = doc.text();
             if after_pos <= text.len() {
                 let search_text = &text[after_pos..];
                 if let Some(m) = re.find(search_text) {
@@ -241,7 +242,20 @@ fn match_remaining(
                     // Must be adjacent
                     if doc.is_adjacent(after_pos, abs_start) {
                         let caps = re.captures(search_text);
-                        let groups = extract_groups(&caps);
+                        let groups = match &caps {
+                            Some(c) => {
+                                let mut g = Vec::new();
+                                for i in 0..c.len() {
+                                    g.push(c.get(i).map(|m2| {
+                                        let s = after_pos + m2.start();
+                                        let e = after_pos + m2.end();
+                                        original[s..e].to_string()
+                                    }));
+                                }
+                                g
+                            }
+                            None => Vec::new(),
+                        };
                         let regex_node = Node {
                             range: Range::new(abs_start, abs_end),
                             token_data: TokenData::RegexMatch(RegexMatchData { groups }),
@@ -309,29 +323,30 @@ fn match_remaining(
 }
 
 /// Find all regex matches in the document.
+/// Matches against the lowered text but extracts captured groups from the
+/// original text to preserve case (important for email, URL, etc.).
 fn find_regex_matches(doc: &Document, re: &Regex) -> Vec<(Range, Vec<Option<String>>)> {
-    let text = doc.lower();
+    let lower = doc.lower();
+    let original = doc.text();
     let mut matches = Vec::new();
 
-    for caps in re.captures_iter(&text) {
+    for caps in re.captures_iter(lower) {
         let m = caps.get(0).unwrap();
         let range = Range::new(m.start(), m.end());
-        let groups = extract_groups(&Some(caps));
+        let groups = extract_groups(&caps, original);
         matches.push((range, groups));
     }
 
     matches
 }
 
-fn extract_groups(caps: &Option<regex::Captures>) -> Vec<Option<String>> {
-    match caps {
-        Some(caps) => {
-            let mut groups = Vec::new();
-            for i in 0..caps.len() {
-                groups.push(caps.get(i).map(|m| m.as_str().to_string()));
-            }
-            groups
-        }
-        None => Vec::new(),
+fn extract_groups(caps: &regex::Captures, original: &str) -> Vec<Option<String>> {
+    let mut groups = Vec::new();
+    for i in 0..caps.len() {
+        groups.push(caps.get(i).map(|m| {
+            // Extract text from original (preserves case) using byte offsets
+            original[m.start()..m.end()].to_string()
+        }));
     }
+    groups
 }
