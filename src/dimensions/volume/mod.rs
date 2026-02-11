@@ -4,8 +4,10 @@ use crate::types::ResolvedValue;
 
 #[derive(Debug, Clone)]
 pub struct VolumeData {
-    pub value: f64,
+    pub value: Option<f64>,
     pub unit: Option<VolumeUnit>,
+    pub min_value: Option<f64>,
+    pub max_value: Option<f64>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,21 +42,98 @@ impl VolumeUnit {
 }
 
 impl VolumeData {
+    /// Volume with a unit and value.
     pub fn new(value: f64, unit: VolumeUnit) -> Self {
         VolumeData {
-            value,
+            value: Some(value),
             unit: Some(unit),
+            min_value: None,
+            max_value: None,
         }
+    }
+
+    /// Value only (latent, no unit). Used by ruleNumeralAsVolume.
+    pub fn value_only(value: f64) -> Self {
+        VolumeData {
+            value: Some(value),
+            unit: None,
+            min_value: None,
+            max_value: None,
+        }
+    }
+
+    /// Unit only (no value). Used by unit-only rules.
+    pub fn unit_only(unit: VolumeUnit) -> Self {
+        VolumeData {
+            value: None,
+            unit: Some(unit),
+            min_value: None,
+            max_value: None,
+        }
+    }
+
+    pub fn with_unit(mut self, unit: VolumeUnit) -> Self {
+        self.unit = Some(unit);
+        self
+    }
+
+    pub fn with_interval(mut self, from: f64, to: f64) -> Self {
+        self.value = None;
+        self.min_value = Some(from);
+        self.max_value = Some(to);
+        self
+    }
+
+    pub fn with_min(mut self, v: f64) -> Self {
+        self.value = None;
+        self.min_value = Some(v);
+        self.max_value = None;
+        self
+    }
+
+    pub fn with_max(mut self, v: f64) -> Self {
+        self.value = None;
+        self.min_value = None;
+        self.max_value = Some(v);
+        self
     }
 }
 
-pub fn resolve(data: &VolumeData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-            "unit": data.unit.map(|u| u.as_str()).unwrap_or("unknown"),
+pub fn resolve(data: &VolumeData) -> Option<ResolvedValue> {
+    let unit = data.unit.as_ref()?;
+    let unit_str = unit.as_str();
+
+    match (data.value, data.min_value, data.max_value) {
+        (Some(v), _, _) => Some(ResolvedValue {
+            kind: "value".to_string(),
+            value: serde_json::json!({
+                "value": v,
+                "type": "value",
+                "unit": unit_str,
+            }),
         }),
+        (None, Some(from), Some(to)) => Some(ResolvedValue {
+            kind: "value".to_string(),
+            value: serde_json::json!({
+                "type": "interval",
+                "from": {"value": from, "unit": unit_str},
+                "to": {"value": to, "unit": unit_str},
+            }),
+        }),
+        (None, Some(from), None) => Some(ResolvedValue {
+            kind: "value".to_string(),
+            value: serde_json::json!({
+                "type": "interval",
+                "from": {"value": from, "unit": unit_str},
+            }),
+        }),
+        (None, None, Some(to)) => Some(ResolvedValue {
+            kind: "value".to_string(),
+            value: serde_json::json!({
+                "type": "interval",
+                "to": {"value": to, "unit": unit_str},
+            }),
+        }),
+        _ => None,
     }
 }

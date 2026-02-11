@@ -158,6 +158,23 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
+        // Fractional numbers: 1/2, 3/4, etc.
+        Rule {
+            name: "fractional number".to_string(),
+            pattern: vec![regex(r#"(\d+)/(\d+)"#)],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let num: f64 = m.group(1)?.parse().ok()?;
+                let den: f64 = m.group(2)?.parse().ok()?;
+                if den == 0.0 {
+                    return None;
+                }
+                Some(TokenData::Numeral(NumeralData::new(num / den)))
+            }),
+        },
         // Negative numbers
         Rule {
             name: "negative number".to_string(),

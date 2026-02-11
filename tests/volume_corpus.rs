@@ -4,14 +4,48 @@ use duckling::{parse_en, DimensionKind};
 fn check_volume(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Volume]);
     let found = entities.iter().any(|e| {
-        e.dim == "volume"
-            && e.value
-                .value
+        if e.dim != "volume" {
+            return false;
+        }
+        let v = &e.value.value;
+
+        // Check simple value (type=value)
+        if v.get("value")
+            .and_then(|v| v.as_f64())
+            .map(|val| (val - expected_val).abs() < 0.01)
+            .unwrap_or(false)
+            && v.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
+        {
+            return true;
+        }
+
+        // Check interval from value
+        if let Some(from) = v.get("from") {
+            if from
                 .get("value")
                 .and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01)
+                .map(|val| (val - expected_val).abs() < 0.01)
                 .unwrap_or(false)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
+                && from.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
+            {
+                return true;
+            }
+        }
+
+        // Check interval to value
+        if let Some(to) = v.get("to") {
+            if to
+                .get("value")
+                .and_then(|v| v.as_f64())
+                .map(|val| (val - expected_val).abs() < 0.01)
+                .unwrap_or(false)
+                && to.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
+            {
+                return true;
+            }
+        }
+
+        false
     });
     assert!(
         found,
