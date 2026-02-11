@@ -2,13 +2,24 @@ pub mod en;
 pub mod helpers;
 
 use chrono::{DateTime, Datelike, Timelike, Utc};
+use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
 use crate::types::ResolvedValue;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartOfDay {
+    Morning,
+    Afternoon,
+    Evening,
+    Night,
+    Lunch,
+}
 
 #[derive(Debug, Clone)]
 pub struct TimeData {
     pub form: TimeForm,
     pub direction: Option<Direction>,
+    pub latent: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -18,13 +29,42 @@ pub enum TimeForm {
     DayOfMonth(u32),      // 1..31
     Hour(u32, bool),      // hour, is_12h_ambiguous
     HourMinute(u32, u32), // hour, minute
+    HourMinuteSecond(u32, u32, u32),
     Year(i32),
     Now,
     Today,
     Tomorrow,
     Yesterday,
-    RelativeGrain { n: i64, grain: crate::dimensions::time_grain::Grain },
+    RelativeGrain { n: i64, grain: Grain },
     DateMDY { month: u32, day: u32, year: Option<i32> },
+    // Part of day
+    PartOfDay(PartOfDay),
+    // Weekend
+    Weekend,
+    // Season: 0=spring, 1=summer, 2=fall, 3=winter
+    Season(u32),
+    // Named holiday (placeholder resolution)
+    Holiday(String),
+    // this(0)/last(-1)/next(1) week/month/year/quarter/season
+    GrainOffset { grain: Grain, offset: i32 },
+    // last/next N days/weeks/months
+    NthGrain { n: i64, grain: Grain, past: bool },
+    // Specific quarter (1-4)
+    Quarter(u32),
+    // Quarter + year
+    QuarterYear(u32, i32),
+    // Day after tomorrow / before yesterday
+    DayAfterTomorrow,
+    DayBeforeYesterday,
+    // Beginning/end of a time period
+    BeginEnd { begin: bool, target: Box<TimeForm> },
+    // Time interval (from, to)
+    Interval(Box<TimeData>, Box<TimeData>),
+    // All week / rest of week
+    AllGrain(Grain),
+    RestOfGrain(Grain),
+    // Composed: two time expressions intersected (e.g., Monday + morning)
+    Composed(Box<TimeData>, Box<TimeData>),
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -38,6 +78,15 @@ impl TimeData {
         TimeData {
             form,
             direction: None,
+            latent: false,
+        }
+    }
+
+    pub fn latent(form: TimeForm) -> Self {
+        TimeData {
+            form,
+            direction: None,
+            latent: true,
         }
     }
 
@@ -47,18 +96,23 @@ impl TimeData {
     }
 }
 
-pub fn resolve(data: &TimeData, context: &Context) -> ResolvedValue {
+pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<ResolvedValue> {
+    if data.latent && !with_latent {
+        return None;
+    }
+
     let ref_time = context.reference_time;
+    let grain = grain_for_form(&data.form);
     let resolved = resolve_form(&data.form, ref_time, data.direction);
 
-    ResolvedValue {
+    Some(ResolvedValue {
         kind: "value".to_string(),
         value: serde_json::json!({
             "value": resolved.format("%Y-%m-%dT%H:%M:%S%:z").to_string(),
-            "grain": grain_for_form(&data.form),
+            "grain": grain,
             "type": "value",
         }),
-    }
+    })
 }
 
 fn grain_for_form(form: &TimeForm) -> &'static str {
@@ -68,6 +122,7 @@ fn grain_for_form(form: &TimeForm) -> &'static str {
         TimeForm::DayOfMonth(_) => "day",
         TimeForm::Hour(_, _) => "hour",
         TimeForm::HourMinute(_, _) => "minute",
+        TimeForm::HourMinuteSecond(_, _, _) => "second",
         TimeForm::Year(_) => "year",
         TimeForm::Now => "second",
         TimeForm::Today => "day",
@@ -75,6 +130,20 @@ fn grain_for_form(form: &TimeForm) -> &'static str {
         TimeForm::Yesterday => "day",
         TimeForm::RelativeGrain { grain, .. } => grain.as_str(),
         TimeForm::DateMDY { .. } => "day",
+        TimeForm::PartOfDay(_) => "hour",
+        TimeForm::Weekend => "week",
+        TimeForm::Season(_) => "month",
+        TimeForm::Holiday(_) => "day",
+        TimeForm::GrainOffset { grain, .. } => grain.as_str(),
+        TimeForm::NthGrain { grain, .. } => grain.as_str(),
+        TimeForm::Quarter(_) => "quarter",
+        TimeForm::QuarterYear(_, _) => "quarter",
+        TimeForm::DayAfterTomorrow => "day",
+        TimeForm::DayBeforeYesterday => "day",
+        TimeForm::BeginEnd { target, .. } => grain_for_form(target),
+        TimeForm::Interval(from, _) => grain_for_form(&from.form),
+        TimeForm::AllGrain(g) | TimeForm::RestOfGrain(g) => g.as_str(),
+        TimeForm::Composed(primary, _) => grain_for_form(&primary.form),
     }
 }
 
@@ -84,7 +153,6 @@ fn resolve_form(
     direction: Option<Direction>,
 ) -> DateTime<Utc> {
     use chrono::Duration;
-    use crate::dimensions::time_grain::Grain;
 
     match form {
         TimeForm::Now => ref_time,
@@ -104,7 +172,6 @@ fn resolve_form(
             .unwrap()
             .and_utc(),
         TimeForm::DayOfWeek(dow) => {
-            // Find next occurrence of this day of week
             let current_dow = ref_time.weekday().num_days_from_monday();
             let target = *dow;
             let days_ahead = if target > current_dow {
@@ -150,10 +217,9 @@ fn resolve_form(
             }
         }
         TimeForm::Hour(h, _ambiguous) => {
-            let hour = *h;
             ref_time
                 .date_naive()
-                .and_hms_opt(hour, 0, 0)
+                .and_hms_opt(*h, 0, 0)
                 .unwrap_or(ref_time.naive_utc())
                 .and_utc()
         }
@@ -161,6 +227,13 @@ fn resolve_form(
             ref_time
                 .date_naive()
                 .and_hms_opt(*h, *m, 0)
+                .unwrap_or(ref_time.naive_utc())
+                .and_utc()
+        }
+        TimeForm::HourMinuteSecond(h, m, s) => {
+            ref_time
+                .date_naive()
+                .and_hms_opt(*h, *m, *s)
                 .unwrap_or(ref_time.naive_utc())
                 .and_utc()
         }
@@ -216,6 +289,70 @@ fn resolve_form(
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc()
+        }
+        TimeForm::PartOfDay(_) => {
+            ref_time.date_naive().and_hms_opt(12, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::Weekend => {
+            let dow = ref_time.weekday().num_days_from_monday();
+            let days_to_sat = ((5i64 - dow as i64) + 7) % 7;
+            let days_to_sat = if days_to_sat == 0 { 7 } else { days_to_sat };
+            (ref_time + Duration::days(days_to_sat))
+                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::Season(_) | TimeForm::Holiday(_) => {
+            ref_time.date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::GrainOffset { grain, offset } => {
+            resolve_form(
+                &TimeForm::RelativeGrain { n: *offset as i64, grain: *grain },
+                ref_time,
+                direction,
+            )
+        }
+        TimeForm::NthGrain { n, grain, past } => {
+            let signed_n = if *past { -(*n) } else { *n };
+            resolve_form(
+                &TimeForm::RelativeGrain { n: signed_n, grain: *grain },
+                ref_time,
+                direction,
+            )
+        }
+        TimeForm::Quarter(q) => {
+            let month = (*q - 1) * 3 + 1;
+            chrono::NaiveDate::from_ymd_opt(ref_time.year(), month, 1)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::QuarterYear(q, y) => {
+            let month = (*q - 1) * 3 + 1;
+            chrono::NaiveDate::from_ymd_opt(*y, month, 1)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::DayAfterTomorrow => {
+            (ref_time + Duration::days(2))
+                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::DayBeforeYesterday => {
+            (ref_time - Duration::days(2))
+                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        }
+        TimeForm::BeginEnd { target, .. } => {
+            resolve_form(target, ref_time, direction)
+        }
+        TimeForm::Interval(from, _) => {
+            resolve_form(&from.form, ref_time, from.direction)
+        }
+        TimeForm::AllGrain(g) | TimeForm::RestOfGrain(g) => {
+            resolve_form(
+                &TimeForm::GrainOffset { grain: *g, offset: 0 },
+                ref_time,
+                direction,
+            )
+        }
+        TimeForm::Composed(primary, _) => {
+            resolve_form(&primary.form, ref_time, primary.direction)
         }
     }
 }

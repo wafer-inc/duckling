@@ -8,6 +8,9 @@ pub struct NumeralData {
     pub value: f64,
     pub grain: Option<u8>,
     pub multipliable: bool,
+    /// True for quantifier words like "single", "couple", "few", "dozen"
+    /// that should not be interpreted as clock hours.
+    pub quantifier: bool,
 }
 
 impl NumeralData {
@@ -16,6 +19,7 @@ impl NumeralData {
             value,
             grain: None,
             multipliable: false,
+            quantifier: false,
         }
     }
 
@@ -26,6 +30,11 @@ impl NumeralData {
 
     pub fn with_multipliable(mut self, multipliable: bool) -> Self {
         self.multipliable = multipliable;
+        self
+    }
+
+    pub fn with_quantifier(mut self) -> Self {
+        self.quantifier = true;
         self
     }
 }

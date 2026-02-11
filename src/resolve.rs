@@ -63,7 +63,9 @@ fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Opt
         }
         TokenData::TimeGrain(grain) => Some(dimensions::time_grain::resolve(grain)),
         TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
-        TokenData::Time(data) => Some(dimensions::time::resolve(data, context)),
+        TokenData::Time(data) => {
+            dimensions::time::resolve(data, context, options.with_latent)
+        }
         TokenData::RegexMatch(_) => None,
     }
 }

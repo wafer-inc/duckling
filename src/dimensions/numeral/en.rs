@@ -25,7 +25,8 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                let val = match text.to_lowercase().as_str() {
+                let low = text.to_lowercase();
+                let val = match low.as_str() {
                     "zero" | "naught" | "nought" | "nil" | "none" | "zilch" => 0.0,
                     "one" | "single" => 1.0,
                     "two" => 2.0,
@@ -38,7 +39,11 @@ pub fn rules() -> Vec<Rule> {
                     "nine" => 9.0,
                     _ => return None,
                 };
-                Some(TokenData::Numeral(NumeralData::new(val)))
+                let mut data = NumeralData::new(val);
+                if low == "single" {
+                    data = data.with_quantifier();
+                }
+                Some(TokenData::Numeral(data))
             }),
         },
         // === Integer words (10..19) — longer alternatives first ===
@@ -93,7 +98,7 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "a few".to_string(),
             pattern: vec![regex(r#"(a )?few"#)],
-            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(3.0)))),
+            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(3.0).with_quantifier()))),
         },
         // Compose tens and units: twenty one, thirty-two
         Rule {
@@ -317,7 +322,7 @@ pub fn rules() -> Vec<Rule> {
             name: "a pair / a couple".to_string(),
             pattern: vec![regex(r#"(a\s+)?(pair|couple)s?(\s+of)?"#)],
             production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(NumeralData::new(2.0)))
+                Some(TokenData::Numeral(NumeralData::new(2.0).with_quantifier()))
             }),
         },
         // a dozen (multipliable)
@@ -326,7 +331,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex(r#"(a )?dozens?( of)?"#)],
             production: Box::new(|_nodes| {
                 Some(TokenData::Numeral(
-                    NumeralData::new(12.0).with_multipliable(true),
+                    NumeralData::new(12.0).with_multipliable(true).with_quantifier(),
                 ))
             }),
         },
