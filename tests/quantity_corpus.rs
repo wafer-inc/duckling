@@ -2,44 +2,68 @@
 use duckling::{parse_en, DimensionKind};
 
 fn check_quantity(text: &str, expected_val: f64, expected_unit: &str) {
+    check_quantity_impl(text, expected_val, expected_unit, None);
+}
+
+fn check_quantity_with_product(text: &str, expected_val: f64, expected_unit: &str, expected_product: &str) {
+    check_quantity_impl(text, expected_val, expected_unit, Some(expected_product));
+}
+
+fn check_quantity_impl(text: &str, expected_val: f64, expected_unit: &str, expected_product: Option<&str>) {
     let entities = parse_en(text, &[DimensionKind::Quantity]);
     let found = entities.iter().any(|e| {
-        e.dim == "quantity"
-            && e.value
-                .value
+        if e.dim != "quantity" {
+            return false;
+        }
+        let v = &e.value.value;
+
+        // Helper to check a single value object (top-level, from, or to)
+        let check_obj = |obj: &serde_json::Value| -> bool {
+            let val_ok = obj
                 .get("value")
                 .and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01)
-                .unwrap_or(false)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
+                .map(|val| (val - expected_val).abs() < 0.01)
+                .unwrap_or(false);
+            let unit_ok = obj.get("unit").and_then(|u| u.as_str()) == Some(expected_unit);
+            let product_ok = match expected_product {
+                Some(p) => obj.get("product").and_then(|v| v.as_str()) == Some(p),
+                None => true,
+            };
+            val_ok && unit_ok && product_ok
+        };
+
+        // Check simple value (top-level has value + unit)
+        if check_obj(v) {
+            return true;
+        }
+
+        // Check interval from value
+        if let Some(from) = v.get("from") {
+            if check_obj(from) {
+                return true;
+            }
+        }
+
+        // Check interval to value
+        if let Some(to) = v.get("to") {
+            if check_obj(to) {
+                return true;
+            }
+        }
+
+        false
     });
     assert!(
         found,
-        "Expected quantity {} {} for '{}', got: {:?}",
+        "Expected quantity {} {} {} for '{}', got: {:?}",
         expected_val,
         expected_unit,
+        expected_product.unwrap_or(""),
         text,
         entities
             .iter()
             .map(|e| format!("{}={:?}", e.dim, e.value))
             .collect::<Vec<_>>()
-    );
-}
-
-fn check_quantity_with_product(text: &str, expected_val: f64, expected_unit: &str, expected_product: &str) {
-    let entities = parse_en(text, &[DimensionKind::Quantity]);
-    let found = entities.iter().any(|e| {
-        e.dim == "quantity"
-            && e.value.value.get("value").and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01).unwrap_or(false)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
-            && e.value.value.get("product").and_then(|v| v.as_str()) == Some(expected_product)
-    });
-    assert!(
-        found,
-        "Expected quantity {} {} of {} for '{}', got: {:?}",
-        expected_val, expected_unit, expected_product, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
     );
 }
 

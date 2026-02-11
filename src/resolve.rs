@@ -51,7 +51,7 @@ fn resolve_token(token: &TokenData, context: &Context) -> Option<ResolvedValue> 
         TokenData::Temperature(data) => dimensions::temperature::resolve(data),
         TokenData::Distance(data) => Some(dimensions::distance::resolve(data)),
         TokenData::Volume(data) => dimensions::volume::resolve(data),
-        TokenData::Quantity(data) => Some(dimensions::quantity::resolve(data)),
+        TokenData::Quantity(data) => dimensions::quantity::resolve(data),
         TokenData::AmountOfMoney(data) => Some(dimensions::amount_of_money::resolve(data)),
         TokenData::Email(data) => Some(dimensions::email::resolve(data)),
         TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
