@@ -64,6 +64,47 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Ordinal(OrdinalData::new(val)))
             }),
         },
+        // Composite ordinals: twenty-fifth, thirty first, fortysecond, etc.
+        Rule {
+            name: "ordinals (composite, e.g. twenty-fifth)".to_string(),
+            pattern: vec![regex(
+                r#"(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)[\s\-\u{2014}]?(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth)"#,
+            )],
+            production: Box::new(|nodes| {
+                let tens_text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let units_text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(2)?,
+                    _ => return None,
+                };
+                let tens = match tens_text.to_lowercase().as_str() {
+                    "twenty" => 20,
+                    "thirty" => 30,
+                    "forty" => 40,
+                    "fifty" => 50,
+                    "sixty" => 60,
+                    "seventy" => 70,
+                    "eighty" => 80,
+                    "ninety" => 90,
+                    _ => return None,
+                };
+                let units = match units_text.to_lowercase().as_str() {
+                    "first" => 1,
+                    "second" => 2,
+                    "third" => 3,
+                    "fourth" => 4,
+                    "fifth" => 5,
+                    "sixth" => 6,
+                    "seventh" => 7,
+                    "eighth" => 8,
+                    "ninth" => 9,
+                    _ => return None,
+                };
+                Some(TokenData::Ordinal(OrdinalData::new(tens + units)))
+            }),
+        },
         // Numeric ordinals: 1st, 2nd, 3rd, 4th, 21st, etc.
         Rule {
             name: "ordinal (numeric)".to_string(),
