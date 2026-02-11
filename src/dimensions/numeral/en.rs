@@ -4,20 +4,30 @@ use crate::types::{DimensionKind, Rule, TokenData};
 use super::helpers::*;
 use super::NumeralData;
 
+/// Predicate: value >= 0 (matches Haskell's isPositive).
+fn is_positive(td: &TokenData) -> bool {
+    matches!(td, TokenData::Numeral(d) if d.value >= 0.0)
+}
+
+/// Predicate: has a grain set.
+fn has_grain(td: &TokenData) -> bool {
+    matches!(td, TokenData::Numeral(d) if d.grain.is_some())
+}
+
 pub fn rules() -> Vec<Rule> {
     vec![
-        // Integer: 0, 1, 2, ..., 9
+        // === Integer words (0..9) ===
         Rule {
             name: "integer (0..9)".to_string(),
-            pattern: vec![regex(r#"(zero|naught|nought|nil|one|two|three|four|five|six|seven|eight|nine)"#)],
+            pattern: vec![regex(r#"(zero|naught|nought|nil|none|zilch|one|single|two|three|four|five|six|seven|eight|nine)"#)],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
                 let val = match text.to_lowercase().as_str() {
-                    "zero" | "naught" | "nought" | "nil" => 0.0,
-                    "one" => 1.0,
+                    "zero" | "naught" | "nought" | "nil" | "none" | "zilch" => 0.0,
+                    "one" | "single" => 1.0,
                     "two" => 2.0,
                     "three" => 3.0,
                     "four" => 4.0,
@@ -31,10 +41,10 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
-        // Integer: 10..19
+        // === Integer words (10..19) — longer alternatives first ===
         Rule {
             name: "integer (10..19)".to_string(),
-            pattern: vec![regex(r#"(ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen)"#)],
+            pattern: vec![regex(r#"(thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|ten|eleven|twelve)"#)],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -56,10 +66,10 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
-        // Integer: 20..90 (tens)
+        // === Integer words (20..90 tens) ===
         Rule {
             name: "integer (20..90)".to_string(),
-            pattern: vec![regex(r#"(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)"#)],
+            pattern: vec![regex(r#"(twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"#)],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -68,7 +78,7 @@ pub fn rules() -> Vec<Rule> {
                 let val = match text.to_lowercase().as_str() {
                     "twenty" => 20.0,
                     "thirty" => 30.0,
-                    "forty" => 40.0,
+                    "forty" | "fourty" => 40.0,
                     "fifty" => 50.0,
                     "sixty" => 60.0,
                     "seventy" => 70.0,
@@ -76,10 +86,16 @@ pub fn rules() -> Vec<Rule> {
                     "ninety" => 90.0,
                     _ => return None,
                 };
-                Some(TokenData::Numeral(NumeralData::new(val).with_multipliable(false)))
+                Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
-        // Compose tens and units: twenty one, thirty-two, etc.
+        // a few / few → 3
+        Rule {
+            name: "a few".to_string(),
+            pattern: vec![regex(r#"(a )?few"#)],
+            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(3.0)))),
+        },
+        // Compose tens and units: twenty one, thirty-two
         Rule {
             name: "integer (21..99)".to_string(),
             pattern: vec![
@@ -91,7 +107,7 @@ pub fn rules() -> Vec<Rule> {
                         false
                     }
                 }),
-                regex(r#"-"#),
+                regex(r#"[\s\-]+"#),
                 predicate(|t| {
                     if let TokenData::Numeral(d) = t {
                         d.value >= 1.0 && d.value <= 9.0
@@ -132,6 +148,54 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(tens + units)))
             }),
         },
+        // Skip hundreds 1: "one eleven" → 111, "two twenty" → 220
+        Rule {
+            name: "one eleven (skip hundreds)".to_string(),
+            pattern: vec![
+                regex(r"(one|two|three|four|five|six|seven|eight|nine)"),
+                regex(r"(ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"),
+            ],
+            production: Box::new(|nodes| {
+                let m1 = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let m2 = match &nodes[1].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let hundreds = word_to_number(m1)?;
+                let rest = word_to_number(m2)?;
+                Some(TokenData::Numeral(NumeralData::new(hundreds * 100.0 + rest)))
+            }),
+        },
+        // Skip hundreds 2: "one twenty two" → 122
+        Rule {
+            name: "one twenty two (skip hundreds)".to_string(),
+            pattern: vec![
+                regex(r"(one|two|three|four|five|six|seven|eight|nine)"),
+                regex(r"(twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"),
+                regex(r"(one|two|three|four|five|six|seven|eight|nine)"),
+            ],
+            production: Box::new(|nodes| {
+                let m1 = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let m2 = match &nodes[1].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let m3 = match &nodes[2].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let hundreds = word_to_number(m1)?;
+                let tens = word_to_number(m2)?;
+                let units = word_to_number(m3)?;
+                Some(TokenData::Numeral(NumeralData::new(hundreds * 100.0 + tens + units)))
+            }),
+        },
         // Numeric digits
         Rule {
             name: "integer (numeric)".to_string(),
@@ -158,7 +222,7 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
-        // Fractional numbers: 1/2, 3/4, etc.
+        // Fractional numbers: 1/2, 3/4
         Rule {
             name: "fractional number".to_string(),
             pattern: vec![regex(r#"(\d+)/(\d+)"#)],
@@ -175,118 +239,10 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(num / den)))
             }),
         },
-        // Negative numbers
-        Rule {
-            name: "negative number".to_string(),
-            pattern: vec![
-                regex(r#"(-|minus|negative)\s?"#),
-                dim(DimensionKind::Numeral),
-            ],
-            production: Box::new(|nodes| {
-                let data = numeral_data(&nodes[1].token_data)?;
-                Some(TokenData::Numeral(NumeralData::new(-data.value)))
-            }),
-        },
-        // Hundred
-        Rule {
-            name: "hundred".to_string(),
-            pattern: vec![regex(r#"(hundred|hundreds)"#)],
-            production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(
-                    NumeralData::new(100.0)
-                        .with_grain(2)
-                        .with_multipliable(true),
-                ))
-            }),
-        },
-        // Thousand
-        Rule {
-            name: "thousand".to_string(),
-            pattern: vec![regex(r#"(thousand|thousands)"#)],
-            production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(
-                    NumeralData::new(1000.0)
-                        .with_grain(3)
-                        .with_multipliable(true),
-                ))
-            }),
-        },
-        // Million
-        Rule {
-            name: "million".to_string(),
-            pattern: vec![regex(r#"(million|millions)"#)],
-            production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(
-                    NumeralData::new(1_000_000.0)
-                        .with_grain(6)
-                        .with_multipliable(true),
-                ))
-            }),
-        },
-        // Billion
-        Rule {
-            name: "billion".to_string(),
-            pattern: vec![regex(r#"(billion|billions)"#)],
-            production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(
-                    NumeralData::new(1_000_000_000.0)
-                        .with_grain(9)
-                        .with_multipliable(true),
-                ))
-            }),
-        },
-        // Number with K/M/G suffix: 100K, 5M
-        Rule {
-            name: "number suffixes (K, M, G)".to_string(),
-            pattern: vec![regex(r#"(\d+(?:\.\d+)?)\s*(k|m|g|b)"#)],
-            production: Box::new(|nodes| {
-                let text = match &nodes[0].token_data {
-                    TokenData::RegexMatch(m) => m.group(0)?,
-                    _ => return None,
-                };
-                let caps = regex::Regex::new(r"(?i)(\d+(?:\.\d+)?)\s*(k|m|g|b)")
-                    .ok()?
-                    .captures(text)?;
-                let num: f64 = caps.get(1)?.as_str().parse().ok()?;
-                let suffix = caps.get(2)?.as_str().to_lowercase();
-                let multiplier = match suffix.as_str() {
-                    "k" => 1_000.0,
-                    "m" => 1_000_000.0,
-                    "g" | "b" => 1_000_000_000.0,
-                    _ => return None,
-                };
-                Some(TokenData::Numeral(NumeralData::new(num * multiplier)))
-            }),
-        },
-        // Compose with multiplier: "five hundred", "two thousand"
-        Rule {
-            name: "compose (multiplier)".to_string(),
-            pattern: vec![
-                predicate(|t| {
-                    if let TokenData::Numeral(d) = t {
-                        d.value >= 1.0 && d.value <= 99.0
-                    } else {
-                        false
-                    }
-                }),
-                predicate(is_multipliable),
-            ],
-            production: Box::new(|nodes| {
-                let base = numeral_data(&nodes[0].token_data)?.value;
-                let mult = numeral_data(&nodes[1].token_data)?.value;
-                Some(TokenData::Numeral(
-                    NumeralData::new(base * mult).with_grain(
-                        numeral_data(&nodes[1].token_data)?
-                            .grain
-                            .unwrap_or(0),
-                    ),
-                ))
-            }),
-        },
-        // Number with comma: 1,000 or 1,000,000
+        // Comma-separated numbers (with optional decimal): 1,000 or 1,000,000.5
         Rule {
             name: "number with commas".to_string(),
-            pattern: vec![regex(r#"(\d{1,3}(?:,\d{3})+)"#)],
+            pattern: vec![regex(r#"(\d{1,3}(?:,\d{3})+(?:\.\d+)?)"#)],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -297,20 +253,81 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(val)))
             }),
         },
-        // a pair, a couple
+        // Number suffixes: 100K, 1.2M, .0012G
+        Rule {
+            name: "number suffixes (K, M, G)".to_string(),
+            pattern: vec![regex(r#"(\d*\.?\d+)\s*(k|m|g|b)"#)],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let num: f64 = m.group(1)?.parse().ok()?;
+                let suffix = m.group(2)?.to_lowercase();
+                let multiplier = match suffix.as_str() {
+                    "k" => 1_000.0,
+                    "m" => 1_000_000.0,
+                    "g" | "b" => 1_000_000_000.0,
+                    _ => return None,
+                };
+                Some(TokenData::Numeral(NumeralData::new(num * multiplier)))
+            }),
+        },
+        // Negative numbers
+        Rule {
+            name: "negative number".to_string(),
+            pattern: vec![
+                regex(r#"(-|minus|negative)\s?"#),
+                predicate(is_positive),
+            ],
+            production: Box::new(|nodes| {
+                let data = numeral_data(&nodes[1].token_data)?;
+                Some(TokenData::Numeral(NumeralData::new(-data.value)))
+            }),
+        },
+        // === Powers of ten (unified): hundred, thousand, lakh, million, crore, billion, trillion ===
+        Rule {
+            name: "powers of tens".to_string(),
+            pattern: vec![regex(r#"(hundred|thousand|l(ac|(a?kh)?)|million|((k|c)r(ore)?|koti)|billion|trillion)s?"#)],
+            production: Box::new(|nodes| {
+                let text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let grain = match text.to_lowercase().as_str() {
+                    "hundred" => 2,
+                    "thousand" => 3,
+                    "lakh" | "lkh" | "l" | "lac" => 5,
+                    "million" => 6,
+                    "cr" | "crore" | "krore" | "kr" | "koti" => 7,
+                    "billion" => 9,
+                    "trillion" => 12,
+                    _ => return None,
+                };
+                let value = 10.0_f64.powi(grain);
+                Some(TokenData::Numeral(
+                    NumeralData::new(value)
+                        .with_grain(grain as u8)
+                        .with_multipliable(true),
+                ))
+            }),
+        },
+        // a pair / a couple
         Rule {
             name: "a pair / a couple".to_string(),
-            pattern: vec![regex(r#"(a\s+)?(pair|couple)(\s+of)?"#)],
+            pattern: vec![regex(r#"(a\s+)?(pair|couple)s?(\s+of)?"#)],
             production: Box::new(|_nodes| {
                 Some(TokenData::Numeral(NumeralData::new(2.0)))
             }),
         },
-        // a dozen
+        // a dozen (multipliable)
         Rule {
-            name: "a dozen".to_string(),
-            pattern: vec![regex(r#"(a\s+)?dozen"#)],
+            name: "a dozen of".to_string(),
+            pattern: vec![regex(r#"(a )?dozens?( of)?"#)],
             production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(NumeralData::new(12.0)))
+                Some(TokenData::Numeral(
+                    NumeralData::new(12.0).with_multipliable(true),
+                ))
             }),
         },
         // "one point 2" / "three point five" (spelled out decimal)
@@ -319,7 +336,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![
                 dim(DimensionKind::Numeral),
                 regex(r"point|dot"),
-                dim(DimensionKind::Numeral),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none())),
             ],
             production: Box::new(|nodes| {
                 let n1 = numeral_data(&nodes[0].token_data)?.value;
@@ -331,42 +348,137 @@ pub fn rules() -> Vec<Rule> {
         // "point 77" (leading dot)
         Rule {
             name: "point 77".to_string(),
-            pattern: vec![regex(r"point|dot"), dim(DimensionKind::Numeral)],
+            pattern: vec![
+                regex(r"point|dot"),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none())),
+            ],
             production: Box::new(|nodes| {
                 let n = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(decimals_to_double(n))))
             }),
         },
-        // Sum composite: "five hundred twenty three" => 523
+        // === Compose by multiplication: "five hundred", "thirty lakh", "200 dozens" ===
         Rule {
-            name: "sum composite".to_string(),
+            name: "compose by multiplication".to_string(),
             pattern: vec![
-                predicate(|t| {
-                    if let TokenData::Numeral(d) = t {
-                        d.value >= 100.0 && d.grain.is_some()
-                    } else {
-                        false
-                    }
-                }),
-                predicate(|t| {
-                    if let TokenData::Numeral(d) = t {
-                        d.value >= 1.0 && d.value <= 99.0
-                    } else {
-                        false
-                    }
-                }),
+                predicate(is_positive),
+                predicate(is_multipliable),
             ],
             production: Box::new(|nodes| {
-                let big = numeral_data(&nodes[0].token_data)?.value;
-                let small = numeral_data(&nodes[1].token_data)?.value;
-                if big > small {
-                    Some(TokenData::Numeral(NumeralData::new(big + small)))
+                let n1 = numeral_data(&nodes[0].token_data)?;
+                let n2 = numeral_data(&nodes[1].token_data)?;
+                let v1 = n1.value;
+                let v2 = n2.value;
+                match n2.grain {
+                    None => {
+                        // No grain (e.g., dozen): simple multiply
+                        Some(TokenData::Numeral(NumeralData::new(v1 * v2)))
+                    }
+                    Some(grain) => {
+                        if v2 > v1 {
+                            Some(TokenData::Numeral(
+                                NumeralData::new(v1 * v2).with_grain(grain),
+                            ))
+                        } else {
+                            None
+                        }
+                    }
+                }
+            }),
+        },
+        // === Intersect 2 numbers (sum): "five hundred four", "twenty-one thousand eleven" ===
+        Rule {
+            name: "intersect 2 numbers".to_string(),
+            pattern: vec![
+                predicate(|td| has_grain(td) && is_positive(td)),
+                predicate(|td| !is_multipliable(td) && is_positive(td)),
+            ],
+            production: Box::new(|nodes| {
+                let n1 = numeral_data(&nodes[0].token_data)?;
+                let n2 = numeral_data(&nodes[1].token_data)?;
+                let grain = n1.grain? as i32;
+                let grain_val = 10.0_f64.powi(grain);
+                if grain_val > n2.value {
+                    Some(TokenData::Numeral(NumeralData::new(n1.value + n2.value)))
+                } else {
+                    None
+                }
+            }),
+        },
+        // === Intersect 2 numbers with "and": "five hundred and four" ===
+        Rule {
+            name: "intersect 2 numbers (with and)".to_string(),
+            pattern: vec![
+                predicate(|td| has_grain(td) && is_positive(td)),
+                regex(r"and"),
+                predicate(|td| !is_multipliable(td) && is_positive(td)),
+            ],
+            production: Box::new(|nodes| {
+                let n1 = numeral_data(&nodes[0].token_data)?;
+                let n2 = numeral_data(&nodes[2].token_data)?;
+                let grain = n1.grain? as i32;
+                let grain_val = 10.0_f64.powi(grain);
+                if grain_val > n2.value {
+                    Some(TokenData::Numeral(NumeralData::new(n1.value + n2.value)))
+                } else {
+                    None
+                }
+            }),
+        },
+        // === Legal parentheses: "forty-five (45)", "45 (forty five)" ===
+        Rule {
+            name: "<integer> '('<integer>')'".to_string(),
+            pattern: vec![
+                predicate(|td| is_natural(td)),
+                regex(r"\("),
+                predicate(|td| is_natural(td)),
+                regex(r"\)"),
+            ],
+            production: Box::new(|nodes| {
+                let n1 = numeral_data(&nodes[0].token_data)?.value;
+                let n2 = numeral_data(&nodes[2].token_data)?.value;
+                if (n1 - n2).abs() < 0.001 {
+                    Some(TokenData::Numeral(NumeralData::new(n1)))
                 } else {
                     None
                 }
             }),
         },
     ]
+}
+
+/// Helper to convert number words to their values.
+fn word_to_number(word: &str) -> Option<f64> {
+    match word.to_lowercase().as_str() {
+        "one" => Some(1.0),
+        "two" => Some(2.0),
+        "three" => Some(3.0),
+        "four" => Some(4.0),
+        "five" => Some(5.0),
+        "six" => Some(6.0),
+        "seven" => Some(7.0),
+        "eight" => Some(8.0),
+        "nine" => Some(9.0),
+        "ten" => Some(10.0),
+        "eleven" => Some(11.0),
+        "twelve" => Some(12.0),
+        "thirteen" => Some(13.0),
+        "fourteen" => Some(14.0),
+        "fifteen" => Some(15.0),
+        "sixteen" => Some(16.0),
+        "seventeen" => Some(17.0),
+        "eighteen" => Some(18.0),
+        "nineteen" => Some(19.0),
+        "twenty" => Some(20.0),
+        "thirty" => Some(30.0),
+        "forty" | "fourty" => Some(40.0),
+        "fifty" => Some(50.0),
+        "sixty" => Some(60.0),
+        "seventy" => Some(70.0),
+        "eighty" => Some(80.0),
+        "ninety" => Some(90.0),
+        _ => None,
+    }
 }
 
 #[cfg(test)]
