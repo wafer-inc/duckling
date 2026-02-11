@@ -26,9 +26,9 @@ pub struct Options {
 }
 
 /// Resolve a node into a structured entity.
-pub fn resolve(node: &Node, context: &Context, _options: &Options, text: &str) -> Option<Entity> {
+pub fn resolve(node: &Node, context: &Context, options: &Options, text: &str) -> Option<Entity> {
     let body = text[node.range.start..node.range.end].to_string();
-    let resolved = resolve_token(&node.token_data, context)?;
+    let resolved = resolve_token(&node.token_data, context, options)?;
 
     Some(Entity {
         body,
@@ -44,7 +44,7 @@ pub fn resolve(node: &Node, context: &Context, _options: &Options, text: &str) -
     })
 }
 
-fn resolve_token(token: &TokenData, context: &Context) -> Option<ResolvedValue> {
+fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Option<ResolvedValue> {
     match token {
         TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
         TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
@@ -52,7 +52,9 @@ fn resolve_token(token: &TokenData, context: &Context) -> Option<ResolvedValue> 
         TokenData::Distance(data) => dimensions::distance::resolve(data),
         TokenData::Volume(data) => dimensions::volume::resolve(data),
         TokenData::Quantity(data) => dimensions::quantity::resolve(data),
-        TokenData::AmountOfMoney(data) => Some(dimensions::amount_of_money::resolve(data)),
+        TokenData::AmountOfMoney(data) => {
+            dimensions::amount_of_money::resolve(data, options.with_latent)
+        }
         TokenData::Email(data) => Some(dimensions::email::resolve(data)),
         TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
         TokenData::Url(data) => Some(dimensions::url::resolve(data)),

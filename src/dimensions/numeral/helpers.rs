@@ -19,6 +19,15 @@ pub fn is_integer(token: &TokenData) -> bool {
     }
 }
 
+/// Matches non-negative numbers (v >= 0).
+/// Equivalent to Haskell Duckling's `isPositive`.
+pub fn is_positive(token: &TokenData) -> bool {
+    match token {
+        TokenData::Numeral(data) => data.value >= 0.0,
+        _ => false,
+    }
+}
+
 /// Matches positive integers (v > 0 and v is integer).
 /// Equivalent to Haskell Duckling's `isNatural`.
 pub fn is_natural(token: &TokenData) -> bool {
