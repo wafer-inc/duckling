@@ -50,6 +50,19 @@ pub fn double_value(token: &TokenData) -> Option<f64> {
     }
 }
 
+/// Convert a number to its decimal form: 5 → 0.5, 25 → 0.25, etc.
+/// Finds the smallest power of 10 greater than x and divides by it.
+pub fn decimals_to_double(x: f64) -> f64 {
+    let mut multiplier = 1.0;
+    for _ in 0..10 {
+        if x < multiplier {
+            return x / multiplier;
+        }
+        multiplier *= 10.0;
+    }
+    0.0
+}
+
 pub fn integer_value(token: &TokenData) -> Option<i64> {
     match token {
         TokenData::Numeral(data) => {

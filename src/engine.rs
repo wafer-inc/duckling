@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use regex::Regex;
 
 use crate::document::Document;
@@ -40,18 +42,32 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let doc = Document::new(text);
     let mut stash = Stash::new();
 
+    // Track seen (start, end, rule_name) to deduplicate and prevent exponential growth
+    let mut seen: HashSet<(usize, usize, Option<String>)> = HashSet::new();
+
     // Phase 1: Apply all regex-leading rules to find initial tokens
     let initial = apply_regex_rules(&doc, rules);
+    for node in initial.all_nodes() {
+        let key = (node.range.start, node.range.end, node.rule_name.clone());
+        seen.insert(key);
+    }
     stash.merge(&initial);
 
     // Phase 2: Saturation loop - keep applying rules until no new tokens
     let max_iterations = 10;
     for _ in 0..max_iterations {
         let new_stash = apply_all_rules(&doc, rules, &stash);
-        if new_stash.is_empty() {
+        let mut actually_new = Stash::new();
+        for node in new_stash.all_nodes() {
+            let key = (node.range.start, node.range.end, node.rule_name.clone());
+            if seen.insert(key) {
+                actually_new.add(node.clone());
+            }
+        }
+        if actually_new.is_empty() {
             break;
         }
-        stash.merge(&new_stash);
+        stash.merge(&actually_new);
     }
 
     stash

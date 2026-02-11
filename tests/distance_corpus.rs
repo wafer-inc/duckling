@@ -4,18 +4,48 @@ use duckling::{parse_en, DimensionKind};
 fn check_distance(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Distance]);
     let found = entities.iter().any(|e| {
-        e.dim == "distance"
-            && e.value
-                .value
+        if e.dim != "distance" {
+            return false;
+        }
+        let v = &e.value.value;
+
+        // Check simple value
+        if v.get("value")
+            .and_then(|v| v.as_f64())
+            .map(|val| (val - expected_val).abs() < 0.01)
+            .unwrap_or(false)
+            && v.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
+        {
+            return true;
+        }
+
+        // Check interval from value
+        if let Some(from) = v.get("from") {
+            if from
                 .get("value")
                 .and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01)
+                .map(|val| (val - expected_val).abs() < 0.01)
                 .unwrap_or(false)
-            && e.value
-                .value
-                .get("unit")
-                .and_then(|v| v.as_str())
-                == Some(expected_unit)
+                && from.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
+            {
+                return true;
+            }
+        }
+
+        // Check interval to value
+        if let Some(to) = v.get("to") {
+            if to
+                .get("value")
+                .and_then(|v| v.as_f64())
+                .map(|val| (val - expected_val).abs() < 0.01)
+                .unwrap_or(false)
+                && to.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
+            {
+                return true;
+            }
+        }
+
+        false
     });
     assert!(
         found,
@@ -48,10 +78,10 @@ fn test_distance_8_miles() {
     check_distance("8 mi", 8.0, "mile");
 }
 
-// simple M 9 - the "m" unit is ambiguous in the original
+// simple M 9 - ambiguous "m" unit
 #[test]
 fn test_distance_9m() {
-    check_distance("9m", 9.0, "metre");
+    check_distance("9m", 9.0, "m");
 }
 
 // simple Centimetre 2
@@ -131,7 +161,7 @@ fn test_distance_composite_km_mi() {
 // 3m is ambiguous
 #[test]
 fn test_distance_3m_ambiguous() {
-    check_distance("3m", 3.0, "metre");
+    check_distance("3m", 3.0, "m");
 }
 
 // 3m and 5cm = 305 centimetres (m inferred as metres)

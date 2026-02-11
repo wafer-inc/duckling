@@ -313,6 +313,30 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(NumeralData::new(12.0)))
             }),
         },
+        // "one point 2" / "three point five" (spelled out decimal)
+        Rule {
+            name: "one point 2".to_string(),
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex(r"point|dot"),
+                dim(DimensionKind::Numeral),
+            ],
+            production: Box::new(|nodes| {
+                let n1 = numeral_data(&nodes[0].token_data)?.value;
+                let n2 = numeral_data(&nodes[2].token_data)?.value;
+                let decimal = decimals_to_double(n2);
+                Some(TokenData::Numeral(NumeralData::new(n1 + decimal)))
+            }),
+        },
+        // "point 77" (leading dot)
+        Rule {
+            name: "point 77".to_string(),
+            pattern: vec![regex(r"point|dot"), dim(DimensionKind::Numeral)],
+            production: Box::new(|nodes| {
+                let n = numeral_data(&nodes[1].token_data)?.value;
+                Some(TokenData::Numeral(NumeralData::new(decimals_to_double(n))))
+            }),
+        },
         // Sum composite: "five hundred twenty three" => 523
         Rule {
             name: "sum composite".to_string(),
