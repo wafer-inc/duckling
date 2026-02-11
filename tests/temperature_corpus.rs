@@ -4,18 +4,85 @@ use duckling::{parse_en, DimensionKind};
 fn check_temperature(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Temperature]);
     let found = entities.iter().any(|e| {
-        e.dim == "temperature"
+        if e.dim != "temperature" {
+            return false;
+        }
+        // Check top-level value (simple temperature)
+        let simple_match = e
+            .value
+            .value
+            .get("value")
+            .and_then(|v| v.as_f64())
+            .map(|v| (v - expected_val).abs() < 0.01)
+            .unwrap_or(false)
+            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit);
+        if simple_match {
+            return true;
+        }
+        // Check interval from value
+        let interval_match = e
+            .value
+            .value
+            .get("from")
+            .and_then(|f| f.get("value"))
+            .and_then(|v| v.as_f64())
+            .map(|v| (v - expected_val).abs() < 0.01)
+            .unwrap_or(false)
             && e.value
                 .value
-                .get("value")
+                .get("from")
+                .and_then(|f| f.get("unit"))
+                .and_then(|v| v.as_str())
+                == Some(expected_unit);
+        if interval_match {
+            return true;
+        }
+        // Check open interval (min only)
+        let min_match = e
+            .value
+            .value
+            .get("type")
+            .and_then(|v| v.as_str())
+            == Some("interval")
+            && e.value.value.get("to").is_none()
+            && e.value
+                .value
+                .get("from")
+                .and_then(|f| f.get("value"))
                 .and_then(|v| v.as_f64())
                 .map(|v| (v - expected_val).abs() < 0.01)
                 .unwrap_or(false)
             && e.value
                 .value
-                .get("unit")
+                .get("from")
+                .and_then(|f| f.get("unit"))
                 .and_then(|v| v.as_str())
-                == Some(expected_unit)
+                == Some(expected_unit);
+        if min_match {
+            return true;
+        }
+        // Check open interval (max only)
+        let max_match = e
+            .value
+            .value
+            .get("type")
+            .and_then(|v| v.as_str())
+            == Some("interval")
+            && e.value.value.get("from").is_none()
+            && e.value
+                .value
+                .get("to")
+                .and_then(|f| f.get("value"))
+                .and_then(|v| v.as_f64())
+                .map(|v| (v - expected_val).abs() < 0.01)
+                .unwrap_or(false)
+            && e.value
+                .value
+                .get("to")
+                .and_then(|f| f.get("unit"))
+                .and_then(|v| v.as_str())
+                == Some(expected_unit);
+        max_match
     });
     assert!(
         found,

@@ -48,7 +48,7 @@ fn resolve_token(token: &TokenData, context: &Context) -> Option<ResolvedValue> 
     match token {
         TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
         TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
-        TokenData::Temperature(data) => Some(dimensions::temperature::resolve(data)),
+        TokenData::Temperature(data) => dimensions::temperature::resolve(data),
         TokenData::Distance(data) => Some(dimensions::distance::resolve(data)),
         TokenData::Volume(data) => Some(dimensions::volume::resolve(data)),
         TokenData::Quantity(data) => Some(dimensions::quantity::resolve(data)),
