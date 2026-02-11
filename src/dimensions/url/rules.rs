@@ -5,51 +5,57 @@ use super::UrlData;
 
 pub fn rules() -> Vec<Rule> {
     vec![
-        // URLs with protocol
+        // Main URL rule: matches URLs with domain.tld pattern
+        // Ported from Haskell ruleURL
         Rule {
-            name: "url (with protocol)".to_string(),
+            name: "url".to_string(),
             pattern: vec![regex(
-                r#"(https?://(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]+\.[a-zA-Z]{2,}[-a-zA-Z0-9@:%_\+.~#?&/=]*)"#,
+                r"((([a-zA-Z]+)://)?(w{2,3}[0-9]*\.)?(([a-zA-Z0-9_-]+\.)+[a-z]{2,4})(:\d+)?(/[^?\s#]*)?(\?[^\s#]+)?(#[-,*=&a-zA-Z0-9]+)?)",
             )],
             production: Box::new(|nodes| {
-                let text = match &nodes[0].token_data {
-                    TokenData::RegexMatch(m) => m.group(1)?,
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
                     _ => return None,
                 };
-                let domain = extract_domain(text)?;
-                Some(TokenData::Url(UrlData::new(text, &domain)))
+                let full = m.group(1)?;
+                let domain = m.group(5)?;
+                Some(TokenData::Url(UrlData::new(full, &domain.to_lowercase())))
             }),
         },
-        // URLs without protocol: www.example.com
+        // Localhost rule
+        // Ported from Haskell ruleLocalhost
         Rule {
-            name: "url (www.)".to_string(),
+            name: "localhost".to_string(),
             pattern: vec![regex(
-                r#"(www\.[-a-zA-Z0-9@:%._\+~#=]+\.[a-zA-Z]{2,}[-a-zA-Z0-9@:%_\+.~#?&/=]*)"#,
+                r"((([a-zA-Z]+)://)?localhost(:\d+)?(/[^?\s#]*)?(\?[^\s#]+)?)",
             )],
             production: Box::new(|nodes| {
-                let text = match &nodes[0].token_data {
-                    TokenData::RegexMatch(m) => m.group(1)?,
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
                     _ => return None,
                 };
-                let domain = extract_domain(text)?;
-                Some(TokenData::Url(UrlData::new(text, &domain)))
+                let full = m.group(1)?;
+                Some(TokenData::Url(UrlData::new(full, "localhost")))
+            }),
+        },
+        // Local URL rule: protocol://hostname (no TLD required)
+        // Ported from Haskell ruleLocalURL
+        Rule {
+            name: "local url".to_string(),
+            pattern: vec![regex(
+                r"(([a-zA-Z]+)://([a-zA-Z0-9_-]+)(:\d+)?(/[^?\s#]*)?(\?[^\s#]+)?)",
+            )],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let full = m.group(1)?;
+                let domain = m.group(3)?;
+                Some(TokenData::Url(UrlData::new(full, &domain.to_lowercase())))
             }),
         },
     ]
-}
-
-fn extract_domain(url: &str) -> Option<String> {
-    let without_protocol = url
-        .strip_prefix("https://")
-        .or_else(|| url.strip_prefix("http://"))
-        .unwrap_or(url);
-    let without_www = without_protocol
-        .strip_prefix("www.")
-        .unwrap_or(without_protocol);
-    let domain = without_www.split('/').next()?;
-    let domain = domain.split('?').next()?;
-    let domain = domain.split('#').next()?;
-    Some(domain.to_string())
 }
 
 #[cfg(test)]
@@ -69,6 +75,7 @@ mod tests {
             ("https://www.example.com", "example.com"),
             ("http://google.com/search?q=test", "google.com"),
             ("www.github.com", "github.com"),
+            ("cnn.com/info", "cnn.com"),
         ] {
             let entities = engine::parse_and_resolve(
                 text,
@@ -79,10 +86,17 @@ mod tests {
             );
             let found = entities.iter().any(|e| {
                 e.dim == "url"
-                    && e.value.value.get("domain").and_then(|v| v.as_str())
+                    && e.value
+                        .value
+                        .get("domain")
+                        .and_then(|v| v.as_str())
                         == Some(*expected_domain)
             });
-            assert!(found, "Expected URL with domain '{}' for '{}', got: {:?}", expected_domain, text, entities);
+            assert!(
+                found,
+                "Expected URL with domain '{}' for '{}', got: {:?}",
+                expected_domain, text, entities
+            );
         }
     }
 }
