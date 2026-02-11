@@ -1,0 +1,16 @@
+[package]
+name = "duckling"
+version = "0.1.0"
+edition = "2021"
+description = "A Rust port of Facebook's Duckling library for parsing natural language into structured data"
+license = "BSD-3-Clause"
+
+[dependencies]
+regex = "1"
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+once_cell = "1"
+smallvec = "1"
+
+[dev-dependencies]

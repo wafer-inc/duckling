@@ -1,0 +1,337 @@
+use regex::Regex;
+
+use crate::document::Document;
+use crate::resolve::{Context, Options};
+use crate::stash::Stash;
+use crate::types::{
+    DimensionKind, Entity, Node, PatternItem, Range, RegexMatchData, Rule, TokenData,
+};
+
+/// Parse text and resolve all entities.
+pub fn parse_and_resolve(
+    text: &str,
+    rules: &[Rule],
+    context: &Context,
+    options: &Options,
+    dims: &[DimensionKind],
+) -> Vec<Entity> {
+    let stash = parse_string(text, rules);
+    let doc_text = text;
+
+    let mut entities: Vec<Entity> = Vec::new();
+    for node in stash.all_nodes() {
+        if let Some(dk) = node.token_data.dimension_kind() {
+            if !dims.is_empty() && !dims.contains(&dk) {
+                continue;
+            }
+        } else {
+            continue;
+        }
+        if let Some(entity) = crate::resolve::resolve(node, context, options, doc_text) {
+            entities.push(entity);
+        }
+    }
+
+    entities
+}
+
+/// Run the saturation-based parsing loop.
+pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
+    let doc = Document::new(text);
+    let mut stash = Stash::new();
+
+    // Phase 1: Apply all regex-leading rules to find initial tokens
+    let initial = apply_regex_rules(&doc, rules);
+    stash.merge(&initial);
+
+    // Phase 2: Saturation loop - keep applying rules until no new tokens
+    let max_iterations = 10;
+    for _ in 0..max_iterations {
+        let new_stash = apply_all_rules(&doc, rules, &stash);
+        if new_stash.is_empty() {
+            break;
+        }
+        stash.merge(&new_stash);
+    }
+
+    stash
+}
+
+/// Apply regex-leading rules to the document to find initial tokens.
+fn apply_regex_rules(doc: &Document, rules: &[Rule]) -> Stash {
+    let mut stash = Stash::new();
+
+    for rule in rules {
+        if rule.pattern.is_empty() {
+            continue;
+        }
+        if let PatternItem::Regex(ref re) = rule.pattern[0] {
+            let matches = find_regex_matches(doc, re);
+            for (range, groups) in matches {
+                let regex_node = Node {
+                    range,
+                    token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                    children: Vec::new(),
+                    rule_name: None,
+                };
+
+                if rule.pattern.len() == 1 {
+                    // Single-pattern rule: produce directly
+                    if let Some(token_data) = (rule.production)(&[&regex_node]) {
+                        let mut node = Node::new(range, token_data);
+                        node.rule_name = Some(rule.name.clone());
+                        node.children = vec![regex_node];
+                        stash.add(node);
+                    }
+                } else {
+                    // Multi-pattern rule: store the regex match for later combination
+                    // We'll handle this in the saturation loop
+                    stash.add(regex_node);
+                }
+            }
+        }
+    }
+
+    stash
+}
+
+/// Apply all rules against the current stash to find new tokens.
+fn apply_all_rules(doc: &Document, rules: &[Rule], stash: &Stash) -> Stash {
+    let mut new_stash = Stash::new();
+
+    for rule in rules {
+        let produced = match_rule(doc, rule, stash);
+        for node in produced {
+            new_stash.add(node);
+        }
+    }
+
+    new_stash
+}
+
+/// Try to match a rule against the document and stash, producing new nodes.
+fn match_rule(doc: &Document, rule: &Rule, stash: &Stash) -> Vec<Node> {
+    let mut results = Vec::new();
+
+    if rule.pattern.is_empty() {
+        return results;
+    }
+
+    match &rule.pattern[0] {
+        PatternItem::Regex(re) => {
+            // Start with regex matches
+            let matches = find_regex_matches(doc, re);
+            for (range, groups) in matches {
+                let regex_node = Node {
+                    range,
+                    token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                    children: Vec::new(),
+                    rule_name: None,
+                };
+
+                if rule.pattern.len() == 1 {
+                    if let Some(token_data) = (rule.production)(&[&regex_node]) {
+                        let mut node = Node::new(range, token_data);
+                        node.rule_name = Some(rule.name.clone());
+                        node.children = vec![regex_node];
+                        results.push(node);
+                    }
+                } else {
+                    // Continue matching remaining patterns
+                    let continuations = match_remaining(
+                        doc,
+                        rule,
+                        stash,
+                        1,
+                        range.end,
+                        vec![regex_node],
+                    );
+                    results.extend(continuations);
+                }
+            }
+        }
+        PatternItem::Dimension(dim) => {
+            // Start with dimension matches from the stash
+            for node in stash.all_nodes() {
+                if node.token_data.dimension_kind() == Some(*dim) {
+                    if rule.pattern.len() == 1 {
+                        if let Some(token_data) = (rule.production)(&[node]) {
+                            let mut new_node = Node::new(node.range, token_data);
+                            new_node.rule_name = Some(rule.name.clone());
+                            new_node.children = vec![node.clone()];
+                            results.push(new_node);
+                        }
+                    } else {
+                        let continuations = match_remaining(
+                            doc,
+                            rule,
+                            stash,
+                            1,
+                            node.range.end,
+                            vec![node.clone()],
+                        );
+                        results.extend(continuations);
+                    }
+                }
+            }
+        }
+        PatternItem::Predicate(pred) => {
+            for node in stash.all_nodes() {
+                if pred(&node.token_data) {
+                    if rule.pattern.len() == 1 {
+                        if let Some(token_data) = (rule.production)(&[node]) {
+                            let mut new_node = Node::new(node.range, token_data);
+                            new_node.rule_name = Some(rule.name.clone());
+                            new_node.children = vec![node.clone()];
+                            results.push(new_node);
+                        }
+                    } else {
+                        let continuations = match_remaining(
+                            doc,
+                            rule,
+                            stash,
+                            1,
+                            node.range.end,
+                            vec![node.clone()],
+                        );
+                        results.extend(continuations);
+                    }
+                }
+            }
+        }
+    }
+
+    results
+}
+
+/// Continue matching the remaining pattern items after a partial match.
+fn match_remaining(
+    doc: &Document,
+    rule: &Rule,
+    stash: &Stash,
+    pattern_idx: usize,
+    after_pos: usize,
+    matched_so_far: Vec<Node>,
+) -> Vec<Node> {
+    let mut results = Vec::new();
+
+    if pattern_idx >= rule.pattern.len() {
+        // All patterns matched - produce the result
+        let refs: Vec<&Node> = matched_so_far.iter().collect();
+        if let Some(token_data) = (rule.production)(&refs) {
+            let start = matched_so_far.first().unwrap().range.start;
+            let end = matched_so_far.last().unwrap().range.end;
+            let mut node = Node::new(Range::new(start, end), token_data);
+            node.rule_name = Some(rule.name.clone());
+            node.children = matched_so_far;
+            results.push(node);
+        }
+        return results;
+    }
+
+    match &rule.pattern[pattern_idx] {
+        PatternItem::Regex(re) => {
+            // Try to match regex starting near after_pos
+            let text = doc.lower();
+            if after_pos <= text.len() {
+                let search_text = &text[after_pos..];
+                if let Some(m) = re.find(search_text) {
+                    let abs_start = after_pos + m.start();
+                    let abs_end = after_pos + m.end();
+                    // Must be adjacent
+                    if doc.is_adjacent(after_pos, abs_start) {
+                        let caps = re.captures(search_text);
+                        let groups = extract_groups(&caps);
+                        let regex_node = Node {
+                            range: Range::new(abs_start, abs_end),
+                            token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                            children: Vec::new(),
+                            rule_name: None,
+                        };
+                        let mut next_matched = matched_so_far.clone();
+                        next_matched.push(regex_node);
+                        let cont = match_remaining(
+                            doc,
+                            rule,
+                            stash,
+                            pattern_idx + 1,
+                            abs_end,
+                            next_matched,
+                        );
+                        results.extend(cont);
+                    }
+                }
+            }
+        }
+        PatternItem::Dimension(dim) => {
+            for node in stash.all_nodes() {
+                if node.token_data.dimension_kind() == Some(*dim)
+                    && node.range.start >= after_pos
+                    && doc.is_adjacent(after_pos, node.range.start)
+                {
+                    let mut next_matched = matched_so_far.clone();
+                    next_matched.push(node.clone());
+                    let cont = match_remaining(
+                        doc,
+                        rule,
+                        stash,
+                        pattern_idx + 1,
+                        node.range.end,
+                        next_matched,
+                    );
+                    results.extend(cont);
+                }
+            }
+        }
+        PatternItem::Predicate(pred) => {
+            for node in stash.all_nodes() {
+                if pred(&node.token_data)
+                    && node.range.start >= after_pos
+                    && doc.is_adjacent(after_pos, node.range.start)
+                {
+                    let mut next_matched = matched_so_far.clone();
+                    next_matched.push(node.clone());
+                    let cont = match_remaining(
+                        doc,
+                        rule,
+                        stash,
+                        pattern_idx + 1,
+                        node.range.end,
+                        next_matched,
+                    );
+                    results.extend(cont);
+                }
+            }
+        }
+    }
+
+    results
+}
+
+/// Find all regex matches in the document.
+fn find_regex_matches(doc: &Document, re: &Regex) -> Vec<(Range, Vec<Option<String>>)> {
+    let text = doc.lower();
+    let mut matches = Vec::new();
+
+    for caps in re.captures_iter(&text) {
+        let m = caps.get(0).unwrap();
+        let range = Range::new(m.start(), m.end());
+        let groups = extract_groups(&Some(caps));
+        matches.push((range, groups));
+    }
+
+    matches
+}
+
+fn extract_groups(caps: &Option<regex::Captures>) -> Vec<Option<String>> {
+    match caps {
+        Some(caps) => {
+            let mut groups = Vec::new();
+            for i in 0..caps.len() {
+                groups.push(caps.get(i).map(|m| m.as_str().to_string()));
+            }
+            groups
+        }
+        None => Vec::new(),
+    }
+}

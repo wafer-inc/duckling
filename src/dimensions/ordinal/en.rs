@@ -1,0 +1,125 @@
+use crate::pattern::regex;
+use crate::types::{Rule, TokenData};
+
+use super::OrdinalData;
+
+pub fn rules() -> Vec<Rule> {
+    vec![
+        Rule {
+            name: "ordinals (first..nineteenth)".to_string(),
+            pattern: vec![regex(
+                r#"(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth)"#,
+            )],
+            production: Box::new(|nodes| {
+                let text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let val = match text.to_lowercase().as_str() {
+                    "first" => 1,
+                    "second" => 2,
+                    "third" => 3,
+                    "fourth" => 4,
+                    "fifth" => 5,
+                    "sixth" => 6,
+                    "seventh" => 7,
+                    "eighth" => 8,
+                    "ninth" => 9,
+                    "tenth" => 10,
+                    "eleventh" => 11,
+                    "twelfth" => 12,
+                    "thirteenth" => 13,
+                    "fourteenth" => 14,
+                    "fifteenth" => 15,
+                    "sixteenth" => 16,
+                    "seventeenth" => 17,
+                    "eighteenth" => 18,
+                    "nineteenth" => 19,
+                    _ => return None,
+                };
+                Some(TokenData::Ordinal(OrdinalData::new(val)))
+            }),
+        },
+        Rule {
+            name: "ordinals (twentieth..ninetieth)".to_string(),
+            pattern: vec![regex(
+                r#"(twentieth|thirtieth|fortieth|fiftieth|sixtieth|seventieth|eightieth|ninetieth)"#,
+            )],
+            production: Box::new(|nodes| {
+                let text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let val = match text.to_lowercase().as_str() {
+                    "twentieth" => 20,
+                    "thirtieth" => 30,
+                    "fortieth" => 40,
+                    "fiftieth" => 50,
+                    "sixtieth" => 60,
+                    "seventieth" => 70,
+                    "eightieth" => 80,
+                    "ninetieth" => 90,
+                    _ => return None,
+                };
+                Some(TokenData::Ordinal(OrdinalData::new(val)))
+            }),
+        },
+        // Numeric ordinals: 1st, 2nd, 3rd, 4th, 21st, etc.
+        Rule {
+            name: "ordinal (numeric)".to_string(),
+            pattern: vec![regex(r#"(\d+)\s*(st|nd|rd|th)"#)],
+            production: Box::new(|nodes| {
+                let text = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let val: i64 = text.parse().ok()?;
+                Some(TokenData::Ordinal(OrdinalData::new(val)))
+            }),
+        },
+    ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::engine;
+    use crate::resolve::{Context, Options};
+    use crate::types::DimensionKind;
+
+    #[test]
+    fn test_ordinals() {
+        let rules = rules();
+        let options = Options { with_latent: false };
+        let context = Context::default();
+
+        for (text, expected) in &[
+            ("first", 1),
+            ("second", 2),
+            ("third", 3),
+            ("tenth", 10),
+            ("1st", 1),
+            ("2nd", 2),
+            ("3rd", 3),
+            ("21st", 21),
+        ] {
+            let entities = engine::parse_and_resolve(
+                text,
+                &rules,
+                &context,
+                &options,
+                &[DimensionKind::Ordinal],
+            );
+            let found = entities.iter().any(|e| {
+                e.dim == "ordinal"
+                    && e.value
+                        .value
+                        .get("value")
+                        .and_then(|v| v.as_i64())
+                        .map(|v| v == *expected)
+                        .unwrap_or(false)
+            });
+            assert!(found, "Expected ordinal {} for '{}', got: {:?}", expected, text, entities);
+        }
+    }
+}
