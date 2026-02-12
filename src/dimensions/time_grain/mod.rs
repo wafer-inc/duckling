@@ -43,6 +43,20 @@ impl Grain {
         }
     }
 
+    /// Returns the next finer grain level, matching Haskell's TG.lower.
+    pub fn lower(&self) -> Grain {
+        match self {
+            Grain::Year => Grain::Month,
+            Grain::Quarter => Grain::Month,
+            Grain::Month => Grain::Day,
+            Grain::Week => Grain::Day,
+            Grain::Day => Grain::Hour,
+            Grain::Hour => Grain::Minute,
+            Grain::Minute => Grain::Second,
+            Grain::Second => Grain::Second,
+        }
+    }
+
     /// Number of seconds in `n` units of this grain.
     /// Matches Haskell Duckling's `inSeconds`.
     pub fn in_seconds(&self, n: i64) -> i64 {

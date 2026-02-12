@@ -1,7 +1,7 @@
 pub mod en;
 pub mod helpers;
 
-use chrono::{DateTime, Datelike, Timelike, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveDate, Timelike, Utc};
 use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
 use crate::types::ResolvedValue;
@@ -15,11 +15,25 @@ pub enum PartOfDay {
     Lunch,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntervalDirection {
+    After,
+    Before,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EarlyLate {
+    Early,
+    Late,
+}
+
 #[derive(Debug, Clone)]
 pub struct TimeData {
     pub form: TimeForm,
     pub direction: Option<Direction>,
     pub latent: bool,
+    pub open_interval_direction: Option<IntervalDirection>,
+    pub early_late: Option<EarlyLate>,
 }
 
 #[derive(Debug, Clone)]
@@ -28,7 +42,7 @@ pub enum TimeForm {
     Month(u32),           // 1..12
     DayOfMonth(u32),      // 1..31
     Hour(u32, bool),      // hour, is_12h_ambiguous
-    HourMinute(u32, u32), // hour, minute
+    HourMinute(u32, u32, bool), // hour, minute, is_12h_ambiguous
     HourMinuteSecond(u32, u32, u32),
     Year(i32),
     Now,
@@ -37,40 +51,42 @@ pub enum TimeForm {
     Yesterday,
     RelativeGrain { n: i64, grain: Grain },
     DateMDY { month: u32, day: u32, year: Option<i32> },
-    // Part of day
     PartOfDay(PartOfDay),
-    // Weekend
     Weekend,
-    // Season: 0=spring, 1=summer, 2=fall, 3=winter
-    Season(u32),
-    // Named holiday (placeholder resolution)
-    Holiday(String),
-    // this(0)/last(-1)/next(1) week/month/year/quarter/season
+    Season(u32), // 0=spring, 1=summer, 2=fall, 3=winter
+    Holiday(String, Option<i32>), // name, optional year
     GrainOffset { grain: Grain, offset: i32 },
-    // last/next N days/weeks/months
-    NthGrain { n: i64, grain: Grain, past: bool },
-    // Specific quarter (1-4)
+    NthGrain { n: i64, grain: Grain, past: bool, interval: bool },
     Quarter(u32),
-    // Quarter + year
     QuarterYear(u32, i32),
-    // Day after tomorrow / before yesterday
     DayAfterTomorrow,
     DayBeforeYesterday,
-    // Beginning/end of a time period
     BeginEnd { begin: bool, target: Box<TimeForm> },
-    // Time interval (from, to)
-    Interval(Box<TimeData>, Box<TimeData>),
-    // All week / rest of week
+    Interval(Box<TimeData>, Box<TimeData>, bool), // from, to, open (true=don't adjust end)
     AllGrain(Grain),
     RestOfGrain(Grain),
-    // Composed: two time expressions intersected (e.g., Monday + morning)
     Composed(Box<TimeData>, Box<TimeData>),
+    // "first Monday of March", "second Tuesday of last month"
+    NthDOWOfTime { n: i32, dow: u32, base: Box<TimeData> },
+    // "last Friday of October"
+    LastDOWOfTime { dow: u32, base: Box<TimeData> },
+    // "last week of September", "last weekend of July"
+    LastCycleOfTime { grain: Grain, base: Box<TimeData> },
+    // "2 Sundays from now", "3 Fridays from now"
+    NDOWsFromTime { n: i32, dow: u32, base: Box<TimeData> },
+    // "closest Monday to Oct 5th"
+    NthClosestToTime { n: i32, dow: u32, base: Box<TimeData> },
+    // "Nth week of month" (e.g., "first week of October 2014")
+    NthGrainOfTime { n: i32, grain: Grain, base: Box<TimeData> },
+    // "last day of October", "5th last day of May"
+    NthLastDayOfTime { n: i32, base: Box<TimeData> },
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum Direction {
     Past,
     Future,
+    FarFuture, // "after next" — skip one extra occurrence
 }
 
 impl TimeData {
@@ -79,6 +95,8 @@ impl TimeData {
             form,
             direction: None,
             latent: false,
+            open_interval_direction: None,
+            early_late: None,
         }
     }
 
@@ -87,6 +105,8 @@ impl TimeData {
             form,
             direction: None,
             latent: true,
+            open_interval_direction: None,
+            early_late: None,
         }
     }
 
@@ -96,263 +116,2745 @@ impl TimeData {
     }
 }
 
+// ============================================================
+// Main resolve entry point
+// ============================================================
+
 pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<ResolvedValue> {
     if data.latent && !with_latent {
         return None;
     }
-
     let ref_time = context.reference_time;
-    let grain = grain_for_form(&data.form);
-    let resolved = resolve_form(&data.form, ref_time, data.direction);
 
+    // 1. Open intervals (ASAP, after/before/since/until + time)
+    if let Some(dir) = data.open_interval_direction {
+        let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+        let formatted = fmt_dt(dt);
+        return match dir {
+            IntervalDirection::After => Some(ResolvedValue {
+                kind: "value".to_string(),
+                value: serde_json::json!({
+                    "from": { "value": formatted, "grain": grain },
+                    "type": "interval",
+                }),
+            }),
+            IntervalDirection::Before => Some(ResolvedValue {
+                kind: "value".to_string(),
+                value: serde_json::json!({
+                    "to": { "value": formatted, "grain": grain },
+                    "type": "interval",
+                }),
+            }),
+        };
+    }
+
+    // 2. Try to resolve as interval
+    if let Some(iv) = try_resolve_as_interval(data, ref_time) {
+        return Some(iv);
+    }
+
+    // 3. Simple value
+    let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
     Some(ResolvedValue {
         kind: "value".to_string(),
         value: serde_json::json!({
-            "value": resolved.format("%Y-%m-%dT%H:%M:%S%:z").to_string(),
+            "value": fmt_dt(dt),
             "grain": grain,
             "type": "value",
         }),
     })
 }
 
-fn grain_for_form(form: &TimeForm) -> &'static str {
-    match form {
-        TimeForm::DayOfWeek(_) => "day",
-        TimeForm::Month(_) => "month",
-        TimeForm::DayOfMonth(_) => "day",
-        TimeForm::Hour(_, _) => "hour",
-        TimeForm::HourMinute(_, _) => "minute",
-        TimeForm::HourMinuteSecond(_, _, _) => "second",
-        TimeForm::Year(_) => "year",
-        TimeForm::Now => "second",
-        TimeForm::Today => "day",
-        TimeForm::Tomorrow => "day",
-        TimeForm::Yesterday => "day",
-        TimeForm::RelativeGrain { grain, .. } => grain.as_str(),
-        TimeForm::DateMDY { .. } => "day",
-        TimeForm::PartOfDay(_) => "hour",
-        TimeForm::Weekend => "week",
-        TimeForm::Season(_) => "month",
-        TimeForm::Holiday(_) => "day",
-        TimeForm::GrainOffset { grain, .. } => grain.as_str(),
-        TimeForm::NthGrain { grain, .. } => grain.as_str(),
-        TimeForm::Quarter(_) => "quarter",
-        TimeForm::QuarterYear(_, _) => "quarter",
-        TimeForm::DayAfterTomorrow => "day",
-        TimeForm::DayBeforeYesterday => "day",
-        TimeForm::BeginEnd { target, .. } => grain_for_form(target),
-        TimeForm::Interval(from, _) => grain_for_form(&from.form),
-        TimeForm::AllGrain(g) | TimeForm::RestOfGrain(g) => g.as_str(),
-        TimeForm::Composed(primary, _) => grain_for_form(&primary.form),
+fn fmt_dt(dt: DateTime<Utc>) -> String {
+    dt.format("%Y-%m-%dT%H:%M:%S%:z").to_string()
+}
+
+// ============================================================
+// Interval resolution
+// ============================================================
+
+fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<ResolvedValue> {
+    match &data.form {
+        TimeForm::Interval(from_data, to_data, open) => {
+            // Special case: from=Now → "by <time>" open interval
+            if matches!(&from_data.form, TimeForm::Now) {
+                let from_dt = ref_time;
+                // For "to", if it's a BeginEnd, resolve to interval and take end point
+                let to_dt = match &to_data.form {
+                    TimeForm::BeginEnd { begin, target } => {
+                        let (_, end) = resolve_begin_end(*begin, target, ref_time, to_data.direction);
+                        end
+                    }
+                    _ => {
+                        let (dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+                        dt
+                    }
+                };
+                return Some(make_interval(from_dt, to_dt, "second"));
+            }
+
+            let (mut from_dt, from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
+            let (to_dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+            // Disambiguate "from" Hour based on "to" Hour context
+            // e.g., "3-4pm" → from=Hour(3, true), to=Hour(16, false) → from should be 15:00
+            if let TimeForm::Hour(h, true) = &from_data.form {
+                if let TimeForm::Hour(to_h, _) = &to_data.form {
+                    if *to_h >= 12 && *h < 12 {
+                        from_dt = ref_time.date_naive()
+                            .and_hms_opt(*h + 12, 0, 0)
+                            .unwrap_or(from_dt.naive_utc())
+                            .and_utc();
+                    }
+                }
+            }
+            // Ensure from <= to (if from ended up after to on same day, fix)
+            if from_dt > to_dt {
+                from_dt = from_dt - Duration::days(1);
+            }
+            // For closed intervals, add 1 unit of the finer grain (matching Haskell)
+            let to_dt = if *open { to_dt } else {
+                adjust_interval_end_with_from(to_dt, &to_data.form, &from_data.form)
+            };
+            Some(make_interval(from_dt, to_dt, from_grain))
+        }
+        TimeForm::NthGrain { n, grain, past, interval: true } => {
+            let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time);
+            Some(make_interval(from, to, grain.as_str()))
+        }
+        TimeForm::PartOfDay(pod) => {
+            let date = ref_time.date_naive();
+            let (from, to) = pod_interval(*pod, date, data.early_late);
+            Some(make_interval(from, to, "hour"))
+        }
+        TimeForm::Weekend => {
+            let (from, to) = resolve_weekend_interval(ref_time, data.direction);
+            Some(make_interval(from, to, "hour"))
+        }
+        TimeForm::AllGrain(g) => {
+            let (from, to) = resolve_all_grain(*g, ref_time);
+            let grain = grain_for_all_rest(*g);
+            Some(make_interval(from, to, grain))
+        }
+        TimeForm::RestOfGrain(g) => {
+            let from = grain_start(ref_time, g.lower());
+            let to = {
+                let period_start = grain_start(ref_time, *g);
+                add_grain(period_start, *g, 1)
+            };
+            // "rest of the week" truncates "from" to day boundary
+            let from = if *g >= Grain::Day { grain_start(ref_time, Grain::Day) } else { from };
+            let grain = grain_for_all_rest(*g);
+            Some(make_interval(from, to, grain))
+        }
+        TimeForm::BeginEnd { begin, target } => {
+            let (from, to) = resolve_begin_end(*begin, target, ref_time, data.direction);
+            let grain = begin_end_grain(target);
+            Some(make_interval(from, to, grain))
+        }
+        TimeForm::Season(s) => {
+            let (from, to) = resolve_season_interval(*s, ref_time, data.direction);
+            Some(make_interval(from, to, "day"))
+        }
+        TimeForm::Composed(primary, secondary) => {
+            // Helper: check if a form is a clock time
+            fn is_clock_time(f: &TimeForm) -> bool {
+                matches!(f, TimeForm::Hour(_, _) | TimeForm::HourMinute(_, _, _) | TimeForm::HourMinuteSecond(_, _, _))
+            }
+            // Helper: check if a TimeData tree contains a clock time
+            fn has_clock_time(td: &TimeData) -> bool {
+                is_clock_time(&td.form)
+                    || matches!(&td.form, TimeForm::Composed(a, b) if has_clock_time(a) || has_clock_time(b))
+            }
+
+            // Composed forms where secondary is PartOfDay → interval
+            // BUT only if there's no clock time that should disambiguate instead
+            if let TimeForm::PartOfDay(pod) = &secondary.form {
+                if !has_clock_time(primary) {
+                    let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                    let date = date_dt.date_naive();
+                    let (from, to) = pod_interval(*pod, date, data.early_late.or(secondary.early_late));
+                    return Some(make_interval(from, to, "hour"));
+                }
+            }
+            // Composed forms where primary is PartOfDay → interval
+            // BUT only if there's no clock time in secondary
+            if let TimeForm::PartOfDay(pod) = &primary.form {
+                if !has_clock_time(secondary) {
+                    let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                    let date = date_dt.date_naive();
+                    let (from, to) = pod_interval(*pod, date, data.early_late.or(primary.early_late));
+                    return Some(make_interval(from, to, "hour"));
+                }
+            }
+            // Check nested Composed forms for PartOfDay intervals
+            // e.g., Composed(DayOfWeek, Composed(PartOfDay, ...))
+            if let TimeForm::Composed(sub_a, sub_b) = &secondary.form {
+                if let TimeForm::PartOfDay(pod) = &sub_a.form {
+                    if !has_clock_time(sub_b) && !has_clock_time(primary) {
+                        let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                        let date = date_dt.date_naive();
+                        let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_a.early_late));
+                        return Some(make_interval(from, to, "hour"));
+                    }
+                }
+                if let TimeForm::PartOfDay(pod) = &sub_b.form {
+                    if !has_clock_time(sub_a) && !has_clock_time(primary) {
+                        let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                        let date = date_dt.date_naive();
+                        let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
+                        return Some(make_interval(from, to, "hour"));
+                    }
+                }
+            }
+            if let TimeForm::Composed(sub_a, sub_b) = &primary.form {
+                if let TimeForm::PartOfDay(pod) = &sub_a.form {
+                    if !has_clock_time(sub_b) && !has_clock_time(secondary) {
+                        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        let date = date_dt.date_naive();
+                        let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_a.early_late));
+                        return Some(make_interval(from, to, "hour"));
+                    }
+                }
+                if let TimeForm::PartOfDay(pod) = &sub_b.form {
+                    if !has_clock_time(sub_a) && !has_clock_time(secondary) {
+                        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        let date = date_dt.date_naive();
+                        let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
+                        return Some(make_interval(from, to, "hour"));
+                    }
+                }
+            }
+            None // not an interval composed form
+        }
+        TimeForm::LastCycleOfTime { grain, base } => {
+            // "last week of September" → interval of the last week within the period
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = grain_start(base_dt, target_grain(&base.form));
+            let base_end = add_grain(base_start, target_grain(&base.form), 1);
+            let from = add_grain(base_end, *grain, -1);
+            Some(make_interval(from, base_end, grain.lower().as_str()))
+        }
+        TimeForm::NthGrainOfTime { n, grain, base } => {
+            // "first week of October 2014" → interval
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = grain_start(base_dt, target_grain(&base.form));
+            let from = add_grain(base_start, *grain, *n - 1);
+            let to = add_grain(from, *grain, 1);
+            Some(make_interval(from, to, grain.lower().as_str()))
+        }
+        TimeForm::Holiday(name, year_opt) => {
+            let year = year_opt.unwrap_or_else(|| holiday_default_year(name, ref_time));
+            // Check for minute-level intervals (Earth Hour)
+            if let Some((from_dt, to_dt)) = resolve_holiday_minute_interval(name, year) {
+                return Some(make_interval(from_dt, to_dt, "minute"));
+            }
+            // Check for day-level intervals
+            if let Some((from_date, to_date)) = resolve_holiday_interval(name, year) {
+                let from_dt = from_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+                let to_dt = to_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+                return Some(make_interval(from_dt, to_dt, "day"));
+            }
+            None
+        }
+        _ => None,
     }
 }
 
-fn resolve_form(
+fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> ResolvedValue {
+    ResolvedValue {
+        kind: "value".to_string(),
+        value: serde_json::json!({
+            "from": { "value": fmt_dt(from), "grain": grain },
+            "to": { "value": fmt_dt(to), "grain": grain },
+            "type": "interval",
+        }),
+    }
+}
+
+/// For closed intervals, add one grain to "to".
+/// Uses the finer grain between from and to (matching Haskell behavior).
+fn adjust_interval_end(to: DateTime<Utc>, to_form: &TimeForm) -> DateTime<Utc> {
+    adjust_interval_end_with_from(to, to_form, to_form)
+}
+
+fn adjust_interval_end_with_from(to: DateTime<Utc>, to_form: &TimeForm, from_form: &TimeForm) -> DateTime<Utc> {
+    let to_grain = form_grain(to_form);
+    let from_grain = form_grain(from_form);
+    // Match Haskell: g2' = if g1 < Day && g2 < Day then min(g1,g2) else g2
+    let adjust_grain = if from_grain < Grain::Day && to_grain < Grain::Day {
+        if from_grain < to_grain { from_grain } else { to_grain }
+    } else {
+        to_grain
+    };
+    match adjust_grain {
+        Grain::Second => to + Duration::seconds(1),
+        Grain::Minute => to + Duration::minutes(1),
+        Grain::Hour => to + Duration::hours(1),
+        Grain::Day => to + Duration::days(1),
+        Grain::Week => to + Duration::weeks(1),
+        Grain::Month => add_months(to, 1),
+        Grain::Quarter => add_months(to, 3),
+        Grain::Year => add_years(to, 1),
+    }
+}
+
+/// Get the grain of a TimeForm
+fn form_grain(f: &TimeForm) -> Grain {
+    match f {
+        TimeForm::Year(_) => Grain::Year,
+        TimeForm::Month(_) => Grain::Month,
+        TimeForm::Quarter(_) | TimeForm::QuarterYear(_, _) => Grain::Quarter,
+        TimeForm::DayOfWeek(_) | TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. }
+        | TimeForm::Today | TimeForm::Tomorrow | TimeForm::Yesterday
+        | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday
+        | TimeForm::Holiday(_, _) => Grain::Day,
+        TimeForm::Hour(_, _) | TimeForm::PartOfDay(_) => Grain::Hour,
+        TimeForm::HourMinute(_, _, _) => Grain::Minute,
+        TimeForm::HourMinuteSecond(_, _, _) => Grain::Second,
+        _ => Grain::Day,
+    }
+}
+
+// ============================================================
+// Simple datetime resolution (returns DateTime + grain string)
+// ============================================================
+
+fn resolve_simple_datetime(
     form: &TimeForm,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
-) -> DateTime<Utc> {
-    use chrono::Duration;
-
+) -> (DateTime<Utc>, &'static str) {
     match form {
-        TimeForm::Now => ref_time,
-        TimeForm::Today => ref_time
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .unwrap()
-            .and_utc(),
-        TimeForm::Tomorrow => (ref_time + Duration::days(1))
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .unwrap()
-            .and_utc(),
-        TimeForm::Yesterday => (ref_time - Duration::days(1))
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .unwrap()
-            .and_utc(),
-        TimeForm::DayOfWeek(dow) => {
-            let current_dow = ref_time.weekday().num_days_from_monday();
-            let target = *dow;
-            let days_ahead = if target > current_dow {
-                target - current_dow
-            } else if target < current_dow {
-                7 - (current_dow - target)
-            } else {
-                7 // same day = next week
-            };
-            let days_ahead = match direction {
-                Some(Direction::Past) => {
-                    if days_ahead == 7 { 0 } else { (days_ahead as i64) - 7 }
-                }
-                _ => days_ahead as i64,
-            };
-            (ref_time + Duration::days(days_ahead))
-                .date_naive()
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc()
-        }
-        TimeForm::Month(m) => {
-            let year = if *m > ref_time.month() {
-                ref_time.year()
-            } else {
-                ref_time.year() + 1
-            };
-            chrono::NaiveDate::from_ymd_opt(year, *m, 1)
-                .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc()
-        }
+        TimeForm::Now => (ref_time, "second"),
+        TimeForm::Today => (midnight(ref_time), "day"),
+        TimeForm::Tomorrow => (midnight(ref_time + Duration::days(1)), "day"),
+        TimeForm::Yesterday => (midnight(ref_time - Duration::days(1)), "day"),
+        TimeForm::DayAfterTomorrow => (midnight(ref_time + Duration::days(2)), "day"),
+        TimeForm::DayBeforeYesterday => (midnight(ref_time - Duration::days(2)), "day"),
+        TimeForm::DayOfWeek(dow) => (resolve_dow(*dow, ref_time, direction), "day"),
+        TimeForm::Month(m) => (resolve_month(*m, ref_time, direction), "month"),
         TimeForm::DayOfMonth(d) => {
-            let date = chrono::NaiveDate::from_ymd_opt(
-                ref_time.year(),
-                ref_time.month(),
-                *d,
-            );
+            // Future-first: if day is past in current month, use next month
+            let date = NaiveDate::from_ymd_opt(ref_time.year(), ref_time.month(), *d);
             match date {
-                Some(d) => d.and_hms_opt(0, 0, 0).unwrap().and_utc(),
-                None => ref_time,
+                Some(date) => {
+                    let dt = date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+                    if dt < ref_time && !matches!(direction, Some(Direction::Past)) {
+                        // Try next month
+                        let next = if ref_time.month() == 12 {
+                            NaiveDate::from_ymd_opt(ref_time.year() + 1, 1, *d)
+                        } else {
+                            NaiveDate::from_ymd_opt(ref_time.year(), ref_time.month() + 1, *d)
+                        };
+                        match next {
+                            Some(nd) => (nd.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
+                            None => (dt, "day"),
+                        }
+                    } else {
+                        (dt, "day")
+                    }
+                }
+                None => (ref_time, "day"),
             }
         }
-        TimeForm::Hour(h, _ambiguous) => {
-            ref_time
-                .date_naive()
-                .and_hms_opt(*h, 0, 0)
-                .unwrap_or(ref_time.naive_utc())
-                .and_utc()
+        TimeForm::Hour(h, _) => {
+            let mut dt = ref_time.date_naive().and_hms_opt(*h, 0, 0)
+                .unwrap_or(ref_time.naive_utc()).and_utc();
+            // Future-first: if past, use tomorrow
+            if dt <= ref_time && !matches!(direction, Some(Direction::Past)) {
+                dt = dt + Duration::days(1);
+            }
+            (dt, "hour")
         }
-        TimeForm::HourMinute(h, m) => {
-            ref_time
-                .date_naive()
-                .and_hms_opt(*h, *m, 0)
-                .unwrap_or(ref_time.naive_utc())
-                .and_utc()
+        TimeForm::HourMinute(h, m, is_12h) => {
+            let today = ref_time.date_naive().and_hms_opt(*h, *m, 0)
+                .unwrap_or(ref_time.naive_utc()).and_utc();
+            if *is_12h && *h < 12 {
+                // 12h ambiguous: try both AM and PM
+                let am = today;
+                let pm = ref_time.date_naive().and_hms_opt(*h + 12, *m, 0)
+                    .unwrap_or(ref_time.naive_utc()).and_utc();
+                if matches!(direction, Some(Direction::Past)) {
+                    // Past direction: pick most recent past
+                    if pm <= ref_time { (pm, "minute") }
+                    else if am <= ref_time { (am, "minute") }
+                    else { (pm - Duration::days(1), "minute") }
+                } else if am.hour() == ref_time.hour() {
+                    // AM is in current hour → keep AM (e.g., "at 4:23" when ref is 4:30)
+                    (am, "minute")
+                } else {
+                    // Pick nearest future (AM first, then PM, then tomorrow AM)
+                    if am > ref_time { (am, "minute") }
+                    else if pm > ref_time { (pm, "minute") }
+                    else { (am + Duration::days(1), "minute") }
+                }
+            } else if *is_12h && *h == 12 {
+                // "12:15" ambiguous - noon vs midnight
+                let noon = today; // h=12 already
+                let midnight = ref_time.date_naive().and_hms_opt(0, *m, 0)
+                    .unwrap_or(ref_time.naive_utc()).and_utc();
+                if noon > ref_time {
+                    (noon, "minute")
+                } else if midnight + Duration::days(1) > ref_time {
+                    (midnight + Duration::days(1), "minute")
+                } else {
+                    (noon + Duration::days(1), "minute")
+                }
+            } else {
+                // 24h/explicit AM/PM: future-first with current-hour tolerance
+                if today <= ref_time && today.hour() != ref_time.hour()
+                    && !matches!(direction, Some(Direction::Past)) {
+                    (today + Duration::days(1), "minute")
+                } else {
+                    (today, "minute")
+                }
+            }
         }
         TimeForm::HourMinuteSecond(h, m, s) => {
-            ref_time
-                .date_naive()
-                .and_hms_opt(*h, *m, *s)
-                .unwrap_or(ref_time.naive_utc())
-                .and_utc()
+            let dt = ref_time.date_naive().and_hms_opt(*h, *m, *s)
+                .unwrap_or(ref_time.naive_utc()).and_utc();
+            (dt, "second")
         }
         TimeForm::Year(y) => {
-            chrono::NaiveDate::from_ymd_opt(*y, 1, 1)
+            let dt = NaiveDate::from_ymd_opt(*y, 1, 1)
                 .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc()
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            (dt, "year")
         }
-        TimeForm::RelativeGrain { n, grain } => {
-            match grain {
-                Grain::Second => ref_time + Duration::seconds(*n),
-                Grain::Minute => ref_time + Duration::minutes(*n),
-                Grain::Hour => ref_time + Duration::hours(*n),
-                Grain::Day => ref_time + Duration::days(*n),
-                Grain::Week => ref_time + Duration::weeks(*n),
-                Grain::Month => {
-                    let total_months = ref_time.year() * 12 + ref_time.month() as i32 + *n as i32;
-                    let year = (total_months - 1) / 12;
-                    let month = ((total_months - 1) % 12 + 1) as u32;
-                    chrono::NaiveDate::from_ymd_opt(year, month, ref_time.day().min(28))
-                        .unwrap_or(ref_time.date_naive())
-                        .and_hms_opt(ref_time.hour(), ref_time.minute(), ref_time.second())
-                        .unwrap()
-                        .and_utc()
-                }
-                Grain::Year => {
-                    let year = ref_time.year() + *n as i32;
-                    chrono::NaiveDate::from_ymd_opt(year, ref_time.month(), ref_time.day().min(28))
-                        .unwrap_or(ref_time.date_naive())
-                        .and_hms_opt(ref_time.hour(), ref_time.minute(), ref_time.second())
-                        .unwrap()
-                        .and_utc()
-                }
-                Grain::Quarter => {
-                    let months = *n * 3;
-                    let total_months = ref_time.year() * 12 + ref_time.month() as i32 + months as i32;
-                    let year = (total_months - 1) / 12;
-                    let month = ((total_months - 1) % 12 + 1) as u32;
-                    chrono::NaiveDate::from_ymd_opt(year, month, ref_time.day().min(28))
-                        .unwrap_or(ref_time.date_naive())
-                        .and_hms_opt(ref_time.hour(), ref_time.minute(), ref_time.second())
-                        .unwrap()
-                        .and_utc()
-                }
-            }
-        }
+        TimeForm::RelativeGrain { n, grain } => resolve_relative_grain(*n, *grain, ref_time),
         TimeForm::DateMDY { month, day, year } => {
-            let y = year.unwrap_or(ref_time.year());
-            chrono::NaiveDate::from_ymd_opt(y, *month, *day)
+            let y = year.unwrap_or_else(|| {
+                // If month has passed, use next year (unless year is explicit)
+                if *month < ref_time.month() || (*month == ref_time.month() && *day < ref_time.day()) {
+                    ref_time.year() + 1
+                } else {
+                    ref_time.year()
+                }
+            });
+            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
                 .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc()
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            (dt, "day")
         }
-        TimeForm::PartOfDay(_) => {
-            ref_time.date_naive().and_hms_opt(12, 0, 0).unwrap().and_utc()
-        }
-        TimeForm::Weekend => {
-            let dow = ref_time.weekday().num_days_from_monday();
-            let days_to_sat = ((5i64 - dow as i64) + 7) % 7;
-            let days_to_sat = if days_to_sat == 0 { 7 } else { days_to_sat };
-            (ref_time + Duration::days(days_to_sat))
-                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
-        }
-        TimeForm::Season(_) | TimeForm::Holiday(_) => {
-            ref_time.date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
-        }
-        TimeForm::GrainOffset { grain, offset } => {
-            resolve_form(
-                &TimeForm::RelativeGrain { n: *offset as i64, grain: *grain },
-                ref_time,
-                direction,
-            )
-        }
-        TimeForm::NthGrain { n, grain, past } => {
-            let signed_n = if *past { -(*n) } else { *n };
-            resolve_form(
-                &TimeForm::RelativeGrain { n: signed_n, grain: *grain },
-                ref_time,
-                direction,
-            )
-        }
+        TimeForm::GrainOffset { grain, offset } => resolve_grain_offset(*grain, *offset, ref_time),
         TimeForm::Quarter(q) => {
             let month = (*q - 1) * 3 + 1;
-            chrono::NaiveDate::from_ymd_opt(ref_time.year(), month, 1)
+            let dt = NaiveDate::from_ymd_opt(ref_time.year(), month, 1)
                 .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0).unwrap().and_utc()
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            (dt, "quarter")
         }
         TimeForm::QuarterYear(q, y) => {
             let month = (*q - 1) * 3 + 1;
-            chrono::NaiveDate::from_ymd_opt(*y, month, 1)
+            let dt = NaiveDate::from_ymd_opt(*y, month, 1)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            (dt, "quarter")
+        }
+        TimeForm::Holiday(name, year_opt) => {
+            let year = year_opt.unwrap_or_else(|| holiday_default_year(name, ref_time));
+            match resolve_holiday(name, year) {
+                Some(date) => (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
+                None => (midnight(ref_time), "day"),
+            }
+        }
+        TimeForm::PartOfDay(_) => {
+            // Standalone PartOfDay as simple value (shouldn't normally reach here
+            // since try_resolve_as_interval handles it, but fallback)
+            (ref_time.date_naive().and_hms_opt(12, 0, 0).unwrap().and_utc(), "hour")
+        }
+        TimeForm::Weekend => {
+            // Fallback simple value
+            let dow = ref_time.weekday().num_days_from_monday();
+            let days_to_sat = if dow <= 4 { 5 - dow as i64 } else { 12 - dow as i64 };
+            let dt = midnight(ref_time + Duration::days(days_to_sat));
+            (dt, "week")
+        }
+        TimeForm::Season(_) | TimeForm::AllGrain(_) | TimeForm::RestOfGrain(_) => {
+            // Fallback — intervals should be caught by try_resolve_as_interval
+            (midnight(ref_time), "day")
+        }
+        TimeForm::BeginEnd { target, .. } => {
+            // Fallback
+            resolve_simple_datetime(target, ref_time, direction)
+        }
+        TimeForm::Interval(from, _, _) => {
+            resolve_simple_datetime(&from.form, ref_time, from.direction)
+        }
+        TimeForm::NthGrain { n, grain, past, .. } => {
+            // "upcoming 2 days" = cycleNth Day 2 = start of the day 2 days from now
+            let signed_n = if *past { -(*n as i32) } else { *n as i32 };
+            let base = grain_start(ref_time, *grain);
+            let dt = add_grain(base, *grain, signed_n);
+            (dt, grain.as_str())
+        }
+        TimeForm::NthDOWOfTime { n, dow, base } => {
+            // "first Monday of March" = find the Nth occurrence of DOW within base period
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = match &base.form {
+                TimeForm::Month(_) => {
+                    NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
+                        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+                }
+                TimeForm::GrainOffset { grain: Grain::Month, offset } => {
+                    let first = start_of_month(ref_time);
+                    add_months(first, *offset)
+                }
+                TimeForm::GrainOffset { grain: Grain::Year, offset } => {
+                    let jan1 = start_of_year(ref_time);
+                    add_years(jan1, *offset)
+                }
+                _ => grain_start(base_dt, Grain::Month),
+            };
+            let dt = nth_dow_of_month(base_start.year(), base_start.month(), *dow, *n as u32);
+            (dt.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
+        }
+        TimeForm::LastDOWOfTime { dow, base } => {
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = match &base.form {
+                TimeForm::Month(_) => {
+                    NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
+                        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+                }
+                TimeForm::GrainOffset { grain: Grain::Month, offset } => {
+                    let first = start_of_month(ref_time);
+                    add_months(first, *offset)
+                }
+                _ => grain_start(base_dt, Grain::Month),
+            };
+            let dt = last_dow_of_month(base_start.year(), base_start.month(), *dow);
+            (dt.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
+        }
+        TimeForm::NDOWsFromTime { n, dow, base } => {
+            // "2 Sundays from now" = find the Nth DOW after base
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_dow = base_dt.weekday().num_days_from_monday();
+            let target_dow = *dow;
+            let days_ahead = ((target_dow as i64 - base_dow as i64) % 7 + 7) % 7;
+            let first = if days_ahead == 0 {
+                base_dt + Duration::days(7) // same DOW → next week
+            } else {
+                base_dt + Duration::days(days_ahead)
+            };
+            let dt = first + Duration::weeks((*n as i64) - 1);
+            (midnight(dt), "day")
+        }
+        TimeForm::NthClosestToTime { n, dow, base } => {
+            // "closest Monday to Oct 5th"
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let dt = closest_dow(base_dt.date_naive(), *dow);
+            // For n > 1, we need the Nth closest — alternate past and future
+            if *n <= 1 {
+                (dt.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
+            } else {
+                // Find all occurrences of DOW near base, sorted by distance
+                let base_date = base_dt.date_naive();
+                let mut candidates: Vec<NaiveDate> = Vec::new();
+                for i in -10..=10i64 {
+                    let d = NaiveDate::from_ymd_opt(base_date.year(), base_date.month(), base_date.day())
+                        .unwrap() + chrono::Duration::weeks(i);
+                    // Find the DOW in this week
+                    let d_dow = d.weekday().num_days_from_monday();
+                    let offset = (*dow as i64 - d_dow as i64 + 7) % 7;
+                    let candidate = d + chrono::Duration::days(offset);
+                    if !candidates.contains(&candidate) {
+                        candidates.push(candidate);
+                    }
+                }
+                candidates.sort_by_key(|c| ((*c - base_date).num_days()).abs());
+                let result = candidates.get((*n - 1) as usize).copied().unwrap_or(base_date);
+                (result.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
+            }
+        }
+        TimeForm::NthGrainOfTime { n, grain, base } => {
+            // "first week of October 2014"
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = grain_start(base_dt, target_grain(&base.form));
+            let dt = add_grain(base_start, *grain, *n - 1);
+            (dt, grain.as_str())
+        }
+        TimeForm::NthLastDayOfTime { n, base } => {
+            // "last day of October 2015", "5th last day of May"
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = match &base.form {
+                TimeForm::Month(_) => {
+                    NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
+                        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+                }
+                TimeForm::GrainOffset { grain: Grain::Month, offset } => {
+                    let first = start_of_month(ref_time);
+                    add_months(first, *offset)
+                }
+                _ => grain_start(base_dt, Grain::Month),
+            };
+            let month_end = add_grain(base_start, Grain::Month, 1);
+            let dt = month_end - Duration::days(*n as i64);
+            (dt, "day")
+        }
+        TimeForm::LastCycleOfTime { grain, base } => {
+            // "last week of September" → interval
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = grain_start(base_dt, target_grain(&base.form));
+            let base_end = add_grain(base_start, target_grain(&base.form), 1);
+            let dt = add_grain(base_end, *grain, -1);
+            (dt, grain.as_str())
+        }
+        TimeForm::Composed(primary, secondary) => {
+            resolve_composed(primary, secondary, ref_time)
+        }
+    }
+}
+
+// ============================================================
+// Day of week resolution
+// ============================================================
+
+fn resolve_dow(dow: u32, ref_time: DateTime<Utc>, direction: Option<Direction>) -> DateTime<Utc> {
+    let current = ref_time.weekday().num_days_from_monday();
+    let target = dow;
+
+    let days = match direction {
+        Some(Direction::Future) | Some(Direction::FarFuture) => {
+            // "next DOW": go to next week's instance
+            let days_to_next_monday = if current == 0 { 7u32 } else { 7 - current };
+            (days_to_next_monday + target) as i64
+        }
+        Some(Direction::Past) => {
+            // "last DOW": most recent past, excluding today
+            let back = if target < current {
+                current - target
+            } else if target > current {
+                7 - (target - current)
+            } else {
+                7 // same day = last week
+            };
+            -(back as i64)
+        }
+        None => {
+            // Plain DOW: nearest future, skip today
+            let ahead = if target > current {
+                target - current
+            } else if target < current {
+                7 - (current - target)
+            } else {
+                7 // same day = next week
+            };
+            ahead as i64
+        }
+    };
+
+    midnight(ref_time + Duration::days(days))
+}
+
+// ============================================================
+// Month resolution
+// ============================================================
+
+fn resolve_month(m: u32, ref_time: DateTime<Utc>, direction: Option<Direction>) -> DateTime<Utc> {
+    let next_occurrence = if m > ref_time.month() || (m == ref_time.month() && direction.is_none()) {
+        NaiveDate::from_ymd_opt(ref_time.year(), m, 1)
+    } else {
+        NaiveDate::from_ymd_opt(ref_time.year() + 1, m, 1)
+    };
+
+    let base = next_occurrence.unwrap_or(ref_time.date_naive())
+        .and_hms_opt(0, 0, 0).unwrap().and_utc();
+
+    match direction {
+        Some(Direction::Past) => {
+            // Most recent past occurrence
+            let year = if m < ref_time.month() || (m == ref_time.month()) {
+                ref_time.year()
+            } else {
+                ref_time.year() - 1
+            };
+            NaiveDate::from_ymd_opt(year, m, 1)
                 .unwrap_or(ref_time.date_naive())
                 .and_hms_opt(0, 0, 0).unwrap().and_utc()
         }
-        TimeForm::DayAfterTomorrow => {
-            (ref_time + Duration::days(2))
-                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        Some(Direction::FarFuture) => {
+            // "March after next": skip one occurrence
+            let year = if m >= ref_time.month() {
+                ref_time.year() + 1
+            } else {
+                ref_time.year() + 2
+            };
+            NaiveDate::from_ymd_opt(year, m, 1)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc()
         }
-        TimeForm::DayBeforeYesterday => {
-            (ref_time - Duration::days(2))
-                .date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+        _ => base,
+    }
+}
+
+// ============================================================
+// RelativeGrain resolution (in N <grain>, N <grain> ago)
+// ============================================================
+
+fn resolve_relative_grain(n: i64, grain: Grain, ref_time: DateTime<Utc>) -> (DateTime<Utc>, &'static str) {
+    let lower = grain.lower();
+    let result = match grain {
+        Grain::Second => ref_time + Duration::seconds(n),
+        Grain::Minute => ref_time + Duration::minutes(n),
+        Grain::Hour => ref_time + Duration::hours(n),
+        Grain::Day => ref_time + Duration::days(n),
+        Grain::Week => ref_time + Duration::weeks(n),
+        Grain::Month => add_months(ref_time, n as i32),
+        Grain::Quarter => add_months(ref_time, n as i32 * 3),
+        Grain::Year => add_years(ref_time, n as i32),
+    };
+    // Truncate to lower grain boundary
+    let truncated = grain_start(result, lower);
+    (truncated, lower.as_str())
+}
+
+// ============================================================
+// GrainOffset resolution (this/last/next week/month/year/quarter)
+// ============================================================
+
+fn resolve_grain_offset(grain: Grain, offset: i32, ref_time: DateTime<Utc>) -> (DateTime<Utc>, &'static str) {
+    let result = match grain {
+        Grain::Week => {
+            let monday = start_of_week(ref_time);
+            monday + Duration::weeks(offset as i64)
         }
-        TimeForm::BeginEnd { target, .. } => {
-            resolve_form(target, ref_time, direction)
+        Grain::Month => {
+            let first = start_of_month(ref_time);
+            add_months(first, offset)
         }
-        TimeForm::Interval(from, _) => {
-            resolve_form(&from.form, ref_time, from.direction)
+        Grain::Year => {
+            let jan1 = start_of_year(ref_time);
+            add_years(jan1, offset)
         }
-        TimeForm::AllGrain(g) | TimeForm::RestOfGrain(g) => {
-            resolve_form(
-                &TimeForm::GrainOffset { grain: *g, offset: 0 },
-                ref_time,
-                direction,
-            )
+        Grain::Quarter => {
+            let qstart = start_of_quarter(ref_time);
+            add_months(qstart, offset * 3)
         }
-        TimeForm::Composed(primary, _) => {
-            resolve_form(&primary.form, ref_time, primary.direction)
+        Grain::Day => {
+            midnight(ref_time) + Duration::days(offset as i64)
+        }
+        _ => {
+            // For smaller grains, just offset from ref_time
+            let secs = grain.in_seconds(offset as i64);
+            ref_time + Duration::seconds(secs)
+        }
+    };
+    (result, grain.as_str())
+}
+
+// ============================================================
+// Composed form resolution
+// ============================================================
+
+fn resolve_composed(
+    primary: &TimeData,
+    secondary: &TimeData,
+    ref_time: DateTime<Utc>,
+) -> (DateTime<Utc>, &'static str) {
+    // Helper: disambiguate hour based on PartOfDay context
+    fn disambiguate_hour(h: u32, is_12h: bool, pod: Option<&PartOfDay>) -> u32 {
+        if !is_12h { return h; }
+        match pod {
+            Some(PartOfDay::Afternoon) | Some(PartOfDay::Evening) | Some(PartOfDay::Night) => {
+                if h < 12 { h + 12 } else { h }
+            }
+            Some(PartOfDay::Morning) => {
+                if h == 12 { 0 } else { h }
+            }
+            _ => h,
         }
     }
+
+    // Extract PartOfDay from a TimeData (possibly nested in Composed)
+    fn extract_pod(td: &TimeData) -> Option<&PartOfDay> {
+        match &td.form {
+            TimeForm::PartOfDay(pod) => Some(pod),
+            TimeForm::Composed(a, b) => extract_pod(a).or_else(|| extract_pod(b)),
+            _ => None,
+        }
+    }
+
+    // Extract base date from a possibly nested Composed form
+    fn extract_date(td: &TimeData, ref_time: DateTime<Utc>) -> DateTime<Utc> {
+        match &td.form {
+            TimeForm::Composed(a, b) => {
+                // Try to get the date part (non-PartOfDay component)
+                match (&a.form, &b.form) {
+                    (TimeForm::PartOfDay(_), _) => extract_date(b, ref_time),
+                    (_, TimeForm::PartOfDay(_)) => extract_date(a, ref_time),
+                    _ => {
+                        let (dt, _) = resolve_simple_datetime(&a.form, ref_time, a.direction);
+                        dt
+                    }
+                }
+            }
+            _ => {
+                let (dt, _) = resolve_simple_datetime(&td.form, ref_time, td.direction);
+                dt
+            }
+        }
+    }
+
+    // If secondary is a clock time, combine with primary's date
+    match &secondary.form {
+        TimeForm::Hour(h, is_12h) => {
+            let pod = extract_pod(primary);
+            let hour = disambiguate_hour(*h, *is_12h, pod);
+            let date_dt = extract_date(primary, ref_time);
+            let mut dt = date_dt.date_naive().and_hms_opt(hour, 0, 0)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            // Future-first: if result is past and date is today, advance to tomorrow
+            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                dt = dt + Duration::days(1);
+            }
+            return (dt, "hour");
+        }
+        TimeForm::HourMinute(h, m, is_12h) => {
+            let pod = extract_pod(primary);
+            let hour = disambiguate_hour(*h, *is_12h, pod);
+            let date_dt = extract_date(primary, ref_time);
+            let mut dt = date_dt.date_naive().and_hms_opt(hour, *m, 0)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                dt = dt + Duration::days(1);
+            }
+            return (dt, "minute");
+        }
+        TimeForm::HourMinuteSecond(h, m, s) => {
+            let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            let dt = date_dt.date_naive().and_hms_opt(*h, *m, *s)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            return (dt, "second");
+        }
+        TimeForm::Now => {
+            // "X from right now" — add duration to ref_time directly (no truncation)
+            if let TimeForm::RelativeGrain { n, grain } = &primary.form {
+                let result = match grain {
+                    Grain::Year => add_years(ref_time, *n as i32),
+                    Grain::Month => add_months(ref_time, *n as i32),
+                    Grain::Week => ref_time + Duration::weeks(*n),
+                    Grain::Day => ref_time + Duration::days(*n),
+                    Grain::Hour => ref_time + Duration::hours(*n),
+                    Grain::Minute => ref_time + Duration::minutes(*n),
+                    Grain::Second => ref_time + Duration::seconds(*n),
+                    Grain::Quarter => add_months(ref_time, *n as i32 * 3),
+                };
+                return (result, "second");
+            }
+            let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            return (dt, "second");
+        }
+        _ => {}
+    }
+
+    // If primary is a clock time, combine with secondary's date
+    match &primary.form {
+        TimeForm::Hour(h, is_12h) => {
+            let pod = extract_pod(secondary);
+            let hour = disambiguate_hour(*h, *is_12h, pod);
+            let date_dt = extract_date(secondary, ref_time);
+            let mut dt = date_dt.date_naive().and_hms_opt(hour, 0, 0)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            // Future-first: if result is past and date is today, advance to tomorrow
+            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                dt = dt + Duration::days(1);
+            }
+            return (dt, "hour");
+        }
+        TimeForm::HourMinute(h, m, is_12h) => {
+            let pod = extract_pod(secondary);
+            let hour = disambiguate_hour(*h, *is_12h, pod);
+            let date_dt = extract_date(secondary, ref_time);
+            let mut dt = date_dt.date_naive().and_hms_opt(hour, *m, 0)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                dt = dt + Duration::days(1);
+            }
+            return (dt, "minute");
+        }
+        TimeForm::HourMinuteSecond(h, m, s) => {
+            let date_dt = extract_date(secondary, ref_time);
+            let dt = date_dt.date_naive().and_hms_opt(*h, *m, *s)
+                .unwrap_or(date_dt.naive_utc()).and_utc();
+            return (dt, "second");
+        }
+        _ => {}
+    }
+
+    // If secondary is a date-like form, use secondary for the date context
+    match &secondary.form {
+        TimeForm::RelativeGrain { n, grain } => {
+            // "today in one hour" → add to ref_time (not midnight)
+            // "3 years from today" → add years but keep today's date
+            let base = match &primary.form {
+                TimeForm::Today | TimeForm::Now => ref_time,
+                _ => {
+                    let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                    dt
+                }
+            };
+            let result = match grain {
+                Grain::Year => add_years(base, *n as i32),
+                Grain::Month => add_months(base, *n as i32),
+                Grain::Week => base + Duration::weeks(*n),
+                Grain::Day => base + Duration::days(*n),
+                Grain::Hour => base + Duration::hours(*n),
+                Grain::Minute => base + Duration::minutes(*n),
+                Grain::Second => base + Duration::seconds(*n),
+                Grain::Quarter => add_months(base, *n as i32 * 3),
+            };
+            // For "today in one hour" etc., use lower grain
+            // For "3 days after Easter", primary is a day-level form → keep day grain
+            let is_day_level_base = matches!(&primary.form,
+                TimeForm::Holiday(..) | TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_)
+                | TimeForm::DayOfWeek(_) | TimeForm::Tomorrow | TimeForm::Yesterday
+                | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday);
+            if is_day_level_base && *grain >= Grain::Day {
+                return (grain_start(result, Grain::Day), "day");
+            }
+            let out_grain = grain.lower().as_str();
+            return (grain_start(result, grain.lower()), out_grain);
+        }
+        TimeForm::GrainOffset { grain, offset } => {
+            // "Monday of this week", "20th of next month"
+            let offset_base = match grain {
+                Grain::Week => {
+                    let monday = start_of_week(ref_time);
+                    monday + Duration::weeks(*offset as i64)
+                }
+                Grain::Month => {
+                    let first = start_of_month(ref_time);
+                    add_months(first, *offset)
+                }
+                Grain::Year => {
+                    let jan1 = start_of_year(ref_time);
+                    add_years(jan1, *offset)
+                }
+                _ => ref_time,
+            };
+            // For DOW within a specific week, directly compute the day
+            if *grain == Grain::Week {
+                if let TimeForm::DayOfWeek(dow) = &primary.form {
+                    let dt = offset_base + Duration::days(*dow as i64);
+                    return (dt, "day");
+                }
+            }
+            // For DayOfMonth within a specific month, directly compute
+            if *grain == Grain::Month {
+                if let TimeForm::DayOfMonth(day) = &primary.form {
+                    let dt = NaiveDate::from_ymd_opt(
+                        offset_base.year(), offset_base.month(), *day)
+                        .unwrap_or(offset_base.date_naive())
+                        .and_hms_opt(0, 0, 0).unwrap().and_utc();
+                    return (dt, "day");
+                }
+            }
+            // Resolve primary in the context of the offset base
+            let (result, primary_grain) = resolve_simple_datetime(&primary.form, offset_base, primary.direction);
+            return (result, primary_grain);
+        }
+        _ => {}
+    }
+
+    // DayOfMonth + Month (or vice versa) → resolve as DateMDY
+    if let TimeForm::DayOfMonth(day) = &primary.form {
+        if let TimeForm::Month(month) = &secondary.form {
+            let y = if *month < ref_time.month() || (*month == ref_time.month() && *day < ref_time.day()) {
+                ref_time.year() + 1
+            } else {
+                ref_time.year()
+            };
+            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            return (dt, "day");
+        }
+    }
+    if let TimeForm::Month(month) = &primary.form {
+        if let TimeForm::DayOfMonth(day) = &secondary.form {
+            let y = if *month < ref_time.month() || (*month == ref_time.month() && *day < ref_time.day()) {
+                ref_time.year() + 1
+            } else {
+                ref_time.year()
+            };
+            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            return (dt, "day");
+        }
+    }
+
+    // Any date-like + Year → resolve date in that year
+    if let TimeForm::Year(y) = &secondary.form {
+        let (base, base_grain) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+        match &primary.form {
+            TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. } => {
+                let dt = NaiveDate::from_ymd_opt(*y, base.month(), base.day())
+                    .unwrap_or(ref_time.date_naive())
+                    .and_hms_opt(0, 0, 0).unwrap().and_utc();
+                return (dt, "day");
+            }
+            TimeForm::Month(m) => {
+                let dt = NaiveDate::from_ymd_opt(*y, *m, 1)
+                    .unwrap_or(ref_time.date_naive())
+                    .and_hms_opt(0, 0, 0).unwrap().and_utc();
+                return (dt, "month");
+            }
+            _ => {
+                // Generic: just override the year
+                let dt = NaiveDate::from_ymd_opt(*y, base.month(), base.day())
+                    .unwrap_or(ref_time.date_naive())
+                    .and_hms_opt(base.hour(), base.minute(), base.second()).unwrap().and_utc();
+                return (dt, base_grain);
+            }
+        }
+    }
+    // Year + Month → resolve month in that year
+    if let TimeForm::Year(y) = &primary.form {
+        if let TimeForm::Month(m) = &secondary.form {
+            let dt = NaiveDate::from_ymd_opt(*y, *m, 1)
+                .unwrap_or(ref_time.date_naive())
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            return (dt, "month");
+        }
+    }
+
+    // If primary is a PartOfDay and secondary has a date, combine
+    if let TimeForm::PartOfDay(_) = &primary.form {
+        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+        return (date_dt, "hour");
+    }
+
+    // Nested Composed: if one side is Composed, try to resolve it first
+    if let TimeForm::Composed(a, b) = &primary.form {
+        let (primary_dt, primary_grain) = resolve_composed(a, b, ref_time);
+        let new_primary = TimeData::new(TimeForm::DateMDY {
+            month: primary_dt.month(), day: primary_dt.day(), year: Some(primary_dt.year()),
+        });
+        return resolve_composed(&new_primary, secondary, ref_time);
+    }
+    if let TimeForm::Composed(a, b) = &secondary.form {
+        let (secondary_dt, secondary_grain) = resolve_composed(a, b, ref_time);
+        let new_secondary = TimeData::new(TimeForm::DateMDY {
+            month: secondary_dt.month(), day: secondary_dt.day(), year: Some(secondary_dt.year()),
+        });
+        return resolve_composed(primary, &new_secondary, ref_time);
+    }
+
+    // DOW + specific date → use the date (DOW is just a hint)
+    if let TimeForm::DayOfWeek(_) = &primary.form {
+        match &secondary.form {
+            TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_) | TimeForm::Holiday(..) => {
+                return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+            }
+            _ => {}
+        }
+    }
+    // Specific date + DOW → use the date
+    if let TimeForm::DayOfWeek(_) = &secondary.form {
+        match &primary.form {
+            TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_) | TimeForm::Holiday(..) => {
+                return resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            }
+            _ => {}
+        }
+    }
+
+    // Month + DayOfWeek or DayOfWeek + Month → resolve DOW within that month
+    // (e.g., "Jul 18" where 18 is DOW? no, this shouldn't happen)
+
+    // Default: resolve secondary if it's more specific than primary
+    fn form_specificity(f: &TimeForm) -> u32 {
+        match f {
+            TimeForm::DateMDY { year: Some(_), .. } => 6,
+            TimeForm::DateMDY { .. } => 5,
+            TimeForm::DayOfMonth(_) => 4,
+            TimeForm::Month(_) => 3,
+            TimeForm::DayOfWeek(_) => 2,
+            TimeForm::Year(_) => 1,
+            _ => 0,
+        }
+    }
+    let s_primary = form_specificity(&primary.form);
+    let s_secondary = form_specificity(&secondary.form);
+    if s_secondary > s_primary && s_secondary > 0 {
+        return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+    }
+
+    // Default: resolve primary
+    resolve_simple_datetime(&primary.form, ref_time, primary.direction)
+}
+
+// ============================================================
+// NthGrain interval resolution (last/next N <grain>)
+// ============================================================
+
+fn resolve_nth_grain_interval(
+    n: i64,
+    grain: Grain,
+    past: bool,
+    ref_time: DateTime<Utc>,
+) -> (DateTime<Utc>, DateTime<Utc>) {
+    let base = grain_start(ref_time, grain);
+
+    if past {
+        let from = add_grain(base, grain, -(n as i32));
+        let to = base;
+        (from, to)
+    } else {
+        let from = add_grain(base, grain, 1);
+        let to = add_grain(base, grain, 1 + n as i32);
+        (from, to)
+    }
+}
+
+// ============================================================
+// Weekend interval
+// ============================================================
+
+fn resolve_weekend_interval(ref_time: DateTime<Utc>, direction: Option<Direction>) -> (DateTime<Utc>, DateTime<Utc>) {
+    let dow = ref_time.weekday().num_days_from_monday();
+    // Weekend = [Friday 18:00, Monday 00:00)
+    match direction {
+        Some(Direction::Past) => {
+            // "this past weekend" or "last weekend"
+            // Find the most recent past Friday
+            let days_to_last_friday = if dow <= 4 {
+                // Mon-Fri: go back to last Friday
+                (dow + 3) as i64 // Mon(0) → 3, Tue(1) → 4, ...
+            } else {
+                // Sat(5) → 1 day back, Sun(6) → 2 days back
+                (dow - 4) as i64
+            };
+            let friday = midnight(ref_time - Duration::days(days_to_last_friday));
+            let from = friday + Duration::hours(18);
+            let to = from + Duration::hours(54); // Friday 18:00 to Monday 00:00
+            (from, to)
+        }
+        _ => {
+            // Next weekend (or this weekend if before Saturday)
+            let days_to_friday = if dow <= 4 {
+                (4 - dow) as i64 // Mon(0)→4, Tue(1)→3, ..., Fri(4)→0
+            } else {
+                (11 - dow) as i64 // Sat(5)→6, Sun(6)→5 (next Friday)
+            };
+            let friday = midnight(ref_time + Duration::days(days_to_friday));
+            let from = friday + Duration::hours(18);
+            let to = from + Duration::hours(54);
+            (from, to)
+        }
+    }
+}
+
+// ============================================================
+// AllGrain interval
+// ============================================================
+
+fn resolve_all_grain(grain: Grain, ref_time: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
+    let from = grain_start(ref_time, grain);
+    // "all week" end = start of next period minus 1 day for week
+    // Actually: all week = [Mon, Sun) = 6 days
+    let to = match grain {
+        Grain::Week => from + Duration::days(6), // Mon to Sun (not including next Mon)
+        _ => add_grain(from, grain, 1),
+    };
+    (from, to)
+}
+
+fn grain_for_all_rest(grain: Grain) -> &'static str {
+    match grain {
+        Grain::Week | Grain::Month | Grain::Year => grain.lower().as_str(),
+        _ => grain.as_str(),
+    }
+}
+
+// ============================================================
+// BeginEnd interval
+// ============================================================
+
+fn resolve_begin_end(
+    begin: bool,
+    target: &TimeForm,
+    ref_time: DateTime<Utc>,
+    direction: Option<Direction>,
+) -> (DateTime<Utc>, DateTime<Utc>) {
+    // Resolve the target period start
+    let (period_start, grain) = match target {
+        TimeForm::GrainOffset { grain, offset } => {
+            let (dt, _) = resolve_grain_offset(*grain, *offset, ref_time);
+            (dt, *grain)
+        }
+        TimeForm::Month(m) => {
+            let dt = resolve_month(*m, ref_time, direction);
+            (NaiveDate::from_ymd_opt(dt.year(), dt.month(), 1)
+                .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc(), Grain::Month)
+        }
+        TimeForm::Year(y) => {
+            let dt = NaiveDate::from_ymd_opt(*y, 1, 1).unwrap()
+                .and_hms_opt(0, 0, 0).unwrap().and_utc();
+            (dt, Grain::Year)
+        }
+        _ => {
+            let (dt, _) = resolve_simple_datetime(target, ref_time, direction);
+            let g = target_grain(target);
+            (grain_start(dt, g), g)
+        }
+    };
+
+    // Use hardcoded boundaries matching Haskell Duckling
+    match grain {
+        Grain::Week => {
+            if begin {
+                // Beginning of week: Mon-Wed (dayOfWeek 1-3)
+                (period_start, period_start + Duration::days(3))
+            } else {
+                // End of week: Fri-Sun (dayOfWeek 5-7)
+                (period_start + Duration::days(4), period_start + Duration::days(7))
+            }
+        }
+        Grain::Month => {
+            let y = period_start.year();
+            let m = period_start.month();
+            if begin {
+                // Beginning of month: day 1 to day 11 (exclusive)
+                let end = make_date(y, m, 11);
+                (period_start, end)
+            } else {
+                // End of month: day 21 to end of month
+                let start = make_date(y, m, 21);
+                let end = add_grain(period_start, Grain::Month, 1);
+                (start, end)
+            }
+        }
+        Grain::Year => {
+            let y = period_start.year();
+            if begin {
+                // Beginning of year: month 1 to month 4 (Jan-Mar)
+                let end = make_date(y, 4, 1);
+                (period_start, end)
+            } else {
+                // End of year: month 9 to end of year (Sep-Dec)
+                let start = make_date(y, 9, 1);
+                let end = make_date(y + 1, 1, 1);
+                (start, end)
+            }
+        }
+        Grain::Day => {
+            if begin {
+                // Beginning of day: 00:00 to 08:00
+                let end = period_start + Duration::hours(8);
+                (period_start, end)
+            } else {
+                // End of day: 17:00 to 00:00
+                let start = period_start + Duration::hours(17);
+                let end = period_start + Duration::days(1);
+                (start, end)
+            }
+        }
+        _ => {
+            // Fallback: divide into thirds
+            let period_end = add_grain(period_start, grain, 1);
+            let total_secs = (period_end - period_start).num_seconds();
+            let portion = total_secs / 3;
+            if begin {
+                let to = period_start + Duration::seconds(portion);
+                let to = grain_start(to, grain.lower());
+                (period_start, to)
+            } else {
+                let from = period_end - Duration::seconds(portion);
+                let from = grain_start(from, grain.lower());
+                (from, period_end)
+            }
+        }
+    }
+}
+
+fn begin_end_grain(target: &TimeForm) -> &'static str {
+    match target {
+        TimeForm::GrainOffset { grain, .. } => grain.lower().as_str(),
+        _ => {
+            let g = target_grain(target);
+            g.lower().as_str()
+        }
+    }
+}
+
+fn target_grain(form: &TimeForm) -> Grain {
+    match form {
+        TimeForm::GrainOffset { grain, .. } => *grain,
+        TimeForm::Month(_) => Grain::Month,
+        TimeForm::Year(_) => Grain::Year,
+        TimeForm::DayOfWeek(_) => Grain::Day,
+        _ => Grain::Day,
+    }
+}
+
+// ============================================================
+// Season interval
+// ============================================================
+
+fn resolve_season_interval(
+    season: u32,
+    ref_time: DateTime<Utc>,
+    direction: Option<Direction>,
+) -> (DateTime<Utc>, DateTime<Utc>) {
+    let year = ref_time.year();
+
+    // Season dates (Northern Hemisphere meteorological approximation)
+    let (from, to) = match season {
+        0 => { // Spring: ~Mar 20 to ~Jun 21
+            (make_date(year, 3, 20), make_date(year, 6, 21))
+        }
+        1 => { // Summer: ~Jun 21 to ~Sep 24
+            (make_date(year, 6, 21), make_date(year, 9, 24))
+        }
+        2 => { // Fall: ~Sep 23 to ~Dec 21
+            (make_date(year, 9, 23), make_date(year, 12, 21))
+        }
+        3 => { // Winter: ~Dec 21 prev to ~Mar 21
+            (make_date(year - 1, 12, 21), make_date(year, 3, 21))
+        }
+        _ => (make_date(year, 1, 1), make_date(year, 4, 1)),
+    };
+
+    match direction {
+        Some(Direction::Past) => {
+            // Previous season
+            let (_from, _to) = match season {
+                0 => (make_date(year - 1, 3, 20), make_date(year - 1, 6, 21)),
+                1 => (make_date(year - 1, 6, 21), make_date(year - 1, 9, 24)),
+                2 => (make_date(year - 1, 9, 23), make_date(year - 1, 12, 21)),
+                3 => (make_date(year - 2, 12, 21), make_date(year - 1, 3, 21)),
+                _ => (from, to),
+            };
+            // But if we're looking for last season (not this specific one), use
+            // the season before the current one
+            let current_season = current_season_number(ref_time);
+            let prev_season = if current_season == 0 { 3 } else { current_season - 1 };
+            season_dates(prev_season, year, direction)
+        }
+        Some(Direction::Future) | Some(Direction::FarFuture) => {
+            let current_season = current_season_number(ref_time);
+            let next_season = (current_season + 1) % 4;
+            season_dates(next_season, year, direction)
+        }
+        None => {
+            if season == 99 {
+                // Generic "season" → use current season
+                let current = current_season_number(ref_time);
+                season_dates(current, year, None)
+            } else {
+                // Specific season like "this Summer" → use that season
+                // If the season hasn't started yet this year, show this year's
+                // If it's already past, show this year's (it's "this" not "next")
+                season_dates(season, year, None)
+            }
+        }
+    }
+}
+
+fn current_season_number(ref_time: DateTime<Utc>) -> u32 {
+    let month = ref_time.month();
+    let day = ref_time.day();
+    match month {
+        12 if day >= 21 => 3,
+        1 | 2 => 3,
+        3 if day < 20 => 3,
+        3..=5 => 0,
+        6 if day < 21 => 0,
+        6..=8 => 1,
+        9 if day < 23 => 1,
+        9..=11 => 2,
+        12 => 2,
+        _ => 0,
+    }
+}
+
+fn season_dates(season: u32, year: i32, direction: Option<Direction>) -> (DateTime<Utc>, DateTime<Utc>) {
+    match season {
+        0 => (make_date(year, 3, 20), make_date(year, 6, 20)),
+        1 => (make_date(year, 6, 21), make_date(year, 9, 24)),
+        2 => {
+            match direction {
+                Some(Direction::Past) => (make_date(year - 1, 9, 23), make_date(year - 1, 12, 20)),
+                _ => (make_date(year, 9, 23), make_date(year, 12, 20)),
+            }
+        }
+        3 => (make_date(year - 1, 12, 21), make_date(year, 3, 21)),
+        _ => (make_date(year, 1, 1), make_date(year, 4, 1)),
+    }
+}
+
+// ============================================================
+// Part of day interval
+// ============================================================
+
+fn pod_interval(pod: PartOfDay, date: NaiveDate, early_late: Option<EarlyLate>) -> (DateTime<Utc>, DateTime<Utc>) {
+    let (start_h, end_h) = match (pod, early_late) {
+        (PartOfDay::Morning, Some(EarlyLate::Early)) => (0, 9),
+        (PartOfDay::Morning, _) => (0, 12),
+        (PartOfDay::Afternoon, _) => (12, 19),
+        (PartOfDay::Evening, Some(EarlyLate::Late)) => (21, 24),
+        (PartOfDay::Evening, _) => (18, 24),
+        (PartOfDay::Night, Some(EarlyLate::Late)) => (21, 24),
+        (PartOfDay::Night, _) => (18, 24),
+        (PartOfDay::Lunch, _) => (12, 14),
+    };
+
+    let from = date.and_hms_opt(start_h, 0, 0).unwrap().and_utc();
+    let to = if end_h >= 24 {
+        (date + Duration::days(1)).and_hms_opt(0, 0, 0).unwrap().and_utc()
+    } else {
+        date.and_hms_opt(end_h, 0, 0).unwrap().and_utc()
+    };
+    (from, to)
+}
+
+// ============================================================
+// Helper functions
+// ============================================================
+
+fn midnight(dt: DateTime<Utc>) -> DateTime<Utc> {
+    dt.date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+fn make_date(y: i32, m: u32, d: u32) -> DateTime<Utc> {
+    NaiveDate::from_ymd_opt(y, m, d)
+        .unwrap_or(NaiveDate::from_ymd_opt(y, 1, 1).unwrap())
+        .and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+fn start_of_week(dt: DateTime<Utc>) -> DateTime<Utc> {
+    let dow = dt.weekday().num_days_from_monday();
+    midnight(dt - Duration::days(dow as i64))
+}
+
+fn start_of_month(dt: DateTime<Utc>) -> DateTime<Utc> {
+    NaiveDate::from_ymd_opt(dt.year(), dt.month(), 1)
+        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+fn start_of_year(dt: DateTime<Utc>) -> DateTime<Utc> {
+    NaiveDate::from_ymd_opt(dt.year(), 1, 1)
+        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+fn start_of_quarter(dt: DateTime<Utc>) -> DateTime<Utc> {
+    let q = (dt.month() - 1) / 3;
+    let month = q * 3 + 1;
+    NaiveDate::from_ymd_opt(dt.year(), month, 1)
+        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
+    match grain {
+        Grain::Second => dt,
+        Grain::Minute => dt.date_naive()
+            .and_hms_opt(dt.hour(), dt.minute(), 0).unwrap().and_utc(),
+        Grain::Hour => dt.date_naive()
+            .and_hms_opt(dt.hour(), 0, 0).unwrap().and_utc(),
+        Grain::Day => midnight(dt),
+        Grain::Week => start_of_week(dt),
+        Grain::Month => start_of_month(dt),
+        Grain::Quarter => start_of_quarter(dt),
+        Grain::Year => start_of_year(dt),
+    }
+}
+
+fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i32) -> DateTime<Utc> {
+    match grain {
+        Grain::Second => dt + Duration::seconds(n as i64),
+        Grain::Minute => dt + Duration::minutes(n as i64),
+        Grain::Hour => dt + Duration::hours(n as i64),
+        Grain::Day => dt + Duration::days(n as i64),
+        Grain::Week => dt + Duration::weeks(n as i64),
+        Grain::Month => add_months(dt, n),
+        Grain::Quarter => add_months(dt, n * 3),
+        Grain::Year => add_years(dt, n),
+    }
+}
+
+fn add_months(dt: DateTime<Utc>, months: i32) -> DateTime<Utc> {
+    let total = dt.year() * 12 + dt.month() as i32 - 1 + months;
+    let year = total.div_euclid(12);
+    let month = (total.rem_euclid(12) + 1) as u32;
+    let day = dt.day().min(days_in_month(year, month));
+    NaiveDate::from_ymd_opt(year, month, day)
+        .unwrap_or(dt.date_naive())
+        .and_hms_opt(dt.hour(), dt.minute(), dt.second())
+        .unwrap()
+        .and_utc()
+}
+
+fn add_years(dt: DateTime<Utc>, years: i32) -> DateTime<Utc> {
+    let year = dt.year() + years;
+    let day = dt.day().min(days_in_month(year, dt.month()));
+    NaiveDate::from_ymd_opt(year, dt.month(), day)
+        .unwrap_or(dt.date_naive())
+        .and_hms_opt(dt.hour(), dt.minute(), dt.second())
+        .unwrap()
+        .and_utc()
+}
+
+fn days_in_month(year: i32, month: u32) -> u32 {
+    match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 => if is_leap_year(year) { 29 } else { 28 },
+        _ => 30,
+    }
+}
+
+fn is_leap_year(year: i32) -> bool {
+    (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+}
+
+// ============================================================
+// Holiday resolution
+// ============================================================
+
+fn holiday_default_year(name: &str, ref_time: DateTime<Utc>) -> i32 {
+    // For holidays, determine whether to use this year or next
+    if let Some(date) = resolve_holiday(name, ref_time.year()) {
+        let dt = date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+        if dt < ref_time {
+            // Holiday has passed this year, check if next year's is better
+            ref_time.year() + 1
+        } else {
+            ref_time.year()
+        }
+    } else {
+        ref_time.year()
+    }
+}
+
+/// Resolve a holiday that is an interval of days. Returns (start_date, end_date_exclusive).
+fn resolve_holiday_interval(name: &str, year: i32) -> Option<(NaiveDate, NaiveDate)> {
+    let name_lower = name.to_lowercase();
+    let name = name_lower.as_str();
+
+    // Rosh Hashanah: 3-day interval
+    if name.starts_with("rosh hashann") || name.starts_with("rosh hashan") || name == "yom teruah" {
+        if let Some(start) = rosh_hashanah(year) {
+            return Some((start, start + Duration::days(3)));
+        }
+    }
+
+    // Chanukah: 8-day interval
+    if name.starts_with("chanukah") || name.starts_with("hanuk") || name.starts_with("hannuk") {
+        if let Some(start) = chanukah(year) {
+            return Some((start, start + Duration::days(8)));
+        }
+    }
+
+    // Passover: 9-day interval (start to start+9)
+    if name == "passover" || name.starts_with("pesac") || name.starts_with("pesak") || name.starts_with("pesah") {
+        if let Some(start) = passover(year) {
+            return Some((start, start + Duration::days(9)));
+        }
+    }
+
+    // Shavuot: 3-day interval (passover+50 to passover+53)
+    if name == "shavuot" || name.starts_with("shavu") || name.starts_with("shovuo") || name.starts_with("feast of weeks") {
+        if let Some(p) = passover(year) {
+            let start = p + Duration::days(50);
+            return Some((start, start + Duration::days(3)));
+        }
+    }
+
+    // Sukkot: 9-day interval (rosh+14 to rosh+23)
+    if name.starts_with("sukkot") || name.starts_with("succos") || name.starts_with("succot")
+       || name.starts_with("sukko") || name.starts_with("feast of the ingathering")
+       || name.starts_with("feast of booth") || name.starts_with("feast of tabernacle") {
+        if let Some(rosh) = rosh_hashanah(year) {
+            let start = rosh + Duration::days(14);
+            return Some((start, start + Duration::days(9)));
+        }
+    }
+
+    // Navaratri: 10-day interval (start to start+10)
+    if name == "navaratri" || name == "durga puja" || name == "durgotsava" || name.starts_with("navarat") {
+        if let Some(start) = navaratri(year) {
+            return Some((start, start + Duration::days(10)));
+        }
+    }
+
+    // Ramadan: from ramadan start to eid al-fitr (exclusive)
+    if name == "ramadan" || name.starts_with("ramadh") || name.starts_with("ramadt") || name.starts_with("ramzan") || name.starts_with("ramzaan") {
+        if let Some(start) = ramadan(year) {
+            if let Some(end) = eid_al_fitr(year) {
+                return Some((start, end));
+            }
+            // Fallback: ~30 days
+            return Some((start, start + Duration::days(30)));
+        }
+    }
+
+    // Lent: Ash Wednesday to Easter (exclusive)
+    if name == "lent" {
+        let easter = easter_date(year);
+        let start = easter - Duration::days(46); // Ash Wednesday
+        return Some((start, easter));
+    }
+
+    // Great Fast / Great Lent: Clean Monday to Orthodox Easter - 8 (exclusive)
+    if name == "great fast" || name == "great lent" {
+        let orthodox = orthodox_easter_date(year);
+        let start = orthodox - Duration::days(48); // Clean Monday
+        let end = orthodox - Duration::days(8); // Day after Lazarus Saturday (exclusive)
+        return Some((start, end));
+    }
+
+    // GYSD: 3-day interval
+    if name == "gysd" || name.starts_with("global youth service") {
+        if let Some(start) = gysd_date(year) {
+            return Some((start, start + Duration::days(3)));
+        }
+    }
+
+    None
+}
+
+/// Resolve a holiday that is a minute-level interval (e.g., Earth Hour).
+fn resolve_holiday_minute_interval(name: &str, year: i32) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
+    let name_lower = name.to_lowercase();
+    let name = name_lower.as_str();
+
+    if name == "earth hour" {
+        // Last Saturday of March, unless it's Holy Saturday, then one week before
+        let last_sat = last_dow_of_month(year, 3, 5); // 5=Saturday
+        let easter = easter_date(year);
+        let holy_saturday = easter - Duration::days(1);
+        let date = if last_sat == holy_saturday {
+            last_sat - Duration::days(7)
+        } else {
+            last_sat
+        };
+        let from = date.and_hms_opt(20, 30, 0).unwrap().and_utc();
+        let to = date.and_hms_opt(21, 31, 0).unwrap().and_utc(); // 60 minutes later, closed interval
+        return Some((from, to));
+    }
+
+    None
+}
+
+fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
+    let name_lower = name.to_lowercase();
+    let name = name_lower.as_str();
+
+    // Fixed-date holidays
+    match name {
+        s if s.starts_with("christmas") || s.starts_with("xmas") =>
+            return NaiveDate::from_ymd_opt(year, 12, 25),
+        s if s.contains("new year") && s.contains("eve") =>
+            return NaiveDate::from_ymd_opt(year, 12, 31),
+        s if s.contains("new year") && s.contains("day") =>
+            return NaiveDate::from_ymd_opt(year, 1, 1),
+        s if s.contains("valentine") =>
+            return NaiveDate::from_ymd_opt(year, 2, 14),
+        "halloween" =>
+            return NaiveDate::from_ymd_opt(year, 10, 31),
+        "world vegan day" =>
+            return NaiveDate::from_ymd_opt(year, 11, 1),
+        s if s.contains("patrick") || s.contains("paddy") =>
+            return NaiveDate::from_ymd_opt(year, 3, 17),
+        "koningsdag" | "king's day" => {
+            // April 27, unless it's a Sunday, then April 26
+            let d = NaiveDate::from_ymd_opt(year, 4, 27).unwrap();
+            if d.weekday().num_days_from_monday() == 6 {
+                // Sunday -> use April 26
+                return NaiveDate::from_ymd_opt(year, 4, 26);
+            }
+            return NaiveDate::from_ymd_opt(year, 4, 27);
+        }
+        _ => {}
+    }
+
+    // Thanksgiving (4th Thursday of November)
+    if name.starts_with("thanksgiving") {
+        return Some(nth_dow_of_month(year, 11, 3, 4)); // 3=Thursday, 4th occurrence
+    }
+
+    // Black Friday (day after Thanksgiving)
+    if name == "black friday" {
+        let thanksgiving = nth_dow_of_month(year, 11, 3, 4);
+        return Some(thanksgiving + Duration::days(1));
+    }
+
+    // Boss's Day (closest weekday to Oct 16)
+    if name.starts_with("boss") {
+        return Some(closest_weekday(NaiveDate::from_ymd_opt(year, 10, 16).unwrap()));
+    }
+
+    // MLK Day / Civil Rights Day / Idaho Human Rights Day (3rd Monday of January)
+    if name.contains("mlk") || name.contains("martin luther king")
+       || name.contains("civil rights") || name.contains("idaho human") {
+        return Some(nth_dow_of_month(year, 1, 0, 3)); // 0=Monday, 3rd occurrence
+    }
+
+    // Easter-based holidays
+    let easter = easter_date(year);
+    match name {
+        s if s.starts_with("easter") => {
+            if s.contains("mon") {
+                return Some(easter + Duration::days(1));
+            }
+            return Some(easter);
+        }
+        "good friday" => return Some(easter - Duration::days(2)),
+        s if s.starts_with("palm sunday") || s.starts_with("branch sunday") =>
+            return Some(easter - Duration::days(7)),
+        s if s.starts_with("maundy") || s.starts_with("covenant thu") || s.contains("of mysteries") =>
+            return Some(easter - Duration::days(3)),
+        s if s.starts_with("pentecost") || s.starts_with("white sunday") =>
+            return Some(easter + Duration::days(49)),
+        s if s.starts_with("whit monday") || s.starts_with("monday of the holy spirit") =>
+            return Some(easter + Duration::days(50)),
+        "trinity sunday" => return Some(easter + Duration::days(56)),
+        s if s.starts_with("pancake") || s.starts_with("mardi gras") || s.starts_with("shrove tuesday") =>
+            return Some(easter - Duration::days(47)),
+        s if s.starts_with("ash wednesday") =>
+            return Some(easter - Duration::days(46)),
+        "lent" => {
+            // Lent is an interval — return start date (Ash Wednesday)
+            return Some(easter - Duration::days(46));
+        }
+        _ => {}
+    }
+
+    // Orthodox Easter-based holidays
+    let orthodox = orthodox_easter_date(year);
+    if name.starts_with("orthodox") {
+        if name.contains("easter") {
+            return Some(orthodox);
+        }
+        if name.contains("good friday") || name.contains("great friday") {
+            return Some(orthodox - Duration::days(2));
+        }
+        if name.contains("shrove monday") {
+            return Some(orthodox - Duration::days(48));
+        }
+    }
+    if name == "clean monday" {
+        return Some(orthodox - Duration::days(48));
+    }
+    if name == "lazarus saturday" {
+        return Some(orthodox - Duration::days(8));
+    }
+    if name == "great fast" {
+        // Interval: Clean Monday to Lazarus Saturday
+        return Some(orthodox - Duration::days(48));
+    }
+
+    // Chinese New Year (lookup table)
+    if name.contains("chinese") && name.contains("new year") {
+        return chinese_new_year(year);
+    }
+
+    // Jewish holidays (lookup tables)
+    if let Some(d) = resolve_jewish_holiday(name, year) {
+        return Some(d);
+    }
+
+    // Islamic holidays (lookup tables)
+    if let Some(d) = resolve_islamic_holiday(name, year) {
+        return Some(d);
+    }
+
+    // Hindu holidays (lookup tables)
+    if let Some(d) = resolve_hindu_holiday(name, year) {
+        return Some(d);
+    }
+
+    // GYSD / Global Youth Service Day (varies)
+    if name == "gysd" || name.starts_with("global youth service") {
+        return gysd_date(year);
+    }
+
+    // Earth Hour (last Saturday of March)
+    if name == "earth hour" {
+        return Some(last_dow_of_month(year, 3, 5)); // 5=Saturday
+    }
+
+    // Parsi New Year / Jamshedi Navroz (every 365 days from Aug 16, 2020)
+    if name.contains("parsi") || name.contains("jamshedi") || name.contains("navroz") {
+        return parsi_new_year(year);
+    }
+
+    // Vesak / Buddha Day
+    if name.starts_with("vesak") || name.starts_with("vaisakha") || name.starts_with("buddha") {
+        return resolve_vesak(year);
+    }
+
+    None
+}
+
+// ============================================================
+// Easter computation (Anonymous Gregorian algorithm)
+// ============================================================
+
+fn easter_date(year: i32) -> NaiveDate {
+    let a = year % 19;
+    let b = year / 100;
+    let c = year % 100;
+    let d = b / 4;
+    let e = b % 4;
+    let f = (b + 8) / 25;
+    let g = (b - f + 1) / 3;
+    let h = (19 * a + b - d - g + 15) % 30;
+    let i = c / 4;
+    let k = c % 4;
+    let l = (32 + 2 * e + 2 * i - h - k) % 7;
+    let m = (a + 11 * h + 22 * l) / 451;
+    let month = (h + l - 7 * m + 114) / 31;
+    let day = (h + l - 7 * m + 114) % 31 + 1;
+    NaiveDate::from_ymd_opt(year, month as u32, day as u32).unwrap()
+}
+
+fn orthodox_easter_date(year: i32) -> NaiveDate {
+    let a = year % 4;
+    let b = year % 7;
+    let c = year % 19;
+    let d = (19 * c + 15) % 30;
+    let e = (2 * a + 4 * b - d + 34) % 7;
+    let month = (d + e + 114) / 31;
+    let day = (d + e + 114) % 31 + 1;
+    // Julian calendar date — add offset to convert to Gregorian
+    // For years 1900-2099, the offset is 13 days
+    let julian = NaiveDate::from_ymd_opt(year, month as u32, day as u32).unwrap();
+    julian + Duration::days(13)
+}
+
+// ============================================================
+// Nth DOW of month computation
+// ============================================================
+
+/// Find the nth occurrence of a given weekday in a month.
+/// dow: 0=Monday, 1=Tuesday, ..., 6=Sunday
+/// n: 1-based (1=first, 2=second, etc.)
+fn nth_dow_of_month(year: i32, month: u32, dow: u32, n: u32) -> NaiveDate {
+    let first = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
+    let first_dow = first.weekday().num_days_from_monday();
+    let offset = ((dow as i32 - first_dow as i32) + 7) % 7;
+    let day = 1 + offset as u32 + (n - 1) * 7;
+    NaiveDate::from_ymd_opt(year, month, day).unwrap_or(first)
+}
+
+/// Find the last occurrence of a given weekday in a month.
+fn last_dow_of_month(year: i32, month: u32, dow: u32) -> NaiveDate {
+    let last_day = days_in_month(year, month);
+    let last = NaiveDate::from_ymd_opt(year, month, last_day).unwrap();
+    let last_dow = last.weekday().num_days_from_monday();
+    let diff = ((last_dow as i32 - dow as i32) + 7) % 7;
+    last - Duration::days(diff as i64)
+}
+
+/// Find the closest occurrence of a specific day of week to a given date.
+fn closest_dow(date: NaiveDate, target_dow: u32) -> NaiveDate {
+    let date_dow = date.weekday().num_days_from_monday();
+    let forward = ((target_dow as i32 - date_dow as i32) + 7) % 7;
+    let backward = ((date_dow as i32 - target_dow as i32) + 7) % 7;
+    if forward == 0 {
+        date // same day
+    } else if forward <= backward {
+        date + Duration::days(forward as i64)
+    } else {
+        date - Duration::days(backward as i64)
+    }
+}
+
+/// Find the closest weekday (Mon-Fri) to a given date.
+fn closest_weekday(date: NaiveDate) -> NaiveDate {
+    let dow = date.weekday().num_days_from_monday();
+    match dow {
+        5 => date - Duration::days(1), // Saturday → Friday
+        6 => date + Duration::days(1), // Sunday → Monday
+        _ => date,
+    }
+}
+
+// ============================================================
+// Holiday lookup tables
+// ============================================================
+
+fn chinese_new_year(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2010 => (2, 14), 2011 => (2, 3), 2012 => (1, 23), 2013 => (2, 10),
+        2014 => (1, 31), 2015 => (2, 19), 2016 => (2, 8), 2017 => (1, 28),
+        2018 => (2, 16), 2019 => (2, 5), 2020 => (1, 25), 2021 => (2, 12),
+        2022 => (2, 1), 2023 => (1, 22), 2024 => (2, 10), 2025 => (1, 29),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn resolve_jewish_holiday(name: &str, year: i32) -> Option<NaiveDate> {
+    // Rosh Hashanah
+    if name.starts_with("rosh hashann") || name.starts_with("rosh hashan") || name == "yom teruah" {
+        return rosh_hashanah(year);
+    }
+    if name == "yom kippur" {
+        return rosh_hashanah(year).map(|d| d + Duration::days(9));
+    }
+    if name == "shemini atzeret" {
+        return rosh_hashanah(year).map(|d| d + Duration::days(21));
+    }
+    if name == "simchat torah" {
+        return rosh_hashanah(year).map(|d| d + Duration::days(22));
+    }
+    if name == "passover" {
+        return passover(year);
+    }
+    if name == "shavuot" {
+        return passover(year).map(|d| d + Duration::days(49));
+    }
+    if name.starts_with("chanukah") || name.starts_with("hanuk") || name.starts_with("hannuk") {
+        return chanukah(year);
+    }
+    if name.starts_with("tisha") {
+        return tisha_bav(year);
+    }
+    if name == "yom haatzmaut" {
+        return yom_haatzmaut(year);
+    }
+    if name.starts_with("lag b") || name.starts_with("lag b'") {
+        return lag_bomer(year);
+    }
+    if name == "yom hashoah" || name == "holocaust day" {
+        return yom_hashoah(year);
+    }
+    if name.starts_with("sukkot") || name.starts_with("succos") || name.starts_with("feast of the ingathering") {
+        return rosh_hashanah(year).map(|d| d + Duration::days(14));
+    }
+    if name == "tu bishvat" {
+        return tu_bishvat(year);
+    }
+    if name == "purim" {
+        return purim(year);
+    }
+    if name == "shushan purim" {
+        return purim(year).map(|d| d + Duration::days(1));
+    }
+    None
+}
+
+fn rosh_hashanah(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (9, 11), 1951 => (9, 30), 1952 => (9, 19), 1953 => (9, 9),
+        1954 => (9, 27), 1955 => (9, 16), 1956 => (9, 5), 1957 => (9, 25),
+        1958 => (9, 14), 1959 => (10, 2), 1960 => (9, 21), 1961 => (9, 10),
+        1962 => (9, 28), 1963 => (9, 18), 1964 => (9, 6), 1965 => (9, 26),
+        1966 => (9, 14), 1967 => (10, 4), 1968 => (9, 22), 1969 => (9, 12),
+        1970 => (9, 30), 1971 => (9, 19), 1972 => (9, 8), 1973 => (9, 26),
+        1974 => (9, 16), 1975 => (9, 5), 1976 => (9, 24), 1977 => (9, 12),
+        1978 => (10, 1), 1979 => (9, 21), 1980 => (9, 10), 1981 => (9, 28),
+        1982 => (9, 17), 1983 => (9, 7), 1984 => (9, 26), 1985 => (9, 15),
+        1986 => (10, 3), 1987 => (9, 23), 1988 => (9, 11), 1989 => (9, 29),
+        1990 => (9, 19), 1991 => (9, 8), 1992 => (9, 27), 1993 => (9, 15),
+        1994 => (9, 5), 1995 => (9, 24), 1996 => (9, 13), 1997 => (10, 1),
+        1998 => (9, 20), 1999 => (9, 10), 2000 => (9, 29), 2001 => (9, 17),
+        2002 => (9, 6), 2003 => (9, 26), 2004 => (9, 15), 2005 => (10, 3),
+        2006 => (9, 22), 2007 => (9, 12), 2008 => (9, 29), 2009 => (9, 18),
+        2010 => (9, 8), 2011 => (9, 28), 2012 => (9, 18), 2013 => (9, 4),
+        2014 => (9, 24), 2015 => (9, 13), 2016 => (10, 2), 2017 => (9, 20),
+        2018 => (9, 9), 2019 => (9, 29), 2020 => (9, 18), 2021 => (9, 6),
+        2022 => (9, 25), 2023 => (9, 15), 2024 => (10, 2), 2025 => (9, 22),
+        2026 => (9, 11), 2027 => (10, 1), 2028 => (9, 20), 2029 => (9, 9),
+        2030 => (9, 27), 2031 => (9, 17), 2032 => (9, 5), 2033 => (9, 23),
+        2034 => (9, 13), 2035 => (10, 3), 2036 => (9, 21), 2037 => (9, 9),
+        2038 => (9, 29), 2039 => (9, 18), 2040 => (9, 7), 2041 => (9, 25),
+        2042 => (9, 14), 2043 => (10, 4), 2044 => (9, 21), 2045 => (9, 11),
+        2046 => (9, 30), 2047 => (9, 20), 2048 => (9, 7), 2049 => (9, 26),
+        2050 => (9, 16),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn passover(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (4, 1), 1951 => (4, 20), 1952 => (4, 9), 1953 => (3, 30),
+        1954 => (4, 17), 1955 => (4, 6), 1956 => (3, 26), 1957 => (4, 15),
+        1958 => (4, 4), 1959 => (4, 22), 1960 => (4, 11), 1961 => (3, 31),
+        1962 => (4, 18), 1963 => (4, 8), 1964 => (3, 27), 1965 => (4, 16),
+        1966 => (4, 4), 1967 => (4, 24), 1968 => (4, 12), 1969 => (4, 2),
+        1970 => (4, 20), 1971 => (4, 9), 1972 => (3, 29), 1973 => (4, 16),
+        1974 => (4, 6), 1975 => (3, 26), 1976 => (4, 14), 1977 => (4, 2),
+        1978 => (4, 21), 1979 => (4, 11), 1980 => (3, 31), 1981 => (4, 18),
+        1982 => (4, 7), 1983 => (3, 28), 1984 => (4, 16), 1985 => (4, 5),
+        1986 => (4, 23), 1987 => (4, 13), 1988 => (4, 1), 1989 => (4, 19),
+        1990 => (4, 9), 1991 => (3, 29), 1992 => (4, 17), 1993 => (4, 5),
+        1994 => (3, 26), 1995 => (4, 14), 1996 => (4, 3), 1997 => (4, 21),
+        1998 => (4, 10), 1999 => (3, 31), 2000 => (4, 19), 2001 => (4, 7),
+        2002 => (3, 27), 2003 => (4, 16), 2004 => (4, 5), 2005 => (4, 23),
+        2006 => (4, 12), 2007 => (4, 2), 2008 => (4, 19), 2009 => (4, 8),
+        2010 => (3, 29), 2011 => (4, 18), 2012 => (4, 6), 2013 => (3, 25),
+        2014 => (4, 14), 2015 => (4, 3), 2016 => (4, 22), 2017 => (4, 10),
+        2018 => (3, 30), 2019 => (4, 19), 2020 => (4, 8), 2021 => (3, 27),
+        2022 => (4, 15), 2023 => (4, 5), 2024 => (4, 22), 2025 => (4, 12),
+        2026 => (4, 1), 2027 => (4, 21), 2028 => (4, 10), 2029 => (3, 30),
+        2030 => (4, 17), 2031 => (4, 7), 2032 => (3, 26), 2033 => (4, 13),
+        2034 => (4, 3), 2035 => (4, 23), 2036 => (4, 11), 2037 => (3, 30),
+        2038 => (4, 19), 2039 => (4, 8), 2040 => (3, 28), 2041 => (4, 15),
+        2042 => (4, 4), 2043 => (4, 24), 2044 => (4, 11), 2045 => (4, 1),
+        2046 => (4, 20), 2047 => (4, 10), 2048 => (3, 28), 2049 => (4, 16),
+        2050 => (4, 6),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn chanukah(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (12, 3), 1951 => (12, 23), 1952 => (12, 12), 1953 => (12, 1),
+        1954 => (12, 19), 1955 => (12, 9), 1956 => (11, 28), 1957 => (12, 17),
+        1958 => (12, 6), 1959 => (12, 25), 1960 => (12, 13), 1961 => (12, 2),
+        1962 => (12, 21), 1963 => (12, 10), 1964 => (11, 29), 1965 => (12, 18),
+        1966 => (12, 7), 1967 => (12, 26), 1968 => (12, 15), 1969 => (12, 4),
+        1970 => (12, 22), 1971 => (12, 12), 1972 => (11, 30), 1973 => (12, 19),
+        1974 => (12, 8), 1975 => (11, 28), 1976 => (12, 16), 1977 => (12, 4),
+        1978 => (12, 24), 1979 => (12, 14), 1980 => (12, 2), 1981 => (12, 20),
+        1982 => (12, 10), 1983 => (11, 30), 1984 => (12, 18), 1985 => (12, 7),
+        1986 => (12, 26), 1987 => (12, 15), 1988 => (12, 3), 1989 => (12, 22),
+        1990 => (12, 11), 1991 => (12, 1), 1992 => (12, 19), 1993 => (12, 8),
+        1994 => (11, 27), 1995 => (12, 17), 1996 => (12, 5), 1997 => (12, 23),
+        1998 => (12, 13), 1999 => (12, 3), 2000 => (12, 21), 2001 => (12, 9),
+        2002 => (11, 29), 2003 => (12, 19), 2004 => (12, 7), 2005 => (12, 25),
+        2006 => (12, 15), 2007 => (12, 4), 2008 => (12, 21), 2009 => (12, 11),
+        2010 => (12, 1), 2011 => (12, 20), 2012 => (12, 8), 2013 => (11, 27),
+        2014 => (12, 16), 2015 => (12, 6), 2016 => (12, 24), 2017 => (12, 12),
+        2018 => (12, 2), 2019 => (12, 22), 2020 => (12, 10), 2021 => (11, 28),
+        2022 => (12, 18), 2023 => (12, 7), 2024 => (12, 25), 2025 => (12, 14),
+        2026 => (12, 4), 2027 => (12, 24), 2028 => (12, 12), 2029 => (12, 1),
+        2030 => (12, 20), 2031 => (12, 9), 2032 => (11, 27), 2033 => (12, 16),
+        2034 => (12, 6), 2035 => (12, 25), 2036 => (12, 13), 2037 => (12, 2),
+        2038 => (12, 21), 2039 => (12, 11), 2040 => (11, 29), 2041 => (12, 17),
+        2042 => (12, 7), 2043 => (12, 26), 2044 => (12, 14), 2045 => (12, 3),
+        2046 => (12, 23), 2047 => (12, 12), 2048 => (11, 29), 2049 => (12, 19),
+        2050 => (12, 9),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn tisha_bav(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (7, 16), 2014 => (8, 5), 2015 => (7, 26), 2016 => (8, 14),
+        2017 => (8, 1), 2018 => (7, 22), 2019 => (8, 11), 2020 => (7, 30),
+        2021 => (7, 18), 2022 => (8, 7), 2023 => (7, 27),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn yom_haatzmaut(year: i32) -> Option<NaiveDate> {
+    // Israel Independence Day - varies
+    let (m, d) = match year {
+        2013 => (4, 16), 2014 => (5, 6), 2015 => (4, 23), 2016 => (5, 12),
+        2017 => (5, 2), 2018 => (4, 19), 2019 => (5, 9), 2020 => (4, 29),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn lag_bomer(year: i32) -> Option<NaiveDate> {
+    // Lag Ba'Omer from Haskell lagBaOmer table
+    let (m, d) = match year {
+        1950 => (5, 4), 1951 => (5, 23), 1952 => (5, 12), 1953 => (5, 2),
+        1954 => (5, 20), 1955 => (5, 9), 1956 => (4, 28), 1957 => (5, 18),
+        1958 => (5, 7), 1959 => (5, 25), 1960 => (5, 14), 1961 => (5, 3),
+        1962 => (5, 21), 1963 => (5, 11), 1964 => (4, 29), 1965 => (5, 19),
+        1966 => (5, 7), 1967 => (5, 27), 1968 => (5, 15), 1969 => (5, 5),
+        1970 => (5, 23), 1971 => (5, 12), 1972 => (5, 1), 1973 => (5, 19),
+        1974 => (5, 9), 1975 => (4, 28), 1976 => (5, 17), 1977 => (5, 5),
+        1978 => (5, 24), 1979 => (5, 14), 1980 => (5, 3), 1981 => (5, 21),
+        1982 => (5, 10), 1983 => (4, 30), 1984 => (5, 19), 1985 => (5, 8),
+        1986 => (5, 26), 1987 => (5, 16), 1988 => (5, 4), 1989 => (5, 22),
+        1990 => (5, 12), 1991 => (5, 1), 1992 => (5, 20), 1993 => (5, 8),
+        1994 => (4, 28), 1995 => (5, 17), 1996 => (5, 6), 1997 => (5, 24),
+        1998 => (5, 13), 1999 => (5, 3), 2000 => (5, 22), 2001 => (5, 10),
+        2002 => (4, 29), 2003 => (5, 19), 2004 => (5, 8), 2005 => (5, 26),
+        2006 => (5, 15), 2007 => (5, 5), 2008 => (5, 22), 2009 => (5, 11),
+        2010 => (5, 1), 2011 => (5, 21), 2012 => (5, 9), 2013 => (4, 27),
+        2014 => (5, 17), 2015 => (5, 6), 2016 => (5, 25), 2017 => (5, 13),
+        2018 => (5, 2), 2019 => (5, 22), 2020 => (5, 11), 2021 => (4, 29),
+        2022 => (5, 18), 2023 => (5, 8), 2024 => (5, 25), 2025 => (5, 15),
+        2026 => (5, 4), 2027 => (5, 24), 2028 => (5, 13), 2029 => (5, 2),
+        2030 => (5, 20), 2031 => (5, 10), 2032 => (4, 28), 2033 => (5, 16),
+        2034 => (5, 6), 2035 => (5, 26), 2036 => (5, 14), 2037 => (5, 2),
+        2038 => (5, 22), 2039 => (5, 11), 2040 => (4, 30), 2041 => (5, 18),
+        2042 => (5, 7), 2043 => (5, 27), 2044 => (5, 14), 2045 => (5, 4),
+        2046 => (5, 23), 2047 => (5, 13), 2048 => (4, 30), 2049 => (5, 19),
+        2050 => (5, 9),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn yom_hashoah(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (4, 8), 2014 => (4, 28), 2015 => (4, 16), 2016 => (5, 5),
+        2017 => (4, 24), 2018 => (4, 12), 2019 => (5, 2), 2020 => (4, 21),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn tu_bishvat(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (1, 26), 2014 => (1, 16), 2015 => (2, 4), 2016 => (1, 25),
+        2017 => (2, 11), 2018 => (1, 31), 2019 => (1, 21), 2020 => (2, 10),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn purim(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (3, 2), 1951 => (3, 21), 1952 => (3, 10), 1953 => (2, 28),
+        1954 => (3, 18), 1955 => (3, 7), 1956 => (2, 25), 1957 => (3, 16),
+        1958 => (3, 5), 1959 => (3, 23), 1960 => (3, 12), 1961 => (3, 1),
+        1962 => (3, 19), 1963 => (3, 9), 1964 => (2, 26), 1965 => (3, 17),
+        1966 => (3, 5), 1967 => (3, 25), 1968 => (3, 13), 1969 => (3, 3),
+        1970 => (3, 21), 1971 => (3, 10), 1972 => (2, 28), 1973 => (3, 17),
+        1974 => (3, 7), 1975 => (2, 24), 1976 => (3, 15), 1977 => (3, 3),
+        1978 => (3, 22), 1979 => (3, 12), 1980 => (3, 1), 1981 => (3, 19),
+        1982 => (3, 8), 1983 => (2, 26), 1984 => (3, 17), 1985 => (3, 6),
+        1986 => (3, 24), 1987 => (3, 14), 1988 => (3, 2), 1989 => (3, 20),
+        1990 => (3, 10), 1991 => (2, 27), 1992 => (3, 18), 1993 => (3, 6),
+        1994 => (2, 24), 1995 => (3, 15), 1996 => (3, 4), 1997 => (3, 22),
+        1998 => (3, 11), 1999 => (3, 1), 2000 => (3, 20), 2001 => (3, 8),
+        2002 => (2, 27), 2003 => (3, 19), 2004 => (3, 6), 2005 => (3, 24),
+        2006 => (3, 13), 2007 => (3, 3), 2008 => (3, 20), 2009 => (3, 9),
+        2010 => (2, 27), 2011 => (3, 19), 2012 => (3, 7), 2013 => (2, 23),
+        2014 => (3, 15), 2015 => (3, 4), 2016 => (3, 23), 2017 => (3, 11),
+        2018 => (2, 28), 2019 => (3, 20), 2020 => (3, 9), 2021 => (2, 25),
+        2022 => (3, 16), 2023 => (3, 6), 2024 => (3, 23), 2025 => (3, 13),
+        2026 => (3, 2), 2027 => (3, 22), 2028 => (3, 11), 2029 => (2, 28),
+        2030 => (3, 18), 2031 => (3, 8), 2032 => (2, 25), 2033 => (3, 14),
+        2034 => (3, 4), 2035 => (3, 24), 2036 => (3, 12), 2037 => (2, 28),
+        2038 => (3, 20), 2039 => (3, 9), 2040 => (2, 27), 2041 => (3, 16),
+        2042 => (3, 5), 2043 => (3, 25), 2044 => (3, 12), 2045 => (3, 2),
+        2046 => (3, 21), 2047 => (3, 11), 2048 => (2, 27), 2049 => (3, 17),
+        2050 => (3, 7),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn resolve_islamic_holiday(name: &str, year: i32) -> Option<NaiveDate> {
+    if name.starts_with("mawlid") {
+        return mawlid(year);
+    }
+    if name.starts_with("eid al-fitr") || name.starts_with("eid al fitr") {
+        return eid_al_fitr(year);
+    }
+    if name.starts_with("eid al-adha") || name.starts_with("eid al adha")
+       || name.starts_with("id ul") || name.starts_with("sacrifice feast")
+       || name.starts_with("bakr id") {
+        return eid_al_adha(year);
+    }
+    if name.starts_with("laylat") || name.starts_with("night of") {
+        return laylat_al_qadr(year);
+    }
+    if name.starts_with("islamic new year") || name.starts_with("amun jadid") {
+        return islamic_new_year(year);
+    }
+    if name.starts_with("ashura") || name.starts_with("day of ashura") {
+        return islamic_new_year(year).map(|d| d + Duration::days(9));
+    }
+    if name == "ramadan" {
+        return ramadan(year);
+    }
+    if name.starts_with("isra") || name.starts_with("the prophet") || name.starts_with("the night journey") || name.starts_with("ascension to heaven") {
+        return isra_miraj(year);
+    }
+    if name.starts_with("jumu") || name.starts_with("jamat") {
+        // Jamat ul-Vida = last Friday before Eid al-Fitr
+        return eid_al_fitr(year).map(|eid| {
+            let dow = eid.weekday().num_days_from_monday(); // 0=Mon...4=Fri
+            let days_back = ((dow as i64 - 4) % 7 + 7) % 7; // days to go back to Friday
+            let days_back = if days_back == 0 { 7 } else { days_back }; // if Eid is Friday, go back 7
+            eid - Duration::days(days_back)
+        });
+    }
+    None
+}
+
+fn mawlid(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (1, 1), // Also 1950-12-22, but take earliest
+        1951 => (12, 11), 1952 => (11, 30), 1953 => (11, 19), 1954 => (11, 8),
+        1955 => (10, 29), 1956 => (10, 17), 1957 => (10, 6), 1958 => (9, 26),
+        1959 => (9, 15), 1960 => (9, 3), 1961 => (8, 23), 1962 => (8, 12),
+        1963 => (8, 2), 1964 => (7, 21), 1965 => (7, 10), 1966 => (7, 1),
+        1967 => (6, 19), 1968 => (6, 8), 1969 => (5, 28), 1970 => (5, 18),
+        1971 => (5, 7), 1972 => (4, 25), 1973 => (4, 15), 1974 => (4, 4),
+        1975 => (3, 24), 1976 => (3, 12), 1977 => (3, 2), 1978 => (2, 19),
+        1979 => (2, 9), 1980 => (1, 30), 1981 => (1, 18), 1982 => (1, 7),
+        1983 => (12, 16), 1984 => (12, 4), 1985 => (11, 24), 1986 => (11, 14),
+        1987 => (11, 3), 1988 => (10, 22), 1989 => (10, 11), 1990 => (10, 1),
+        1991 => (9, 20), 1992 => (9, 9), 1993 => (8, 29), 1994 => (8, 19),
+        1995 => (8, 8), 1996 => (7, 27), 1997 => (7, 16), 1998 => (7, 6),
+        1999 => (6, 26), 2000 => (6, 14), 2001 => (6, 4), 2002 => (5, 24),
+        2003 => (5, 13), 2004 => (5, 1), 2005 => (4, 21), 2006 => (4, 10),
+        2007 => (3, 31), 2008 => (3, 20), 2009 => (3, 9), 2010 => (2, 26),
+        2011 => (2, 15), 2012 => (2, 4), 2013 => (1, 24), 2014 => (1, 13),
+        2015 => (1, 3), 2016 => (12, 11), 2017 => (11, 30), 2018 => (11, 20),
+        2019 => (11, 9), 2020 => (10, 29), 2021 => (10, 18), 2022 => (10, 8),
+        2023 => (9, 27), 2024 => (9, 15), 2025 => (9, 4), 2026 => (8, 25),
+        2027 => (8, 14), 2028 => (8, 3),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn eid_al_fitr(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (7, 16), 1951 => (7, 6), 1952 => (6, 23), 1953 => (6, 13),
+        1954 => (6, 2), 1955 => (5, 23), 1956 => (5, 11), 1957 => (5, 1),
+        1958 => (4, 20), 1959 => (4, 10), 1960 => (3, 28), 1961 => (3, 18),
+        1962 => (3, 7), 1963 => (2, 24), 1964 => (2, 14), 1965 => (2, 2),
+        1966 => (1, 22), 1967 => (1, 12), 1968 => (1, 1),
+        // 1968 also has Dec 21
+        1969 => (12, 10), 1970 => (11, 30), 1971 => (11, 19), 1972 => (11, 7),
+        1973 => (10, 27), 1974 => (10, 16), 1975 => (10, 6), 1976 => (9, 24),
+        1977 => (9, 14), 1978 => (9, 3), 1979 => (8, 23), 1980 => (8, 12),
+        1981 => (8, 1), 1982 => (7, 21), 1983 => (7, 11), 1984 => (6, 30),
+        1985 => (6, 19), 1986 => (6, 8), 1987 => (5, 28), 1988 => (5, 16),
+        1989 => (5, 6), 1990 => (4, 26), 1991 => (4, 15), 1992 => (4, 4),
+        1993 => (3, 24), 1994 => (3, 13), 1995 => (3, 2), 1996 => (2, 19),
+        1997 => (2, 8), 1998 => (1, 29), 1999 => (1, 18), 2000 => (1, 8),
+        // 2000 also has Dec 27
+        2001 => (12, 16), 2002 => (12, 5), 2003 => (11, 25), 2004 => (11, 14),
+        2005 => (11, 3), 2006 => (10, 23), 2007 => (10, 13), 2008 => (10, 1),
+        2009 => (9, 20), 2010 => (9, 10), 2011 => (8, 30), 2012 => (8, 19),
+        2013 => (8, 8), 2014 => (7, 28), 2015 => (7, 17), 2016 => (7, 6),
+        2017 => (6, 25), 2018 => (6, 15), 2019 => (6, 4), 2020 => (5, 24),
+        2021 => (5, 13), 2022 => (5, 2), 2023 => (4, 21), 2024 => (4, 10),
+        2025 => (3, 30), 2026 => (3, 20), 2027 => (3, 9), 2028 => (2, 26),
+        2029 => (2, 14), 2030 => (2, 5), 2031 => (1, 25), 2032 => (1, 14),
+        2033 => (1, 3),
+        // 2033 also has Dec 23
+        2034 => (12, 12), 2035 => (12, 2), 2036 => (11, 20), 2037 => (11, 10),
+        2038 => (10, 30), 2039 => (10, 19), 2040 => (10, 8), 2041 => (9, 27),
+        2042 => (9, 16), 2043 => (9, 6), 2044 => (8, 25), 2045 => (8, 15),
+        2046 => (8, 4), 2047 => (7, 24), 2048 => (7, 13), 2049 => (7, 2),
+        2050 => (6, 21),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn eid_al_adha(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (9, 23), 1951 => (9, 12), 1952 => (8, 31), 1953 => (8, 20),
+        1954 => (8, 9), 1955 => (7, 30), 1956 => (7, 19), 1957 => (7, 8),
+        1958 => (6, 27), 1959 => (6, 17), 1960 => (6, 4), 1961 => (5, 25),
+        1962 => (5, 14), 1963 => (5, 3), 1964 => (4, 22), 1965 => (4, 11),
+        1966 => (4, 1), 1967 => (3, 21), 1968 => (3, 9), 1969 => (2, 27),
+        1970 => (2, 16), 1971 => (2, 6), 1972 => (1, 26), 1973 => (1, 14),
+        1974 => (1, 3),
+        // 1974 also has Dec 24
+        1975 => (12, 13), 1976 => (12, 1), 1977 => (11, 21), 1978 => (11, 10),
+        1979 => (10, 31), 1980 => (10, 19), 1981 => (10, 8), 1982 => (9, 27),
+        1983 => (9, 17), 1984 => (9, 5), 1985 => (8, 26), 1986 => (8, 15),
+        1987 => (8, 4), 1988 => (7, 23), 1989 => (7, 13), 1990 => (7, 2),
+        1991 => (6, 22), 1992 => (6, 11), 1993 => (5, 31), 1994 => (5, 20),
+        1995 => (5, 9), 1996 => (4, 27), 1997 => (4, 17), 1998 => (4, 7),
+        1999 => (3, 27), 2000 => (3, 16), 2001 => (3, 5), 2002 => (2, 22),
+        2003 => (2, 11), 2004 => (2, 1), 2005 => (1, 21), 2006 => (1, 10),
+        // 2006 also has Dec 31
+        2007 => (12, 20), 2008 => (12, 8), 2009 => (11, 27),
+        2011 => (11, 6), 2012 => (10, 26),
+        2013 => (10, 15), 2014 => (10, 4), 2015 => (8, 23), 2016 => (9, 11),
+        2017 => (9, 1), 2018 => (8, 21), 2019 => (8, 11), 2020 => (7, 31),
+        2021 => (7, 20), 2022 => (7, 9), 2023 => (6, 28), 2024 => (6, 16),
+        2025 => (6, 6), 2026 => (5, 27), 2027 => (5, 16), 2028 => (5, 5),
+        2029 => (4, 24),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn laylat_al_qadr(year: i32) -> Option<NaiveDate> {
+    // Laylat al-Qadr = Ramadan + 26 days
+    ramadan(year).map(|d| d + Duration::days(26))
+}
+
+fn islamic_new_year(year: i32) -> Option<NaiveDate> {
+    // Muharram / Islamic New Year from Haskell muharram table
+    let (m, d) = match year {
+        1998 => (4, 27), 1999 => (4, 17), 2000 => (4, 6), 2001 => (3, 26),
+        2002 => (3, 15), 2003 => (4, 4), 2004 => (2, 21), 2005 => (2, 10),
+        2006 => (1, 31), 2007 => (1, 20), 2008 => (1, 10),
+        2009 => (12, 18), 2010 => (12, 7), 2011 => (11, 26), 2012 => (11, 15),
+        2013 => (11, 4), 2014 => (10, 25), 2015 => (10, 14), 2016 => (10, 2),
+        2017 => (9, 21), 2018 => (9, 11), 2019 => (8, 31), 2020 => (8, 20),
+        2021 => (8, 9), 2022 => (7, 30), 2023 => (7, 19), 2024 => (7, 7),
+        2025 => (6, 26), 2026 => (6, 16), 2027 => (6, 6), 2028 => (5, 25),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn ramadan(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (6, 17), 1951 => (6, 6), 1952 => (5, 25), 1953 => (5, 14),
+        1954 => (5, 4), 1955 => (4, 24), 1956 => (4, 12), 1957 => (4, 1),
+        1958 => (3, 21), 1959 => (3, 11), 1960 => (2, 28), 1961 => (2, 16),
+        1962 => (2, 5), 1963 => (1, 26), 1964 => (1, 15), 1965 => (1, 3),
+        // 1965 also has Dec 23
+        1966 => (12, 13), 1967 => (12, 2), 1968 => (11, 21), 1969 => (11, 10),
+        1970 => (11, 1), 1971 => (10, 20), 1972 => (10, 8), 1973 => (9, 27),
+        1974 => (9, 17), 1975 => (9, 6), 1976 => (8, 26), 1977 => (8, 15),
+        1978 => (8, 5), 1979 => (7, 25), 1980 => (7, 13), 1981 => (7, 2),
+        1982 => (6, 22), 1983 => (6, 12), 1984 => (5, 31), 1985 => (5, 20),
+        1986 => (5, 9), 1987 => (4, 29), 1988 => (4, 17), 1989 => (4, 7),
+        1990 => (3, 27), 1991 => (3, 17), 1992 => (3, 5), 1993 => (2, 22),
+        1994 => (2, 11), 1995 => (1, 31), 1996 => (1, 21), 1997 => (1, 10),
+        // 1997 also has Dec 30
+        1998 => (12, 19), 1999 => (12, 9), 2000 => (11, 27), 2001 => (11, 16),
+        2002 => (11, 6), 2003 => (10, 26), 2004 => (10, 15), 2005 => (10, 4),
+        2006 => (9, 24), 2007 => (9, 13), 2008 => (9, 1), 2009 => (8, 22),
+        2010 => (8, 11), 2011 => (8, 1), 2012 => (7, 20), 2013 => (7, 9),
+        2014 => (6, 28), 2015 => (6, 18), 2016 => (6, 6), 2017 => (5, 27),
+        2018 => (5, 16), 2019 => (5, 6), 2020 => (4, 24), 2021 => (4, 13),
+        2022 => (4, 2), 2023 => (3, 23), 2024 => (3, 11), 2025 => (3, 1),
+        2026 => (2, 18), 2027 => (2, 8), 2028 => (1, 28), 2029 => (1, 16),
+        2030 => (1, 6),
+        // 2030 also has Dec 26
+        2031 => (12, 15), 2032 => (12, 4), 2033 => (11, 23), 2034 => (11, 12),
+        2035 => (11, 2), 2036 => (10, 21), 2037 => (10, 11), 2038 => (9, 30),
+        2039 => (9, 19), 2040 => (9, 8), 2041 => (8, 28), 2042 => (8, 17),
+        2043 => (8, 7), 2044 => (7, 26), 2045 => (7, 16), 2046 => (7, 5),
+        2047 => (6, 24), 2048 => (6, 13), 2049 => (6, 2), 2050 => (5, 22),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn rajab(year: i32) -> Option<NaiveDate> {
+    // Rajab start dates from Haskell rajab table
+    let (m, d) = match year {
+        1999 => (10, 10), 2000 => (9, 28), 2001 => (9, 18), 2002 => (9, 8),
+        2003 => (8, 29), 2004 => (8, 17), 2005 => (8, 6), 2006 => (7, 26),
+        2007 => (7, 15), 2008 => (7, 4), 2009 => (6, 24), 2010 => (6, 13),
+        2011 => (6, 3), 2012 => (5, 22), 2013 => (5, 11), 2014 => (4, 30),
+        2015 => (4, 20), 2016 => (4, 8), 2017 => (3, 29), 2018 => (3, 18),
+        2019 => (3, 8), 2020 => (2, 25), 2021 => (2, 13), 2022 => (2, 2),
+        2023 => (1, 23), 2024 => (1, 13), 2025 => (1, 1),
+        // 2025 also has Dec 21
+        2026 => (12, 10), 2027 => (11, 29), 2028 => (11, 18),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn isra_miraj(year: i32) -> Option<NaiveDate> {
+    // Isra and Mi'raj = Rajab + 26 days
+    rajab(year).map(|d| d + Duration::days(26))
+}
+
+fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
+    if name == "diwali" || name == "deepavali" {
+        return diwali(year);
+    }
+    if name == "holi" || name == "dhulandi" || name == "phagwah" {
+        return holi(year);
+    }
+    if name == "chhoti holi" || name == "holika dahan" || name == "kamudu pyre" {
+        return holi(year).map(|d| d - Duration::days(1));
+    }
+    if name == "navaratri" || name == "durga puja" {
+        return navaratri(year);
+    }
+    if name.starts_with("dussehra") || name.starts_with("vijayadashami") {
+        return navaratri(year).map(|d| d + Duration::days(9));
+    }
+    if name == "dhanteras" || name == "dhanatrayodashi" {
+        return diwali(year).map(|d| d - Duration::days(2));
+    }
+    if name.starts_with("bhai dooj") {
+        return diwali(year).map(|d| d + Duration::days(2));
+    }
+    if name.starts_with("maha shivaratri") {
+        return maha_shivaratri(year);
+    }
+    if name.starts_with("ganesh chaturthi") {
+        return ganesh_chaturthi(year);
+    }
+    if name.starts_with("krishna janmashtami") || name.starts_with("gokulashtami") {
+        return janmashtami(year);
+    }
+    if name.starts_with("rama navami") {
+        return rama_navami(year);
+    }
+    if name.starts_with("rakhi") || name.starts_with("raksha bandhan") {
+        return raksha_bandhan(year);
+    }
+    if name.starts_with("pongal") || name.starts_with("makar") || name.starts_with("makara") || name.starts_with("maghi") {
+        return thai_pongal(year);
+    }
+    if name.starts_with("vaisakhi") || name.starts_with("baisakhi") || name.starts_with("mesadi") {
+        return vaisakhi(year);
+    }
+    if name.starts_with("onam") || name.starts_with("thiru onam") {
+        return onam(year);
+    }
+    if name.starts_with("ugadi") || name.starts_with("yugadi") {
+        return ugadi(year);
+    }
+    if name.starts_with("karva chauth") {
+        return karva_chauth(year);
+    }
+    if name.starts_with("ratha") {
+        return rath_yatra(year);
+    }
+    if name.starts_with("chhath") || name.starts_with("dala puja") {
+        return diwali(year).map(|d| d + Duration::days(6));
+    }
+    if name.starts_with("vasant panchami") || name.starts_with("basant panchami") {
+        return vasant_panchami(year);
+    }
+    if name.starts_with("saraswati jayanti") {
+        return saraswati_jayanti(year);
+    }
+    if name.starts_with("naraka chaturdashi") || name.starts_with("kali chaudas") || name.starts_with("choti diwali") {
+        return diwali(year).map(|d| d - Duration::days(1));
+    }
+    if name.starts_with("maha saptami") {
+        return navaratri(year).map(|d| d + Duration::days(6));
+    }
+    if name.starts_with("mahavir jayanti") || name.starts_with("mahavir janma")
+       || name.starts_with("mahaveer jayanti") || name.starts_with("mahaveer janma") {
+        return mahavir_jayanti(year);
+    }
+    if name.starts_with("guru gobind") || name.starts_with("guru govind") {
+        return guru_gobind_singh(year);
+    }
+    if name.starts_with("guru ravida") || name.starts_with("guru ravidas") {
+        return guru_ravidas(year);
+    }
+    if name.starts_with("valmiki jayanti") || name.starts_with("maharishi valmiki") || name.starts_with("pargat diwas") {
+        return valmiki_jayanti(year);
+    }
+    if name.starts_with("rabindra jayanti") || name.starts_with("rabindranath jayanti") {
+        return rabindra_jayanti(year);
+    }
+    if name.starts_with("bogi pandigai") {
+        return NaiveDate::from_ymd_opt(year, 1, 13);
+    }
+    if name.starts_with("maattu pongal") {
+        return NaiveDate::from_ymd_opt(year, 1, 15);
+    }
+    if name.starts_with("kaanum pongal") || name.starts_with("kanni pongal") {
+        return NaiveDate::from_ymd_opt(year, 1, 16);
+    }
+    if name.starts_with("lakshmi puja") {
+        return diwali(year);
+    }
+    None
+}
+
+// Hindu holiday lookup tables
+fn diwali(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2010 => (11, 5), 2011 => (10, 26), 2012 => (11, 13), 2013 => (11, 3),
+        2014 => (10, 23), 2015 => (11, 11), 2016 => (10, 30), 2017 => (10, 19),
+        2018 => (11, 7), 2019 => (10, 27), 2020 => (11, 14), 2021 => (11, 4),
+        2022 => (10, 24), 2023 => (11, 12), 2024 => (11, 1), 2025 => (10, 20),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn holi(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (3, 27), 2014 => (3, 17), 2015 => (3, 6), 2016 => (3, 24),
+        2017 => (3, 13), 2018 => (3, 2), 2019 => (3, 21), 2020 => (3, 10),
+        2021 => (3, 29), 2022 => (3, 18), 2023 => (3, 8),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn navaratri(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (9, 28), 2001 => (10, 17), 2002 => (10, 7), 2003 => (9, 26),
+        2004 => (10, 14), 2005 => (10, 4), 2006 => (9, 23), 2007 => (10, 12),
+        2008 => (9, 30), 2009 => (9, 19), 2010 => (10, 8), 2011 => (9, 28),
+        2012 => (10, 16), 2013 => (10, 5), 2014 => (9, 25), 2015 => (10, 13),
+        2016 => (10, 1), 2017 => (9, 21), 2018 => (10, 9), 2019 => (9, 29),
+        2020 => (10, 17), 2021 => (10, 6), 2022 => (9, 26), 2023 => (10, 15),
+        2024 => (10, 3), 2025 => (9, 22), 2026 => (10, 11), 2027 => (9, 30),
+        2028 => (9, 19), 2029 => (10, 8), 2030 => (9, 27),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn maha_shivaratri(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (3, 10), 2014 => (2, 27), 2015 => (2, 17), 2016 => (3, 7),
+        2017 => (2, 24), 2018 => (2, 13), 2019 => (3, 4), 2020 => (2, 21),
+        2021 => (3, 11), 2022 => (3, 1), 2023 => (2, 18),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn ganesh_chaturthi(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (9, 9), 2014 => (8, 29), 2015 => (9, 17), 2016 => (9, 5),
+        2017 => (8, 25), 2018 => (9, 13), 2019 => (9, 2), 2020 => (8, 22),
+        2021 => (9, 10), 2022 => (8, 31), 2023 => (9, 19),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn janmashtami(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (8, 22), 2001 => (8, 12), 2002 => (8, 31), 2003 => (8, 20),
+        2004 => (9, 6), 2005 => (8, 26), 2006 => (8, 15), 2007 => (9, 3),
+        2008 => (8, 23), 2009 => (8, 13), 2010 => (9, 1), 2011 => (8, 21),
+        2012 => (8, 9), 2013 => (8, 28), 2014 => (8, 17), 2015 => (9, 5),
+        2016 => (8, 25), 2017 => (8, 14), 2018 => (9, 3), 2019 => (8, 23),
+        2020 => (8, 11), 2021 => (8, 30), 2022 => (8, 19), 2023 => (9, 6),
+        2024 => (8, 26), 2025 => (8, 16), 2026 => (9, 4), 2027 => (8, 25),
+        2028 => (8, 13), 2029 => (9, 1), 2030 => (8, 21),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn rama_navami(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (4, 19), 2014 => (4, 8), 2015 => (3, 28), 2016 => (4, 15),
+        2017 => (4, 4), 2018 => (3, 25), 2019 => (4, 14), 2020 => (4, 2),
+        2021 => (4, 21), 2022 => (4, 10), 2023 => (3, 30),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn raksha_bandhan(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (8, 20), 2014 => (8, 10), 2015 => (8, 29), 2016 => (8, 18),
+        2017 => (8, 7), 2018 => (8, 26), 2019 => (8, 15), 2020 => (8, 3),
+        2021 => (8, 22), 2022 => (8, 11), 2023 => (8, 30),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn onam(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (9, 10), 2001 => (8, 31), 2002 => (8, 21), 2003 => (9, 8),
+        2004 => (8, 28), 2005 => (9, 15), 2006 => (9, 5), 2007 => (8, 26),
+        2008 => (9, 12), 2009 => (9, 2), 2010 => (8, 23), 2011 => (9, 9),
+        2012 => (8, 29), 2013 => (8, 20), 2014 => (9, 6), 2015 => (8, 28),
+        2016 => (9, 13), 2017 => (9, 4), 2018 => (8, 24), 2019 => (9, 11),
+        2020 => (8, 31), 2021 => (8, 21), 2022 => (9, 8), 2023 => (8, 29),
+        2024 => (9, 15), 2025 => (9, 5), 2026 => (8, 26), 2027 => (9, 12),
+        2028 => (9, 1), 2029 => (8, 22), 2030 => (9, 9),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn ugadi(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (4, 11), 2014 => (3, 31), 2015 => (3, 21), 2016 => (4, 8),
+        2017 => (3, 28), 2018 => (3, 18), 2019 => (4, 6), 2020 => (3, 25),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn karva_chauth(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (10, 22), 2014 => (10, 11), 2015 => (10, 30), 2016 => (10, 19),
+        2017 => (10, 8), 2018 => (10, 27), 2019 => (10, 17), 2020 => (11, 4),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn rath_yatra(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (7, 10), 2014 => (6, 29), 2015 => (7, 18), 2016 => (7, 6),
+        2017 => (6, 25), 2018 => (7, 14), 2019 => (7, 4), 2020 => (6, 23),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn vasant_panchami(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (2, 10), 2001 => (1, 29), 2002 => (2, 17), 2003 => (2, 6),
+        2004 => (1, 26), 2005 => (2, 13), 2006 => (2, 2), 2007 => (1, 23),
+        2008 => (2, 11), 2009 => (1, 31), 2010 => (1, 20), 2011 => (2, 8),
+        2012 => (1, 28), 2013 => (2, 15), 2014 => (2, 4), 2015 => (1, 24),
+        2016 => (2, 12), 2017 => (2, 1), 2018 => (1, 22), 2019 => (2, 10),
+        2020 => (1, 29), 2021 => (2, 16), 2022 => (2, 5), 2023 => (1, 26),
+        2024 => (2, 14), 2025 => (2, 2), 2026 => (1, 23), 2027 => (2, 11),
+        2028 => (1, 31), 2029 => (1, 19), 2030 => (2, 7),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn saraswati_jayanti(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (2, 29), 2001 => (2, 17), 2002 => (3, 8), 2003 => (2, 26),
+        2004 => (2, 15), 2005 => (3, 5), 2006 => (2, 23), 2007 => (2, 12),
+        2008 => (3, 2), 2009 => (2, 19), 2010 => (2, 8), 2011 => (2, 27),
+        2012 => (2, 16), 2013 => (3, 7), 2014 => (2, 24), 2015 => (2, 14),
+        2016 => (3, 4), 2017 => (2, 21), 2018 => (2, 10), 2019 => (2, 28),
+        2020 => (2, 18), 2021 => (3, 8), 2022 => (2, 26), 2023 => (2, 15),
+        2024 => (3, 5), 2025 => (2, 23), 2026 => (2, 12), 2027 => (3, 2),
+        2028 => (2, 19), 2029 => (2, 8), 2030 => (2, 27),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn mahavir_jayanti(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (4, 24), 2014 => (4, 13), 2015 => (4, 2), 2016 => (4, 20),
+        2017 => (4, 9), 2018 => (3, 29), 2019 => (4, 17), 2020 => (4, 6),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn guru_gobind_singh(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (1, 14), 2001 => (1, 2), 2002 => (1, 21),
+        2003 => (12, 29), // Actually in Dec of same year (following year's Nanakshahi)
+        2004 => (1, 5), 2005 => (1, 16),
+        2006 => (12, 27),
+        2007 => (1, 5), 2008 => (1, 14),
+        2009 => (12, 23),
+        2010 => (1, 5), 2011 => (1, 5), 2012 => (1, 5),
+        2013 => (1, 18), 2014 => (1, 7), 2015 => (1, 5),
+        2016 => (1, 16),
+        2017 => (12, 25),
+        2018 => (1, 5), 2019 => (1, 13), 2020 => (2, 1),
+        2021 => (1, 19), 2022 => (1, 8), 2023 => (1, 5),
+        2024 => (1, 17), 2025 => (1, 5), 2026 => (1, 5),
+        2027 => (1, 14), 2028 => (1, 3), 2029 => (1, 5),
+        2030 => (1, 10),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn guru_ravidas(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (2, 25), 2014 => (2, 14), 2015 => (2, 3), 2016 => (2, 22),
+        2017 => (2, 11), 2018 => (1, 31), 2019 => (2, 19), 2020 => (2, 9),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn valmiki_jayanti(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (10, 18), 2014 => (10, 8), 2015 => (10, 27), 2016 => (10, 16),
+        2017 => (10, 5), 2018 => (10, 24), 2019 => (10, 13), 2020 => (10, 31),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn vaisakhi(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (4, 13), 2001 => (4, 13), 2002 => (4, 14), 2003 => (4, 14),
+        2004 => (4, 13), 2005 => (4, 13), 2006 => (4, 14), 2007 => (4, 14),
+        2008 => (4, 13), 2009 => (4, 14), 2010 => (4, 14), 2011 => (4, 14),
+        2012 => (4, 13), 2013 => (4, 14), 2014 => (4, 14), 2015 => (4, 14),
+        2016 => (4, 13), 2017 => (4, 14), 2018 => (4, 14), 2019 => (4, 14),
+        2020 => (4, 13), 2021 => (4, 14), 2022 => (4, 14), 2023 => (4, 14),
+        2024 => (4, 13), 2025 => (4, 14), 2026 => (4, 14), 2027 => (4, 14),
+        2028 => (4, 13), 2029 => (4, 14), 2030 => (4, 14),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn parsi_new_year(year: i32) -> Option<NaiveDate> {
+    // Parsi New Year: every 365 days from anchor Aug 16, 2020
+    let anchor = NaiveDate::from_ymd_opt(2020, 8, 16).unwrap();
+    // Calculate for the given year by finding offset from anchor
+    // Try the date from a precomputed table for accuracy
+    let (m, d) = match year {
+        2010 => (8, 19), 2011 => (8, 19), 2012 => (8, 18), 2013 => (8, 18),
+        2014 => (8, 18), 2015 => (8, 18), 2016 => (8, 17), 2017 => (8, 17),
+        2018 => (8, 17), 2019 => (8, 17), 2020 => (8, 16), 2021 => (8, 16),
+        2022 => (8, 16), 2023 => (8, 16), 2024 => (8, 15), 2025 => (8, 15),
+        2026 => (8, 15), 2027 => (8, 15), 2028 => (8, 14), 2029 => (8, 14),
+        2030 => (8, 14),
+        _ => {
+            // Fallback: compute dynamically
+            let diff_years = year - 2020;
+            let approx = anchor + Duration::days(diff_years as i64 * 365);
+            // Find the closest date in the target year
+            if approx.year() == year {
+                return Some(approx);
+            }
+            return Some(approx);
+        }
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn thai_pongal(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (1, 15), 2001 => (1, 14), 2002 => (1, 14), 2003 => (1, 14),
+        2004 => (1, 15), 2005 => (1, 14), 2006 => (1, 14), 2007 => (1, 15),
+        2008 => (1, 15), 2009 => (1, 14), 2010 => (1, 14), 2011 => (1, 15),
+        2012 => (1, 15), 2013 => (1, 14), 2014 => (1, 14), 2015 => (1, 15),
+        2016 => (1, 15), 2017 => (1, 14), 2018 => (1, 14), 2019 => (1, 15),
+        2020 => (1, 15), 2021 => (1, 14), 2022 => (1, 14), 2023 => (1, 15),
+        2024 => (1, 15), 2025 => (1, 14), 2026 => (1, 14), 2027 => (1, 15),
+        2028 => (1, 15), 2029 => (1, 14), 2030 => (1, 14),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn rabindra_jayanti(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (5, 8), 2001 => (5, 9), 2002 => (5, 9), 2003 => (5, 9),
+        2004 => (5, 8), 2005 => (5, 9), 2006 => (5, 9), 2007 => (5, 9),
+        2008 => (5, 8), 2009 => (5, 9), 2010 => (5, 9), 2011 => (5, 9),
+        2012 => (5, 8), 2013 => (5, 9), 2014 => (5, 9), 2015 => (5, 9),
+        2016 => (5, 8), 2017 => (5, 9), 2018 => (5, 9), 2019 => (5, 9),
+        2020 => (5, 8), 2021 => (5, 9), 2022 => (5, 9), 2023 => (5, 9),
+        2024 => (5, 8), 2025 => (5, 9), 2026 => (5, 9), 2027 => (5, 9),
+        2028 => (5, 9), 2029 => (5, 9), 2030 => (5, 9),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn gysd_date(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (4, 26), 2014 => (4, 11), 2015 => (4, 17), 2016 => (4, 15),
+        2017 => (4, 21), 2018 => (4, 20), 2019 => (4, 26), 2020 => (4, 17),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn resolve_vesak(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2013 => (5, 24), 2014 => (5, 13), 2015 => (6, 1), 2016 => (5, 21),
+        2017 => (5, 10), 2018 => (5, 29), 2019 => (5, 19), 2020 => (5, 7),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
 }
