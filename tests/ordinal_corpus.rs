@@ -1,16 +1,10 @@
 // Ported from Duckling/Ordinal/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_ordinal(text: &str, expected: i64) {
     let entities = parse_en(text, &[DimensionKind::Ordinal]);
     let found = entities.iter().any(|e| {
-        e.dim == "ordinal"
-            && e.value
-                .value
-                .get("value")
-                .and_then(|v| v.as_i64())
-                .map(|v| v == expected)
-                .unwrap_or(false)
+        matches!(&e.value, DimensionValue::Ordinal(v) if *v == expected)
     });
     assert!(
         found,
@@ -19,7 +13,7 @@ fn check_ordinal(text: &str, expected: i64) {
         text,
         entities
             .iter()
-            .map(|e| format!("{}={:?}", e.dim, e.value))
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
             .collect::<Vec<_>>()
     );
 }

@@ -554,15 +554,12 @@ mod tests {
                 &[DimensionKind::AmountOfMoney],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "amount-of-money"
-                    && e.value
-                        .value
-                        .get("value")
-                        .and_then(|v| v.as_f64())
-                        .map(|v| (v - expected_val).abs() < 0.01)
-                        .unwrap_or(false)
-                    && e.value.value.get("unit").and_then(|v| v.as_str())
-                        == Some(*expected_unit)
+                match &e.value {
+                    crate::types::DimensionValue::AmountOfMoney(crate::types::MeasurementValue::Value { value, unit }) => {
+                        (*value - expected_val).abs() < 0.01 && unit == *expected_unit
+                    }
+                    _ => false,
+                }
             });
             assert!(
                 found,

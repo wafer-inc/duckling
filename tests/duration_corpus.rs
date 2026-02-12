@@ -1,29 +1,29 @@
 // Ported from Duckling/Duration/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue, Grain};
 
 fn check_duration(text: &str, expected_val: i64, expected_unit: &str) {
+    let expected_grain = Grain::from_str(expected_unit);
     let entities = parse_en(text, &[DimensionKind::Duration]);
     let found = entities.iter().any(|e| {
-        e.dim == "duration"
-            && e.value.value.get("value").and_then(|v| v.as_i64()) == Some(expected_val)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
+        matches!(&e.value, DimensionValue::Duration { value, grain, .. }
+            if *value == expected_val && *grain == expected_grain)
     });
     assert!(
         found,
         "Expected duration {} {} for '{}', got: {:?}",
         expected_val, expected_unit, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 
 fn check_no_duration(text: &str) {
     let entities = parse_en(text, &[DimensionKind::Duration]);
-    let found = entities.iter().any(|e| e.dim == "duration");
+    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Duration { .. }));
     assert!(
         !found,
         "Expected NO duration for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 

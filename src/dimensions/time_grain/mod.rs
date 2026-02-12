@@ -1,10 +1,10 @@
 pub mod en;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 /// Time grain, ordered from smallest to largest (Second < Minute < ... < Year).
 /// Ordering matches Haskell Duckling's derived Ord.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Grain {
     Second,
     Minute,
@@ -27,6 +27,20 @@ impl Grain {
             Grain::Month => "month",
             Grain::Quarter => "quarter",
             Grain::Year => "year",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Grain {
+        match s {
+            "second" => Grain::Second,
+            "minute" => Grain::Minute,
+            "hour" => Grain::Hour,
+            "day" => Grain::Day,
+            "week" => Grain::Week,
+            "month" => Grain::Month,
+            "quarter" => Grain::Quarter,
+            "year" => Grain::Year,
+            _ => Grain::Second,
         }
     }
 
@@ -90,12 +104,6 @@ impl Ord for Grain {
     }
 }
 
-pub fn resolve(grain: &Grain) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": grain.as_str(),
-            "type": "value",
-        }),
-    }
+pub fn resolve(grain: &Grain) -> DimensionValue {
+    DimensionValue::TimeGrain(*grain)
 }

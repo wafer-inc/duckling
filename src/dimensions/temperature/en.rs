@@ -220,9 +220,12 @@ mod tests {
             &[DimensionKind::Temperature],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(80.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("fahrenheit")
+            match &e.value {
+                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
+                    (*value - 80.0).abs() < 0.01 && unit == "fahrenheit"
+                }
+                _ => false,
+            }
         });
         assert!(found, "Expected 80F, got: {:?}", entities);
     }
@@ -241,9 +244,12 @@ mod tests {
             &[DimensionKind::Temperature],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(3.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("celsius")
+            match &e.value {
+                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
+                    (*value - 3.0).abs() < 0.01 && unit == "celsius"
+                }
+                _ => false,
+            }
         });
         assert!(found, "Expected 3C, got: {:?}", entities);
     }
@@ -262,8 +268,12 @@ mod tests {
             &[DimensionKind::Temperature],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(3.0)
+            match &e.value {
+                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, .. }) => {
+                    (*value - 3.0).abs() < 0.01
+                }
+                _ => false,
+            }
         });
         assert!(found, "Expected temperature 3, got: {:?}", entities);
     }
@@ -282,9 +292,12 @@ mod tests {
             &[DimensionKind::Temperature],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(-2.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("degree")
+            match &e.value {
+                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
+                    (*value - (-2.0)).abs() < 0.01 && unit == "degree"
+                }
+                _ => false,
+            }
         });
         assert!(found, "Expected -2 degree, got: {:?}", entities);
     }

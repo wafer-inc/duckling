@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::ResolvedValue;
+use crate::types::{DimensionValue, MeasurementValue, MeasurementPoint};
 
 #[derive(Debug, Clone)]
 pub struct TemperatureData {
@@ -80,41 +80,25 @@ pub fn units_are_compatible(u1: Option<TemperatureUnit>, u2: TemperatureUnit) ->
     }
 }
 
-pub fn resolve(data: &TemperatureData) -> Option<ResolvedValue> {
+pub fn resolve(data: &TemperatureData) -> Option<DimensionValue> {
     let unit = data.unit.as_ref()?;
-    let unit_str = unit.as_str();
+    let unit_str = unit.as_str().to_string();
 
-    match (data.value, data.min_value, data.max_value) {
-        (Some(v), _, _) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "value": v,
-                "type": "value",
-                "unit": unit_str,
-            }),
-        }),
-        (None, Some(from), Some(to)) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "from": {"value": from, "unit": unit_str},
-                "to": {"value": to, "unit": unit_str},
-            }),
-        }),
-        (None, Some(from), None) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "from": {"value": from, "unit": unit_str},
-            }),
-        }),
-        (None, None, Some(to)) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "to": {"value": to, "unit": unit_str},
-            }),
-        }),
-        _ => None,
-    }
+    let mv = match (data.value, data.min_value, data.max_value) {
+        (Some(v), _, _) => MeasurementValue::Value { value: v, unit: unit_str },
+        (None, Some(from), Some(to)) => MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit: unit_str.clone() }),
+            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+        },
+        (None, Some(from), None) => MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit: unit_str }),
+            to: None,
+        },
+        (None, None, Some(to)) => MeasurementValue::Interval {
+            from: None,
+            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+        },
+        _ => return None,
+    };
+    Some(DimensionValue::Temperature(mv))
 }

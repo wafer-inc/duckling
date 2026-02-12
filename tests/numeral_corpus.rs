@@ -1,16 +1,10 @@
 // Ported from Duckling/Numeral/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_numeral(text: &str, expected: f64) {
     let entities = parse_en(text, &[DimensionKind::Numeral]);
     let found = entities.iter().any(|e| {
-        e.dim == "number"
-            && e.value
-                .value
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - expected).abs() < 0.01)
-                .unwrap_or(false)
+        matches!(&e.value, DimensionValue::Numeral(v) if (*v - expected).abs() < 0.01)
     });
     assert!(
         found,
@@ -19,7 +13,7 @@ fn check_numeral(text: &str, expected: f64) {
         text,
         entities
             .iter()
-            .map(|e| format!("{}={:?}", e.dim, e.value))
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
             .collect::<Vec<_>>()
     );
 }

@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 #[derive(Debug, Clone)]
 pub struct OrdinalData {
@@ -13,12 +13,6 @@ impl OrdinalData {
     }
 }
 
-pub fn resolve(data: &OrdinalData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-        }),
-    }
+pub fn resolve(data: &OrdinalData) -> DimensionValue {
+    DimensionValue::Ordinal(data.value)
 }

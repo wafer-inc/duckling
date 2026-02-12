@@ -81,8 +81,7 @@ mod tests {
                 &[DimensionKind::Email],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "email"
-                    && e.value.value.get("value").and_then(|v| v.as_str()) == Some(*email)
+                matches!(&e.value, crate::types::DimensionValue::Email(v) if v == *email)
             });
             assert!(found, "Expected email '{}', got: {:?}", email, entities);
         }

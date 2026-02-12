@@ -357,9 +357,12 @@ mod tests {
                 &[DimensionKind::Volume],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "volume"
-                    && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(*expected_val)
-                    && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(*expected_unit)
+                match &e.value {
+                    crate::types::DimensionValue::Volume(crate::types::MeasurementValue::Value { value, unit }) => {
+                        (*value - *expected_val).abs() < 0.01 && unit == *expected_unit
+                    }
+                    _ => false,
+                }
             });
             assert!(found, "Expected {} {} for '{}', got: {:?}", expected_val, expected_unit, text, entities);
         }

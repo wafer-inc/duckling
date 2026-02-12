@@ -395,9 +395,7 @@ mod tests {
                 &[DimensionKind::Duration],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "duration"
-                    && e.value.value.get("value").and_then(|v| v.as_i64()) == Some(*expected_val as i64)
-                    && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(*expected_unit)
+                matches!(&e.value, crate::types::DimensionValue::Duration { value, grain, .. } if *value == *expected_val as i64 && grain.as_str() == *expected_unit)
             });
             assert!(found, "Expected {} {} for '{}', got: {:?}", expected_val, expected_unit, text, entities);
         }

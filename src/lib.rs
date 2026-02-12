@@ -13,7 +13,8 @@ pub mod types;
 // Re-exports for convenience
 pub use locale::{Lang, Region, Locale};
 pub use resolve::{Context, Options};
-pub use types::{DimensionKind, Entity, ResolvedValue};
+pub use types::{DimensionKind, DimensionValue, Entity, MeasurementValue, MeasurementPoint, TimeValue, TimePoint};
+pub use dimensions::time_grain::Grain;
 
 /// Parse natural language text and return structured entities.
 ///
@@ -64,13 +65,7 @@ mod integration_tests {
     fn test_parse_numeral() {
         let entities = parse_en("thirty three", &[DimensionKind::Numeral]);
         let found = entities.iter().any(|e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| (v - 33.0).abs() < 0.01)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01)
         });
         assert!(found, "Expected 33, got: {:?}", entities);
     }
@@ -79,13 +74,7 @@ mod integration_tests {
     fn test_parse_100k() {
         let entities = parse_en("100K", &[DimensionKind::Numeral]);
         let found = entities.iter().any(|e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| (v - 100_000.0).abs() < 0.01)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01)
         });
         assert!(found, "Expected 100000, got: {:?}", entities);
     }
@@ -94,9 +83,8 @@ mod integration_tests {
     fn test_parse_temperature() {
         let entities = parse_en("80 degrees fahrenheit", &[DimensionKind::Temperature]);
         let found = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(80.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("fahrenheit")
+            matches!(&e.value, DimensionValue::Temperature(MeasurementValue::Value { value, unit })
+                if (*value - 80.0).abs() < 0.01 && unit == "fahrenheit")
         });
         assert!(found, "Expected 80F, got: {:?}", entities);
     }
@@ -105,9 +93,7 @@ mod integration_tests {
     fn test_parse_email() {
         let entities = parse_en("user@example.com", &[DimensionKind::Email]);
         let found = entities.iter().any(|e| {
-            e.dim == "email"
-                && e.value.value.get("value").and_then(|v| v.as_str())
-                    == Some("user@example.com")
+            matches!(&e.value, DimensionValue::Email(v) if v == "user@example.com")
         });
         assert!(found, "Expected email, got: {:?}", entities);
     }
@@ -120,13 +106,12 @@ mod integration_tests {
         );
 
         let has_numeral = entities.iter().any(|e| {
-            e.dim == "number"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(3.0)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 3.0).abs() < 0.01)
         });
 
         let has_temp = entities.iter().any(|e| {
-            e.dim == "temperature"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(3.0)
+            matches!(&e.value, DimensionValue::Temperature(MeasurementValue::Value { value, .. })
+                if (*value - 3.0).abs() < 0.01)
         });
 
         assert!(
@@ -142,7 +127,7 @@ mod integration_tests {
             "visit https://www.example.com/path",
             &[DimensionKind::Url],
         );
-        let found = entities.iter().any(|e| e.dim == "url");
+        let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Url { .. }));
         assert!(found, "Expected URL, got: {:?}", entities);
     }
 
@@ -150,9 +135,8 @@ mod integration_tests {
     fn test_parse_money() {
         let entities = parse_en("$42.50", &[DimensionKind::AmountOfMoney]);
         let found = entities.iter().any(|e| {
-            e.dim == "amount-of-money"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(42.5)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("USD")
+            matches!(&e.value, DimensionValue::AmountOfMoney(MeasurementValue::Value { value, unit })
+                if (*value - 42.5).abs() < 0.01 && unit == "USD")
         });
         assert!(found, "Expected $42.50, got: {:?}", entities);
     }
@@ -161,8 +145,7 @@ mod integration_tests {
     fn test_parse_ordinal() {
         let entities = parse_en("the 3rd", &[DimensionKind::Ordinal]);
         let found = entities.iter().any(|e| {
-            e.dim == "ordinal"
-                && e.value.value.get("value").and_then(|v| v.as_i64()) == Some(3)
+            matches!(&e.value, DimensionValue::Ordinal(3))
         });
         assert!(found, "Expected 3rd, got: {:?}", entities);
     }
@@ -171,9 +154,7 @@ mod integration_tests {
     fn test_parse_duration() {
         let entities = parse_en("3 days", &[DimensionKind::Duration]);
         let found = entities.iter().any(|e| {
-            e.dim == "duration"
-                && e.value.value.get("value").and_then(|v| v.as_i64()) == Some(3)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("day")
+            matches!(&e.value, DimensionValue::Duration { value: 3, grain: Grain::Day, .. })
         });
         assert!(found, "Expected 3 days, got: {:?}", entities);
     }
@@ -181,7 +162,7 @@ mod integration_tests {
     #[test]
     fn test_parse_time_today() {
         let entities = parse_en("today", &[DimensionKind::Time]);
-        let found = entities.iter().any(|e| e.dim == "time");
+        let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Time(_)));
         assert!(found, "Expected time for 'today', got: {:?}", entities);
     }
 
@@ -189,9 +170,8 @@ mod integration_tests {
     fn test_parse_distance() {
         let entities = parse_en("5 miles", &[DimensionKind::Distance]);
         let found = entities.iter().any(|e| {
-            e.dim == "distance"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(5.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("mile")
+            matches!(&e.value, DimensionValue::Distance(MeasurementValue::Value { value, unit })
+                if (*value - 5.0).abs() < 0.01 && unit == "mile")
         });
         assert!(found, "Expected 5 miles, got: {:?}", entities);
     }
@@ -200,9 +180,8 @@ mod integration_tests {
     fn test_parse_volume() {
         let entities = parse_en("2 gallons", &[DimensionKind::Volume]);
         let found = entities.iter().any(|e| {
-            e.dim == "volume"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(2.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("gallon")
+            matches!(&e.value, DimensionValue::Volume(MeasurementValue::Value { value, unit })
+                if (*value - 2.0).abs() < 0.01 && unit == "gallon")
         });
         assert!(found, "Expected 2 gallons, got: {:?}", entities);
     }
@@ -211,8 +190,8 @@ mod integration_tests {
     fn test_parse_quantity() {
         let entities = parse_en("5 pounds", &[DimensionKind::Quantity]);
         let found = entities.iter().any(|e| {
-            e.dim == "quantity"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(5.0)
+            matches!(&e.value, DimensionValue::Quantity { measurement: MeasurementValue::Value { value, .. }, .. }
+                if (*value - 5.0).abs() < 0.01)
         });
         assert!(found, "Expected 5 pounds, got: {:?}", entities);
     }

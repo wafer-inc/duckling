@@ -1,51 +1,30 @@
 // Ported from Duckling/Volume/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
 
 fn check_volume(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Volume]);
     let found = entities.iter().any(|e| {
-        if e.dim != "volume" {
-            return false;
-        }
-        let v = &e.value.value;
-
-        // Check simple value (type=value)
-        if v.get("value")
-            .and_then(|v| v.as_f64())
-            .map(|val| (val - expected_val).abs() < 0.01)
-            .unwrap_or(false)
-            && v.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
-        {
-            return true;
-        }
-
-        // Check interval from value
-        if let Some(from) = v.get("from") {
-            if from
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|val| (val - expected_val).abs() < 0.01)
-                .unwrap_or(false)
-                && from.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
-            {
-                return true;
+        match &e.value {
+            DimensionValue::Volume(mv) => match mv {
+                MeasurementValue::Value { value, unit } => {
+                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
+                }
+                MeasurementValue::Interval { from, to } => {
+                    if let Some(MeasurementPoint { value, unit }) = from {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    if let Some(MeasurementPoint { value, unit }) = to {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    false
+                }
             }
+            _ => false,
         }
-
-        // Check interval to value
-        if let Some(to) = v.get("to") {
-            if to
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|val| (val - expected_val).abs() < 0.01)
-                .unwrap_or(false)
-                && to.get("unit").and_then(|u| u.as_str()) == Some(expected_unit)
-            {
-                return true;
-            }
-        }
-
-        false
     });
     assert!(
         found,
@@ -55,7 +34,7 @@ fn check_volume(text: &str, expected_val: f64, expected_unit: &str) {
         text,
         entities
             .iter()
-            .map(|e| format!("{}={:?}", e.dim, e.value))
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
             .collect::<Vec<_>>()
     );
 }

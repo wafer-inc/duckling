@@ -80,7 +80,7 @@ mod tests {
                 &options,
                 &[DimensionKind::PhoneNumber],
             );
-            let found = entities.iter().any(|e| e.dim == "phone-number");
+            let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
             assert!(
                 found,
                 "Expected phone number for '{}', got: {:?}",
@@ -103,7 +103,7 @@ mod tests {
                 &options,
                 &[DimensionKind::PhoneNumber],
             );
-            let found = entities.iter().any(|e| e.dim == "phone-number");
+            let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
             assert!(
                 !found,
                 "Expected NO phone number for '{}', got: {:?}",

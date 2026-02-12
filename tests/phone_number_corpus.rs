@@ -1,28 +1,27 @@
 // Ported from Duckling/PhoneNumber/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_phone(text: &str, expected_value: &str) {
     let entities = parse_en(text, &[DimensionKind::PhoneNumber]);
     let found = entities.iter().any(|e| {
-        e.dim == "phone-number"
-            && e.value.value.get("value").and_then(|v| v.as_str()) == Some(expected_value)
+        matches!(&e.value, DimensionValue::PhoneNumber(v) if v == expected_value)
     });
     assert!(
         found,
         "Expected phone number value '{}' for '{}', got: {:?}",
         expected_value, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 
 fn check_no_phone(text: &str) {
     let entities = parse_en(text, &[DimensionKind::PhoneNumber]);
-    let found = entities.iter().any(|e| e.dim == "phone-number");
+    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::PhoneNumber(_)));
     assert!(
         !found,
         "Expected NO phone number for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 

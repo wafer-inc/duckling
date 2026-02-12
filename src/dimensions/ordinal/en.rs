@@ -126,7 +126,7 @@ mod tests {
     use super::*;
     use crate::engine;
     use crate::resolve::{Context, Options};
-    use crate::types::DimensionKind;
+    use crate::types::{DimensionKind, DimensionValue};
 
     #[test]
     fn test_ordinals() {
@@ -135,7 +135,7 @@ mod tests {
         let context = Context::default();
 
         for (text, expected) in &[
-            ("first", 1),
+            ("first", 1i64),
             ("second", 2),
             ("third", 3),
             ("tenth", 10),
@@ -151,15 +151,9 @@ mod tests {
                 &options,
                 &[DimensionKind::Ordinal],
             );
-            let found = entities.iter().any(|e| {
-                e.dim == "ordinal"
-                    && e.value
-                        .value
-                        .get("value")
-                        .and_then(|v| v.as_i64())
-                        .map(|v| v == *expected)
-                        .unwrap_or(false)
-            });
+            let found = entities
+                .iter()
+                .any(|e| matches!(&e.value, DimensionValue::Ordinal(v) if *v == *expected));
             assert!(found, "Expected ordinal {} for '{}', got: {:?}", expected, text, entities);
         }
     }

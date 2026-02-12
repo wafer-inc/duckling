@@ -1,7 +1,7 @@
 pub mod en;
 pub mod helpers;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 #[derive(Debug, Clone)]
 pub struct NumeralData {
@@ -39,12 +39,6 @@ impl NumeralData {
     }
 }
 
-pub fn resolve(data: &NumeralData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-        }),
-    }
+pub fn resolve(data: &NumeralData) -> DimensionValue {
+    DimensionValue::Numeral(data.value)
 }

@@ -1,88 +1,30 @@
 // Ported from Duckling/Temperature/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
 
 fn check_temperature(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Temperature]);
     let found = entities.iter().any(|e| {
-        if e.dim != "temperature" {
-            return false;
+        match &e.value {
+            DimensionValue::Temperature(mv) => match mv {
+                MeasurementValue::Value { value, unit } => {
+                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
+                }
+                MeasurementValue::Interval { from, to } => {
+                    if let Some(MeasurementPoint { value, unit }) = from {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    if let Some(MeasurementPoint { value, unit }) = to {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    false
+                }
+            }
+            _ => false,
         }
-        // Check top-level value (simple temperature)
-        let simple_match = e
-            .value
-            .value
-            .get("value")
-            .and_then(|v| v.as_f64())
-            .map(|v| (v - expected_val).abs() < 0.01)
-            .unwrap_or(false)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit);
-        if simple_match {
-            return true;
-        }
-        // Check interval from value
-        let interval_match = e
-            .value
-            .value
-            .get("from")
-            .and_then(|f| f.get("value"))
-            .and_then(|v| v.as_f64())
-            .map(|v| (v - expected_val).abs() < 0.01)
-            .unwrap_or(false)
-            && e.value
-                .value
-                .get("from")
-                .and_then(|f| f.get("unit"))
-                .and_then(|v| v.as_str())
-                == Some(expected_unit);
-        if interval_match {
-            return true;
-        }
-        // Check open interval (min only)
-        let min_match = e
-            .value
-            .value
-            .get("type")
-            .and_then(|v| v.as_str())
-            == Some("interval")
-            && e.value.value.get("to").is_none()
-            && e.value
-                .value
-                .get("from")
-                .and_then(|f| f.get("value"))
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01)
-                .unwrap_or(false)
-            && e.value
-                .value
-                .get("from")
-                .and_then(|f| f.get("unit"))
-                .and_then(|v| v.as_str())
-                == Some(expected_unit);
-        if min_match {
-            return true;
-        }
-        // Check open interval (max only)
-        let max_match = e
-            .value
-            .value
-            .get("type")
-            .and_then(|v| v.as_str())
-            == Some("interval")
-            && e.value.value.get("from").is_none()
-            && e.value
-                .value
-                .get("to")
-                .and_then(|f| f.get("value"))
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01)
-                .unwrap_or(false)
-            && e.value
-                .value
-                .get("to")
-                .and_then(|f| f.get("unit"))
-                .and_then(|v| v.as_str())
-                == Some(expected_unit);
-        max_match
     });
     assert!(
         found,
@@ -92,7 +34,7 @@ fn check_temperature(text: &str, expected_val: f64, expected_unit: &str) {
         text,
         entities
             .iter()
-            .map(|e| format!("{}={:?}", e.dim, e.value))
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
             .collect::<Vec<_>>()
     );
 }
@@ -145,8 +87,6 @@ fn test_temp_negative_2_degree() {
 // between Degree (30, 40) - range tests
 #[test]
 fn test_temp_between_30_40_degree() {
-    // These require range support which we haven't implemented
-    // Including them so they show up as failures to track
     check_temperature("between 30 and 40 degrees", 30.0, "degree");
     check_temperature("from 30 degrees to 40 degrees", 30.0, "degree");
 }

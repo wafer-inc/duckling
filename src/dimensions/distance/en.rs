@@ -330,9 +330,12 @@ mod tests {
                 &[DimensionKind::Distance],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "distance"
-                    && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(*expected_val)
-                    && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(*expected_unit)
+                match &e.value {
+                    crate::types::DimensionValue::Distance(crate::types::MeasurementValue::Value { value, unit }) => {
+                        (*value - *expected_val).abs() < 0.01 && unit == *expected_unit
+                    }
+                    _ => false,
+                }
             });
             assert!(
                 found,

@@ -309,9 +309,12 @@ mod tests {
             &[DimensionKind::Quantity],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "quantity"
-                && e.value.value.get("value").and_then(|v| v.as_f64()) == Some(5.0)
-                && e.value.value.get("unit").and_then(|v| v.as_str()) == Some("pound")
+            match &e.value {
+                crate::types::DimensionValue::Quantity { measurement: crate::types::MeasurementValue::Value { value, unit }, .. } => {
+                    (*value - 5.0).abs() < 0.01 && unit == "pound"
+                }
+                _ => false,
+            }
         });
         assert!(found, "Expected 5 pounds, got: {:?}", entities);
     }

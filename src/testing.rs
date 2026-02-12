@@ -56,7 +56,7 @@ pub fn check_corpus(corpus: &Corpus, rules: &[Rule], dims: &[DimensionKind]) -> 
                     entities.len(),
                     entities
                         .iter()
-                        .map(|e| format!("{}({:?})", e.dim, e.value))
+                        .map(|e| format!("{}({:?})", e.value.dim_kind(), e.value))
                         .collect::<Vec<_>>()
                 ));
             }

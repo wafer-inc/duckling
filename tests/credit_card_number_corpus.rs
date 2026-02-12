@@ -1,29 +1,28 @@
 // Ported from Duckling/CreditCardNumber/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_cc(text: &str, expected_number: &str, expected_issuer: &str) {
     let entities = parse_en(text, &[DimensionKind::CreditCardNumber]);
     let found = entities.iter().any(|e| {
-        e.dim == "credit-card-number"
-            && e.value.value.get("value").and_then(|v| v.as_str()) == Some(expected_number)
-            && e.value.value.get("issuer").and_then(|v| v.as_str()) == Some(expected_issuer)
+        matches!(&e.value, DimensionValue::CreditCardNumber { value, issuer }
+            if value == expected_number && issuer == expected_issuer)
     });
     assert!(
         found,
         "Expected credit card number '{}' issuer '{}' for '{}', got: {:?}",
         expected_number, expected_issuer, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 
 fn check_no_cc(text: &str) {
     let entities = parse_en(text, &[DimensionKind::CreditCardNumber]);
-    let found = entities.iter().any(|e| e.dim == "credit-card-number");
+    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::CreditCardNumber { .. }));
     assert!(
         !found,
         "Expected NO credit card for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 

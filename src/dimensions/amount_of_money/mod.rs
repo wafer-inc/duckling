@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::ResolvedValue;
+use crate::types::{DimensionValue, MeasurementValue, MeasurementPoint};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Currency {
@@ -189,7 +189,7 @@ impl AmountOfMoneyData {
     }
 }
 
-pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<ResolvedValue> {
+pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<DimensionValue> {
     // Latent tokens filtered when with_latent=false
     if data.latent && !with_latent {
         return None;
@@ -199,53 +199,27 @@ pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<ResolvedVa
         return None;
     }
 
-    let unit = data.currency.as_str();
+    let unit = data.currency.as_str().to_string();
 
-    if let Some(value) = data.value {
-        // Simple value
-        Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "value": value,
-                "type": "value",
-                "unit": unit,
-            }),
-        })
+    let mv = if let Some(value) = data.value {
+        MeasurementValue::Value { value, unit }
     } else if let (Some(from), Some(to)) = (data.min_value, data.max_value) {
-        // Between interval
-        Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "value": from,
-                "unit": unit,
-                "from": {"value": from, "unit": unit},
-                "to": {"value": to, "unit": unit},
-            }),
-        })
+        MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit: unit.clone() }),
+            to: Some(MeasurementPoint { value: to, unit }),
+        }
     } else if let Some(from) = data.min_value {
-        // Above / at least
-        Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "value": from,
-                "unit": unit,
-                "from": {"value": from, "unit": unit},
-            }),
-        })
+        MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit }),
+            to: None,
+        }
     } else if let Some(to) = data.max_value {
-        // Under / at most
-        Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "value": to,
-                "unit": unit,
-                "to": {"value": to, "unit": unit},
-            }),
-        })
+        MeasurementValue::Interval {
+            from: None,
+            to: Some(MeasurementPoint { value: to, unit }),
+        }
     } else {
-        None
-    }
+        return None;
+    };
+    Some(DimensionValue::AmountOfMoney(mv))
 }

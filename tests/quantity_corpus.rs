@@ -1,5 +1,5 @@
 // Ported from Duckling/Quantity/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
 
 fn check_quantity(text: &str, expected_val: f64, expected_unit: &str) {
     check_quantity_impl(text, expected_val, expected_unit, None);
@@ -12,46 +12,34 @@ fn check_quantity_with_product(text: &str, expected_val: f64, expected_unit: &st
 fn check_quantity_impl(text: &str, expected_val: f64, expected_unit: &str, expected_product: Option<&str>) {
     let entities = parse_en(text, &[DimensionKind::Quantity]);
     let found = entities.iter().any(|e| {
-        if e.dim != "quantity" {
-            return false;
-        }
-        let v = &e.value.value;
-
-        // Helper to check a single value object (top-level, from, or to)
-        let check_obj = |obj: &serde_json::Value| -> bool {
-            let val_ok = obj
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|val| (val - expected_val).abs() < 0.01)
-                .unwrap_or(false);
-            let unit_ok = obj.get("unit").and_then(|u| u.as_str()) == Some(expected_unit);
-            let product_ok = match expected_product {
-                Some(p) => obj.get("product").and_then(|v| v.as_str()) == Some(p),
-                None => true,
-            };
-            val_ok && unit_ok && product_ok
-        };
-
-        // Check simple value (top-level has value + unit)
-        if check_obj(v) {
-            return true;
-        }
-
-        // Check interval from value
-        if let Some(from) = v.get("from") {
-            if check_obj(from) {
-                return true;
+        match &e.value {
+            DimensionValue::Quantity { measurement, product } => {
+                let product_ok = match expected_product {
+                    Some(p) => product.as_deref() == Some(p),
+                    None => true,
+                };
+                if !product_ok { return false; }
+                match measurement {
+                    MeasurementValue::Value { value, unit } => {
+                        (*value - expected_val).abs() < 0.01 && unit == expected_unit
+                    }
+                    MeasurementValue::Interval { from, to } => {
+                        if let Some(MeasurementPoint { value, unit }) = from {
+                            if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                                return true;
+                            }
+                        }
+                        if let Some(MeasurementPoint { value, unit }) = to {
+                            if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                                return true;
+                            }
+                        }
+                        false
+                    }
+                }
             }
+            _ => false,
         }
-
-        // Check interval to value
-        if let Some(to) = v.get("to") {
-            if check_obj(to) {
-                return true;
-            }
-        }
-
-        false
     });
     assert!(
         found,
@@ -62,7 +50,7 @@ fn check_quantity_impl(text: &str, expected_val: f64, expected_unit: &str, expec
         text,
         entities
             .iter()
-            .map(|e| format!("{}={:?}", e.dim, e.value))
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
             .collect::<Vec<_>>()
     );
 }

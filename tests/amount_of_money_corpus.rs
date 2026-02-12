@@ -1,19 +1,37 @@
 // Ported from Duckling/AmountOfMoney/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
 
 fn check_money(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::AmountOfMoney]);
     let found = entities.iter().any(|e| {
-        e.dim == "amount-of-money"
-            && e.value.value.get("value").and_then(|v| v.as_f64())
-                .map(|v| (v - expected_val).abs() < 0.01).unwrap_or(false)
-            && e.value.value.get("unit").and_then(|v| v.as_str()) == Some(expected_unit)
+        match &e.value {
+            DimensionValue::AmountOfMoney(mv) => match mv {
+                MeasurementValue::Value { value, unit } => {
+                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
+                }
+                MeasurementValue::Interval { from, to } => {
+                    // For intervals, check from value (matching original test behavior)
+                    if let Some(MeasurementPoint { value, unit }) = from {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    if let Some(MeasurementPoint { value, unit }) = to {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    false
+                }
+            }
+            _ => false,
+        }
     });
     assert!(
         found,
         "Expected money {} {} for '{}', got: {:?}",
         expected_val, expected_unit, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 

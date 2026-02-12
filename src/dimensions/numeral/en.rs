@@ -492,7 +492,7 @@ mod tests {
     use crate::engine;
     use crate::resolve::{Context, Options};
     use crate::testing::{check_corpus, Corpus};
-    use crate::types::DimensionKind;
+    use crate::types::{DimensionKind, DimensionValue};
     use chrono::Utc;
 
     fn build_rules() -> Vec<Rule> {
@@ -509,33 +509,15 @@ mod tests {
         let mut corpus = Corpus::new(context);
 
         corpus.add(vec!["zero", "Zero", "ZERO"], |e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| v == 0.0)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if *v == 0.0)
         });
 
         corpus.add(vec!["one", "One"], |e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| v == 1.0)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if *v == 1.0)
         });
 
         corpus.add(vec!["fifteen", "Fifteen"], |e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| v == 15.0)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if *v == 15.0)
         });
 
         let rules = build_rules();
@@ -558,13 +540,7 @@ mod tests {
             &[DimensionKind::Numeral],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "number"
-                && e.value
-                    .value
-                    .get("value")
-                    .and_then(|v| v.as_f64())
-                    .map(|v| (v - 33.0).abs() < 0.01)
-                    .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01)
         });
         assert!(found, "Expected to find 33, got: {:?}", entities);
     }
@@ -580,12 +556,7 @@ mod tests {
         let entities =
             engine::parse_and_resolve("42", &rules, &context, &options, &[DimensionKind::Numeral]);
         let found = entities.iter().any(|e| {
-            e.value
-                .value
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - 42.0).abs() < 0.01)
-                .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 42.0).abs() < 0.01)
         });
         assert!(found, "Expected 42, got: {:?}", entities);
     }
@@ -606,12 +577,7 @@ mod tests {
             &[DimensionKind::Numeral],
         );
         let found = entities.iter().any(|e| {
-            e.value
-                .value
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - 100_000.0).abs() < 0.01)
-                .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01)
         });
         assert!(found, "Expected 100000, got: {:?}", entities);
     }
@@ -632,12 +598,7 @@ mod tests {
             &[DimensionKind::Numeral],
         );
         let found = entities.iter().any(|e| {
-            e.value
-                .value
-                .get("value")
-                .and_then(|v| v.as_f64())
-                .map(|v| (v - 500.0).abs() < 0.01)
-                .unwrap_or(false)
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 500.0).abs() < 0.01)
         });
         assert!(found, "Expected 500, got: {:?}", entities);
     }

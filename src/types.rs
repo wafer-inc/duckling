@@ -1,5 +1,6 @@
 use std::fmt;
 
+use chrono::{DateTime, Utc};
 use crate::dimensions::amount_of_money::AmountOfMoneyData;
 use crate::dimensions::credit_card_number::CreditCardNumberData;
 use crate::dimensions::distance::DistanceData;
@@ -52,6 +53,70 @@ impl fmt::Display for DimensionKind {
             DimensionKind::Time => "time",
         };
         write!(f, "{}", s)
+    }
+}
+
+/// Used by Temperature, Distance, Volume, Quantity, AmountOfMoney
+#[derive(Debug, Clone, serde::Serialize)]
+pub enum MeasurementValue {
+    Value { value: f64, unit: String },
+    Interval { from: Option<MeasurementPoint>, to: Option<MeasurementPoint> },
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct MeasurementPoint {
+    pub value: f64,
+    pub unit: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub enum TimeValue {
+    Instant { value: DateTime<Utc>, grain: Grain },
+    Interval { from: Option<TimePoint>, to: Option<TimePoint> },
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct TimePoint {
+    pub value: DateTime<Utc>,
+    pub grain: Grain,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub enum DimensionValue {
+    Numeral(f64),
+    Ordinal(i64),
+    Temperature(MeasurementValue),
+    Distance(MeasurementValue),
+    Volume(MeasurementValue),
+    Quantity { measurement: MeasurementValue, product: Option<String> },
+    AmountOfMoney(MeasurementValue),
+    Email(String),
+    PhoneNumber(String),
+    Url { value: String, domain: String },
+    CreditCardNumber { value: String, issuer: String },
+    TimeGrain(Grain),
+    Duration { value: i64, grain: Grain, normalized_seconds: i64 },
+    Time(TimeValue),
+}
+
+impl DimensionValue {
+    pub fn dim_kind(&self) -> DimensionKind {
+        match self {
+            DimensionValue::Numeral(_) => DimensionKind::Numeral,
+            DimensionValue::Ordinal(_) => DimensionKind::Ordinal,
+            DimensionValue::Temperature(_) => DimensionKind::Temperature,
+            DimensionValue::Distance(_) => DimensionKind::Distance,
+            DimensionValue::Volume(_) => DimensionKind::Volume,
+            DimensionValue::Quantity { .. } => DimensionKind::Quantity,
+            DimensionValue::AmountOfMoney(_) => DimensionKind::AmountOfMoney,
+            DimensionValue::Email(_) => DimensionKind::Email,
+            DimensionValue::PhoneNumber(_) => DimensionKind::PhoneNumber,
+            DimensionValue::Url { .. } => DimensionKind::Url,
+            DimensionValue::CreditCardNumber { .. } => DimensionKind::CreditCardNumber,
+            DimensionValue::TimeGrain(_) => DimensionKind::TimeGrain,
+            DimensionValue::Duration { .. } => DimensionKind::Duration,
+            DimensionValue::Time(_) => DimensionKind::Time,
+        }
     }
 }
 
@@ -185,19 +250,11 @@ impl fmt::Debug for Rule {
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct ResolvedValue {
-    #[serde(rename = "type")]
-    pub kind: String,
-    pub value: serde_json::Value,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
 pub struct Entity {
     pub body: String,
     pub start: usize,
     pub end: usize,
-    pub dim: String,
-    pub value: ResolvedValue,
+    pub value: DimensionValue,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub latent: Option<bool>,
 }

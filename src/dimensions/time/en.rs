@@ -3650,8 +3650,7 @@ mod tests {
                 &[DimensionKind::Time],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "time"
-                    && e.value.value.get("grain").and_then(|v| v.as_str()) == Some("day")
+                matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Instant { grain, .. }) if *grain == crate::dimensions::time_grain::Grain::Day)
             });
             assert!(found, "Expected time for '{}', got: {:?}", day, entities);
         }
@@ -3671,7 +3670,7 @@ mod tests {
                 &options,
                 &[DimensionKind::Time],
             );
-            let found = entities.iter().any(|e| e.dim == "time");
+            let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::Time(_)));
             assert!(found, "Expected time for '{}', got: {:?}", text, entities);
         }
     }
@@ -3690,8 +3689,7 @@ mod tests {
             &[DimensionKind::Time],
         );
         let found = entities.iter().any(|e| {
-            e.dim == "time"
-                && e.value.value.get("grain").and_then(|v| v.as_str()) == Some("minute")
+            matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Instant { grain, .. }) if *grain == crate::dimensions::time_grain::Grain::Minute)
         });
         assert!(found, "Expected time for '3:30', got: {:?}", entities);
     }
@@ -3709,7 +3707,7 @@ mod tests {
             &options,
             &[DimensionKind::Time],
         );
-        let found = entities.iter().any(|e| e.dim == "time");
+        let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::Time(_)));
         assert!(found, "Expected time for 'in 3 days', got: {:?}", entities);
     }
 }

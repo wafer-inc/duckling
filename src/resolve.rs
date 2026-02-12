@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use crate::dimensions;
 use crate::locale::Locale;
-use crate::types::{Entity, Node, ResolvedValue, TokenData};
+use crate::types::{DimensionValue, Entity, Node, TokenData};
 
 /// Context for resolving parsed tokens into structured values.
 #[derive(Debug, Clone)]
@@ -37,17 +37,12 @@ pub fn resolve(node: &Node, context: &Context, options: &Options, text: &str) ->
         body,
         start: node.range.start,
         end: node.range.end,
-        dim: node
-            .token_data
-            .dimension_kind()
-            .map(|d| d.to_string())
-            .unwrap_or_default(),
         value: resolved,
         latent: None,
     })
 }
 
-fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Option<ResolvedValue> {
+fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Option<DimensionValue> {
     match token {
         TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
         TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),

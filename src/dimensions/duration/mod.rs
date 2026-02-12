@@ -1,7 +1,7 @@
 pub mod en;
 
 use crate::dimensions::time_grain::Grain;
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 #[derive(Debug, Clone)]
 pub struct DurationData {
@@ -36,18 +36,10 @@ impl DurationData {
     }
 }
 
-pub fn resolve(data: &DurationData) -> ResolvedValue {
-    let norm_value = data.grain.in_seconds(data.value);
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-            "unit": data.grain.as_str(),
-            "normalized": {
-                "value": norm_value,
-                "unit": "second",
-            },
-        }),
+pub fn resolve(data: &DurationData) -> DimensionValue {
+    DimensionValue::Duration {
+        value: data.value,
+        grain: data.grain,
+        normalized_seconds: data.grain.in_seconds(data.value),
     }
 }

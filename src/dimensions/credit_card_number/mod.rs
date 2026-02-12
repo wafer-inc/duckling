@@ -1,6 +1,6 @@
 pub mod rules;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 pub const MIN_NUMBER_DIGITS: usize = 8;
 pub const MAX_NUMBER_DIGITS: usize = 19;
@@ -86,13 +86,9 @@ pub fn luhn_check(number: &str) -> bool {
     sum % 10 == 0
 }
 
-pub fn resolve(data: &CreditCardNumberData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "issuer": data.issuer,
-            "type": "value",
-        }),
+pub fn resolve(data: &CreditCardNumberData) -> DimensionValue {
+    DimensionValue::CreditCardNumber {
+        value: data.value.clone(),
+        issuer: data.issuer.clone(),
     }
 }

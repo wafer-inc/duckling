@@ -85,12 +85,7 @@ mod tests {
                 &[DimensionKind::Url],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "url"
-                    && e.value
-                        .value
-                        .get("domain")
-                        .and_then(|v| v.as_str())
-                        == Some(*expected_domain)
+                matches!(&e.value, crate::types::DimensionValue::Url { domain, .. } if domain == *expected_domain)
             });
             assert!(
                 found,

@@ -4,7 +4,7 @@ pub mod helpers;
 use chrono::{DateTime, Datelike, Duration, NaiveDate, Timelike, Utc};
 use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
-use crate::types::ResolvedValue;
+use crate::types::{DimensionValue, TimeValue, TimePoint};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartOfDay {
@@ -130,7 +130,7 @@ impl TimeData {
 // Main resolve entry point
 // ============================================================
 
-pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<ResolvedValue> {
+pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<DimensionValue> {
     if data.latent && !with_latent {
         return None;
     }
@@ -151,43 +151,33 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
 
     // 1. Open intervals (ASAP, after/before/since/until + time)
     if let Some(dir) = data.open_interval_direction {
-        let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
-        let formatted = fmt_dt(apply_tz(dt));
-        let grain = if has_tz { "minute" } else { grain };
+        let (dt, grain_str) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+        let grain = if has_tz { Grain::Minute } else { Grain::from_str(grain_str) };
+        let point = TimePoint { value: apply_tz(dt), grain };
         return match dir {
-            IntervalDirection::After => Some(ResolvedValue {
-                kind: "value".to_string(),
-                value: serde_json::json!({
-                    "from": { "value": formatted, "grain": grain },
-                    "type": "interval",
-                }),
-            }),
-            IntervalDirection::Before => Some(ResolvedValue {
-                kind: "value".to_string(),
-                value: serde_json::json!({
-                    "to": { "value": formatted, "grain": grain },
-                    "type": "interval",
-                }),
-            }),
+            IntervalDirection::After => Some(DimensionValue::Time(TimeValue::Interval {
+                from: Some(point),
+                to: None,
+            })),
+            IntervalDirection::Before => Some(DimensionValue::Time(TimeValue::Interval {
+                from: None,
+                to: Some(point),
+            })),
         };
     }
 
     // 2. Try to resolve as interval (pass context for per-endpoint timezone)
-    if let Some(iv) = try_resolve_as_interval(data, ref_time, context) {
-        return Some(iv);
+    if let Some(tv) = try_resolve_as_interval(data, ref_time, context) {
+        return Some(DimensionValue::Time(tv));
     }
 
     // 3. Simple value
-    let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
-    let grain = if has_tz { "minute" } else { grain };
-    Some(ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": fmt_dt(apply_tz(dt)),
-            "grain": grain,
-            "type": "value",
-        }),
-    })
+    let (dt, grain_str) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+    let grain = if has_tz { Grain::Minute } else { Grain::from_str(grain_str) };
+    Some(DimensionValue::Time(TimeValue::Instant {
+        value: apply_tz(dt),
+        grain,
+    }))
 }
 
 /// Map timezone abbreviation to UTC offset in minutes
@@ -230,25 +220,11 @@ fn tz_shift_for(data: &TimeData, context: &Context) -> Option<Duration> {
     })
 }
 
-/// Resolve a TimeData to a datetime, applying its timezone shift if present.
-/// This mirrors Haskell where each predicate carries its own shiftTimezone wrapper.
-fn resolve_dt_with_tz(data: &TimeData, ref_time: DateTime<Utc>, context: &Context) -> (DateTime<Utc>, &'static str) {
-    let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
-    match tz_shift_for(data, context) {
-        Some(shift) => (dt + shift, "minute"),
-        None => (dt, grain),
-    }
-}
-
-fn fmt_dt(dt: DateTime<Utc>) -> String {
-    dt.format("%Y-%m-%dT%H:%M:%S%:z").to_string()
-}
-
 // ============================================================
 // Interval resolution
 // ============================================================
 
-fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &Context) -> Option<ResolvedValue> {
+fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &Context) -> Option<TimeValue> {
     match &data.form {
         TimeForm::Interval(from_data, to_data, open) => {
             // Special case: from=Now → "by <time>" open interval
@@ -607,14 +583,11 @@ fn resolve_on_date(form: &TimeForm, date: NaiveDate, ref_time: DateTime<Utc>, di
     }
 }
 
-fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "from": { "value": fmt_dt(from), "grain": grain },
-            "to": { "value": fmt_dt(to), "grain": grain },
-            "type": "interval",
-        }),
+fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeValue {
+    let g = Grain::from_str(grain);
+    TimeValue::Interval {
+        from: Some(TimePoint { value: from, grain: g }),
+        to: Some(TimePoint { value: to, grain: g }),
     }
 }
 

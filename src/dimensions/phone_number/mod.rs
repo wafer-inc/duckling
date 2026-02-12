@@ -1,6 +1,6 @@
 pub mod rules;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 #[derive(Debug, Clone)]
 pub struct PhoneNumberData {
@@ -15,12 +15,6 @@ impl PhoneNumberData {
     }
 }
 
-pub fn resolve(data: &PhoneNumberData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-        }),
-    }
+pub fn resolve(data: &PhoneNumberData) -> DimensionValue {
+    DimensionValue::PhoneNumber(data.value.clone())
 }

@@ -1,28 +1,27 @@
 // Ported from Duckling/Email/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind};
+use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_email(text: &str, expected: &str) {
     let entities = parse_en(text, &[DimensionKind::Email]);
     let found = entities.iter().any(|e| {
-        e.dim == "email"
-            && e.value.value.get("value").and_then(|v| v.as_str()) == Some(expected)
+        matches!(&e.value, DimensionValue::Email(v) if v == expected)
     });
     assert!(
         found,
         "Expected email '{}' for '{}', got: {:?}",
         expected, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 
 fn check_no_email(text: &str) {
     let entities = parse_en(text, &[DimensionKind::Email]);
-    let found = entities.iter().any(|e| e.dim == "email");
+    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Email(_)));
     assert!(
         !found,
         "Expected NO email for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 

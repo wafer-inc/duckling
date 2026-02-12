@@ -1,6 +1,6 @@
 pub mod rules;
 
-use crate::types::ResolvedValue;
+use crate::types::DimensionValue;
 
 #[derive(Debug, Clone)]
 pub struct UrlData {
@@ -17,13 +17,9 @@ impl UrlData {
     }
 }
 
-pub fn resolve(data: &UrlData) -> ResolvedValue {
-    ResolvedValue {
-        kind: "value".to_string(),
-        value: serde_json::json!({
-            "value": data.value,
-            "type": "value",
-            "domain": data.domain,
-        }),
+pub fn resolve(data: &UrlData) -> DimensionValue {
+    DimensionValue::Url {
+        value: data.value.clone(),
+        domain: data.domain.clone(),
     }
 }

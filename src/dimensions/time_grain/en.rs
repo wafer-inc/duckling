@@ -79,8 +79,7 @@ mod tests {
                 &[DimensionKind::TimeGrain],
             );
             let found = entities.iter().any(|e| {
-                e.dim == "time-grain"
-                    && e.value.value.get("value").and_then(|v| v.as_str()) == Some(*expected_grain)
+                matches!(&e.value, crate::types::DimensionValue::TimeGrain(g) if g.as_str() == *expected_grain)
             });
             assert!(found, "Expected grain '{}' for '{}', got: {:?}", expected_grain, text, entities);
         }

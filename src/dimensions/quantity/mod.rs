@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::ResolvedValue;
+use crate::types::{DimensionValue, MeasurementValue, MeasurementPoint};
 
 #[derive(Debug, Clone)]
 pub struct QuantityData {
@@ -78,59 +78,28 @@ impl QuantityData {
     }
 }
 
-fn single_json(unit_str: &str, value: f64, product: &Option<String>) -> serde_json::Value {
-    let mut obj = serde_json::json!({"value": value, "unit": unit_str});
-    if let Some(ref p) = product {
-        obj.as_object_mut()
-            .unwrap()
-            .insert("product".to_string(), serde_json::json!(p));
-    }
-    obj
-}
-
-pub fn resolve(data: &QuantityData) -> Option<ResolvedValue> {
+pub fn resolve(data: &QuantityData) -> Option<DimensionValue> {
     let unit = data.unit.as_ref()?;
-    let unit_str = unit.as_str();
+    let unit_str = unit.as_str().to_string();
 
-    match (data.value, data.min_value, data.max_value) {
-        (Some(v), _, _) => {
-            let mut json = serde_json::json!({
-                "value": v,
-                "type": "value",
-                "unit": unit_str,
-            });
-            if let Some(ref p) = data.product {
-                json.as_object_mut()
-                    .unwrap()
-                    .insert("product".to_string(), serde_json::json!(p));
-            }
-            Some(ResolvedValue {
-                kind: "value".to_string(),
-                value: json,
-            })
-        }
-        (None, Some(from), Some(to)) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "from": single_json(unit_str, from, &data.product),
-                "to": single_json(unit_str, to, &data.product),
-            }),
-        }),
-        (None, Some(from), None) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "from": single_json(unit_str, from, &data.product),
-            }),
-        }),
-        (None, None, Some(to)) => Some(ResolvedValue {
-            kind: "value".to_string(),
-            value: serde_json::json!({
-                "type": "interval",
-                "to": single_json(unit_str, to, &data.product),
-            }),
-        }),
-        _ => None,
-    }
+    let mv = match (data.value, data.min_value, data.max_value) {
+        (Some(v), _, _) => MeasurementValue::Value { value: v, unit: unit_str },
+        (None, Some(from), Some(to)) => MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit: unit_str.clone() }),
+            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+        },
+        (None, Some(from), None) => MeasurementValue::Interval {
+            from: Some(MeasurementPoint { value: from, unit: unit_str }),
+            to: None,
+        },
+        (None, None, Some(to)) => MeasurementValue::Interval {
+            from: None,
+            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+        },
+        _ => return None,
+    };
+    Some(DimensionValue::Quantity {
+        measurement: mv,
+        product: data.product.clone(),
+    })
 }
