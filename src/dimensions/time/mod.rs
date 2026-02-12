@@ -473,7 +473,9 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
             if let TimeForm::Composed(sub_a, sub_b) = &primary.form {
                 if let TimeForm::PartOfDay(pod) = &sub_a.form {
                     if !has_clock_time(sub_b) && !has_clock_time(secondary) {
-                        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        // Combine the non-PartOfDay part (sub_b) with secondary to get the date
+                        // e.g., Composed(Morning, Christmas) + Year(2013) → resolve Christmas+2013 first
+                        let (date_dt, _) = resolve_composed(sub_b, secondary, ref_time);
                         let date = date_dt.date_naive();
                         let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_a.early_late));
                         return Some(make_interval(from, to, "hour"));
@@ -481,7 +483,8 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
                 }
                 if let TimeForm::PartOfDay(pod) = &sub_b.form {
                     if !has_clock_time(sub_a) && !has_clock_time(secondary) {
-                        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        // Combine the non-PartOfDay part (sub_a) with secondary to get the date
+                        let (date_dt, _) = resolve_composed(sub_a, secondary, ref_time);
                         let date = date_dt.date_naive();
                         let (from, to) = pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
                         return Some(make_interval(from, to, "hour"));
@@ -656,6 +659,16 @@ fn form_grain(f: &TimeForm) -> Grain {
         TimeForm::HourMinute(_, _, _) => Grain::Minute,
         TimeForm::HourMinuteSecond(_, _, _) => Grain::Second,
         TimeForm::DurationAfter { grain, .. } => *grain,
+        TimeForm::Composed(a, b) => {
+            let ga = form_grain(&a.form);
+            let gb = form_grain(&b.form);
+            if ga < gb { ga } else { gb }
+        }
+        TimeForm::Interval(from_td, to_td, _) => {
+            let gf = form_grain(&from_td.form);
+            let gt = form_grain(&to_td.form);
+            if gf < gt { gf } else { gt }
+        }
         _ => Grain::Day,
     }
 }
@@ -905,15 +918,26 @@ fn resolve_simple_datetime(
         }
         TimeForm::NthClosestToTime { n, target, base } => {
             // Haskell: predNthClosest — merge past/future candidates sorted by distance
+            // Generates past and future occurrences of target relative to base,
+            // then picks the nth closest by absolute distance.
             let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
-            // Generate candidates by resolving the target at multiple offsets
             let mut candidates: Vec<DateTime<Utc>> = Vec::new();
-            let target_grain_val = form_grain(&target.form);
+
+            // Determine the cyclic grain for generating candidates
+            // Holidays and months cycle yearly; DOWs cycle weekly
+            let cycle_grain = match &target.form {
+                TimeForm::Holiday(..) | TimeForm::Month(_) | TimeForm::DateMDY { .. }
+                    | TimeForm::DayOfMonth(_) => Grain::Year,
+                TimeForm::DayOfWeek(_) => Grain::Week,
+                _ => form_grain(&target.form),
+            };
+
             // Generate candidates in both directions from base
-            for i in -10..=10i32 {
-                let offset_ref = add_grain(base_dt, target_grain_val, i);
+            let range = (*n).max(5) + 2; // enough to find nth closest
+            for i in -(range)..=(range) {
+                let offset_ref = add_grain(base_dt, cycle_grain, i);
                 let (dt, _) = resolve_simple_datetime(&target.form, offset_ref, None);
-                if !candidates.iter().any(|c| (*c - dt).num_seconds().abs() < 3600) {
+                if !candidates.iter().any(|c| (*c - dt).num_seconds().abs() < 86400) {
                     candidates.push(dt);
                 }
             }
@@ -1198,6 +1222,14 @@ fn resolve_composed(
     // Helper: disambiguate hour based on PartOfDay context
     fn disambiguate_hour(h: u32, is_12h: bool, pod: Option<&PartOfDay>) -> u32 {
         if !is_12h { return h; }
+        // Haskell logic: (start < 12 || hours == 12) → AM
+        // When hour == 12 with is_12h, always treat as midnight (0) in any PartOfDay context
+        if h == 12 {
+            return match pod {
+                Some(_) => 0,  // "this morning/afternoon/evening at 12" → midnight
+                None => h,     // No PartOfDay context → keep 12
+            };
+        }
         match pod {
             Some(PartOfDay::Afternoon) | Some(PartOfDay::Evening) | Some(PartOfDay::Night) => {
                 if h < 12 { h + 12 } else { h }
@@ -1227,7 +1259,8 @@ fn resolve_composed(
                     (TimeForm::PartOfDay(_), _) => extract_date(b, ref_time),
                     (_, TimeForm::PartOfDay(_)) => extract_date(a, ref_time),
                     _ => {
-                        let (dt, _) = resolve_simple_datetime(&a.form, ref_time, a.direction);
+                        // Resolve full composition (e.g., DOW + DateMDY → proper intersection)
+                        let (dt, _) = resolve_composed(a, b, ref_time);
                         dt
                     }
                 }
@@ -1588,7 +1621,39 @@ fn resolve_composed(
             TimeForm::DayOfMonth(day) => {
                 return (find_dow_dom_intersection(*dow, *day, ref_time), "day");
             }
+            // GrainOffset + DOW: find the DOW within the grain period
+            // e.g., "last week's sunday" → Sunday of last week
+            TimeForm::GrainOffset { grain, offset } => {
+                let (period_start, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                // Find the target DOW within the period
+                let period_date = period_start.date_naive();
+                let current_dow = period_date.weekday().num_days_from_monday();
+                let days_to_target = if *dow >= current_dow {
+                    (*dow - current_dow) as i64
+                } else {
+                    (*dow + 7 - current_dow) as i64
+                };
+                let target_date = period_date + chrono::Duration::days(days_to_target);
+                let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+                return (dt, "day");
+            }
             _ => {}
+        }
+    }
+    // DOW + GrainOffset: same as above but reversed
+    if let TimeForm::DayOfWeek(dow) = &primary.form {
+        if let TimeForm::GrainOffset { grain, offset } = &secondary.form {
+            let (period_start, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+            let period_date = period_start.date_naive();
+            let current_dow = period_date.weekday().num_days_from_monday();
+            let days_to_target = if *dow >= current_dow {
+                (*dow - current_dow) as i64
+            } else {
+                (*dow + 7 - current_dow) as i64
+            };
+            let target_date = period_date + chrono::Duration::days(days_to_target);
+            let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+            return (dt, "day");
         }
     }
 

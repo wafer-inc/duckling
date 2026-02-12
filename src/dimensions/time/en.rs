@@ -207,7 +207,7 @@ pub fn rules() -> Vec<Rule> {
         // ====================================================================
         Rule {
             name: "morning (latent)".to_string(),
-            pattern: vec![regex(r"\b(early morning|morning)\b")],
+            pattern: vec![regex(r"\b(early ((in|hours of) the )?morning|morning)\b")],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(0).unwrap_or("").to_string(),
@@ -569,6 +569,25 @@ pub fn rules() -> Vec<Rule> {
                 let is_pm = ap.to_lowercase().starts_with('p');
                 let hour = if is_pm && hour < 12 { hour + 12 } else if !is_pm && hour == 12 { 0 } else { hour };
                 Some(TokenData::Time(TimeData::new(TimeForm::Hour(hour, false))))
+            }),
+        },
+        // H + a/p only (no "m") — latent, used in compositions (e.g., "9a to 11a")
+        Rule {
+            name: "H a/p (latent)".to_string(),
+            pattern: vec![regex(r"\b(\d{1,2})([ap])\b")],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let hour: u32 = m.group(1)?.parse().ok()?;
+                let ap = m.group(2)?;
+                if hour > 12 || hour == 0 {
+                    return None;
+                }
+                let is_pm = ap.to_lowercase().starts_with('p');
+                let hour = if is_pm && hour < 12 { hour + 12 } else if !is_pm && hour == 12 { 0 } else { hour };
+                Some(TokenData::Time(TimeData::latent(TimeForm::Hour(hour, false))))
             }),
         },
         // 3-digit HMM + am/pm (e.g., "330 p.m.")
@@ -2782,7 +2801,7 @@ pub fn rules() -> Vec<Rule> {
             name: "intersect by of/from/for/,/'s".to_string(),
             pattern: vec![
                 dim(DimensionKind::Time),
-                regex(r"\b(of|from|for|'s)( the)?\b|,"),
+                regex(r"\b(of|from|for)\b( the)?|'s( the)?|,"),
                 dim(DimensionKind::Time),
             ],
             production: Box::new(|nodes| {

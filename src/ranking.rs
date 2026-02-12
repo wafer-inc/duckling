@@ -25,14 +25,16 @@ pub fn remove_overlapping(entities: Vec<Entity>) -> Vec<Entity> {
 
     for entity in entities {
         let dominated = result.iter().any(|existing| {
-            // entity is contained within existing
+            // entity is strictly contained within existing (not equal span)
             existing.start <= entity.start && entity.end <= existing.end
+                && (existing.start < entity.start || entity.end < existing.end)
         });
 
         if !dominated {
-            // Remove any existing entities that this one dominates
+            // Remove any existing entities that this one strictly dominates
             result.retain(|existing| {
-                !(entity.start <= existing.start && existing.end <= entity.end)
+                !(entity.start <= existing.start && existing.end <= entity.end
+                    && (entity.start < existing.start || existing.end < entity.end))
             });
             result.push(entity);
         }
