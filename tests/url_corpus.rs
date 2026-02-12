@@ -10,19 +10,29 @@ fn check_url(text: &str, expected_url: &str, expected_domain: &str) {
     assert!(
         found,
         "Expected URL '{}' domain '{}' for '{}', got: {:?}",
-        expected_url, expected_domain, text,
-        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+        expected_url,
+        expected_domain,
+        text,
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
     );
 }
 
 fn check_no_url(text: &str) {
     let entities = parse_en(text, &[DimensionKind::Url]);
-    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Url { .. }));
+    let found = entities
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::Url { .. }));
     assert!(
         !found,
         "Expected NO URL for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
     );
 }
 
@@ -39,7 +49,11 @@ fn test_url_www_bla_port_path() {
 
 #[test]
 fn test_url_https_myserver() {
-    check_url("https://myserver?foo=bar", "https://myserver?foo=bar", "myserver");
+    check_url(
+        "https://myserver?foo=bar",
+        "https://myserver?foo=bar",
+        "myserver",
+    );
 }
 
 #[test]
@@ -49,7 +63,11 @@ fn test_url_cnn_com() {
 
 #[test]
 fn test_url_bla_com_path() {
-    check_url("bla.com/path/path?ext=%23&foo=bla", "bla.com/path/path?ext=%23&foo=bla", "bla.com");
+    check_url(
+        "bla.com/path/path?ext=%23&foo=bla",
+        "bla.com/path/path?ext=%23&foo=bla",
+        "bla.com",
+    );
 }
 
 #[test]
@@ -69,22 +87,38 @@ fn test_url_http_kimchi() {
 
 #[test]
 fn test_url_https_500px() {
-    check_url("https://500px.com:443/about", "https://500px.com:443/about", "500px.com");
+    check_url(
+        "https://500px.com:443/about",
+        "https://500px.com:443/about",
+        "500px.com",
+    );
 }
 
 #[test]
 fn test_url_www2_foo_bar() {
-    check_url("www2.foo-bar.net?foo=bar", "www2.foo-bar.net?foo=bar", "foo-bar.net");
+    check_url(
+        "www2.foo-bar.net?foo=bar",
+        "www2.foo-bar.net?foo=bar",
+        "foo-bar.net",
+    );
 }
 
 #[test]
 fn test_url_api_wit_ai() {
-    check_url("https://api.wit.ai/message?q=hi", "https://api.wit.ai/message?q=hi", "api.wit.ai");
+    check_url(
+        "https://api.wit.ai/message?q=hi",
+        "https://api.wit.ai/message?q=hi",
+        "api.wit.ai",
+    );
 }
 
 #[test]
 fn test_url_amazon_co_uk() {
-    check_url("aMaZon.co.uk/?page=home", "aMaZon.co.uk/?page=home", "amazon.co.uk");
+    check_url(
+        "aMaZon.co.uk/?page=home",
+        "aMaZon.co.uk/?page=home",
+        "amazon.co.uk",
+    );
 }
 
 #[test]

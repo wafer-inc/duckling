@@ -1,30 +1,28 @@
 // Ported from Duckling/Volume/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementPoint, MeasurementValue};
 
 fn check_volume(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Volume]);
-    let found = entities.iter().any(|e| {
-        match &e.value {
-            DimensionValue::Volume(mv) => match mv {
-                MeasurementValue::Value { value, unit } => {
-                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
-                }
-                MeasurementValue::Interval { from, to } => {
-                    if let Some(MeasurementPoint { value, unit }) = from {
-                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                            return true;
-                        }
-                    }
-                    if let Some(MeasurementPoint { value, unit }) = to {
-                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                            return true;
-                        }
-                    }
-                    false
-                }
+    let found = entities.iter().any(|e| match &e.value {
+        DimensionValue::Volume(mv) => match mv {
+            MeasurementValue::Value { value, unit } => {
+                (*value - expected_val).abs() < 0.01 && unit == expected_unit
             }
-            _ => false,
-        }
+            MeasurementValue::Interval { from, to } => {
+                if let Some(MeasurementPoint { value, unit }) = from {
+                    if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                        return true;
+                    }
+                }
+                if let Some(MeasurementPoint { value, unit }) = to {
+                    if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                        return true;
+                    }
+                }
+                false
+            }
+        },
+        _ => false,
     });
     assert!(
         found,

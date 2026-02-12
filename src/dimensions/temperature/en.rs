@@ -68,10 +68,7 @@ pub fn rules() -> Vec<Rule> {
         // <temp> Fahrenheit
         Rule {
             name: "<temp> fahrenheit".to_string(),
-            pattern: vec![
-                is_value_only(true),
-                regex(r#"f(ah?rh?eh?n(h?eit)?)?\.?"#),
-            ],
+            pattern: vec![is_value_only(true), regex(r#"f(ah?rh?eh?n(h?eit)?)?\.?"#)],
             production: Box::new(|nodes| {
                 let data = temperature_data(&nodes[0].token_data)?;
                 Some(TokenData::Temperature(
@@ -219,13 +216,12 @@ mod tests {
             &options,
             &[DimensionKind::Temperature],
         );
-        let found = entities.iter().any(|e| {
-            match &e.value {
-                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
-                    (*value - 80.0).abs() < 0.01 && unit == "fahrenheit"
-                }
-                _ => false,
-            }
+        let found = entities.iter().any(|e| match &e.value {
+            crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value {
+                value,
+                unit,
+            }) => (*value - 80.0).abs() < 0.01 && unit == "fahrenheit",
+            _ => false,
         });
         assert!(found, "Expected 80F, got: {:?}", entities);
     }
@@ -243,13 +239,12 @@ mod tests {
             &options,
             &[DimensionKind::Temperature],
         );
-        let found = entities.iter().any(|e| {
-            match &e.value {
-                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
-                    (*value - 3.0).abs() < 0.01 && unit == "celsius"
-                }
-                _ => false,
-            }
+        let found = entities.iter().any(|e| match &e.value {
+            crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value {
+                value,
+                unit,
+            }) => (*value - 3.0).abs() < 0.01 && unit == "celsius",
+            _ => false,
         });
         assert!(found, "Expected 3C, got: {:?}", entities);
     }
@@ -267,13 +262,12 @@ mod tests {
             &options,
             &[DimensionKind::Temperature],
         );
-        let found = entities.iter().any(|e| {
-            match &e.value {
-                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, .. }) => {
-                    (*value - 3.0).abs() < 0.01
-                }
-                _ => false,
-            }
+        let found = entities.iter().any(|e| match &e.value {
+            crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value {
+                value,
+                ..
+            }) => (*value - 3.0).abs() < 0.01,
+            _ => false,
         });
         assert!(found, "Expected temperature 3, got: {:?}", entities);
     }
@@ -291,13 +285,12 @@ mod tests {
             &options,
             &[DimensionKind::Temperature],
         );
-        let found = entities.iter().any(|e| {
-            match &e.value {
-                crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value { value, unit }) => {
-                    (*value - (-2.0)).abs() < 0.01 && unit == "degree"
-                }
-                _ => false,
-            }
+        let found = entities.iter().any(|e| match &e.value {
+            crate::types::DimensionValue::Temperature(crate::types::MeasurementValue::Value {
+                value,
+                unit,
+            }) => (*value - (-2.0)).abs() < 0.01 && unit == "degree",
+            _ => false,
         });
         assert!(found, "Expected -2 degree, got: {:?}", entities);
     }

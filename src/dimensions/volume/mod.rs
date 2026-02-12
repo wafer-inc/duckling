@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::{DimensionValue, MeasurementValue, MeasurementPoint};
+use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 
 #[derive(Debug, Clone)]
 pub struct VolumeData {
@@ -104,18 +104,33 @@ pub fn resolve(data: &VolumeData) -> Option<DimensionValue> {
     let unit_str = unit.as_str().to_string();
 
     let mv = match (data.value, data.min_value, data.max_value) {
-        (Some(v), _, _) => MeasurementValue::Value { value: v, unit: unit_str },
+        (Some(v), _, _) => MeasurementValue::Value {
+            value: v,
+            unit: unit_str,
+        },
         (None, Some(from), Some(to)) => MeasurementValue::Interval {
-            from: Some(MeasurementPoint { value: from, unit: unit_str.clone() }),
-            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+            from: Some(MeasurementPoint {
+                value: from,
+                unit: unit_str.clone(),
+            }),
+            to: Some(MeasurementPoint {
+                value: to,
+                unit: unit_str,
+            }),
         },
         (None, Some(from), None) => MeasurementValue::Interval {
-            from: Some(MeasurementPoint { value: from, unit: unit_str }),
+            from: Some(MeasurementPoint {
+                value: from,
+                unit: unit_str,
+            }),
             to: None,
         },
         (None, None, Some(to)) => MeasurementValue::Interval {
             from: None,
-            to: Some(MeasurementPoint { value: to, unit: unit_str }),
+            to: Some(MeasurementPoint {
+                value: to,
+                unit: unit_str,
+            }),
         },
         _ => return None,
     };

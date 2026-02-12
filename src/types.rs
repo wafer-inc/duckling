@@ -1,6 +1,5 @@
 use std::fmt;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::dimensions::amount_of_money::AmountOfMoneyData;
 use crate::dimensions::credit_card_number::CreditCardNumberData;
 use crate::dimensions::distance::DistanceData;
@@ -15,6 +14,7 @@ use crate::dimensions::time::TimeData;
 use crate::dimensions::time_grain::Grain;
 use crate::dimensions::url::UrlData;
 use crate::dimensions::volume::VolumeData;
+use chrono::{DateTime, NaiveDateTime, Utc};
 
 /// The kind of dimension to extract from text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -25,8 +25,7 @@ pub fn rules() -> Vec<Rule> {
                 let extension = m.group(3);
 
                 // Count digits in the body
-                let body_digits: String =
-                    body.chars().filter(|c| c.is_ascii_digit()).collect();
+                let body_digits: String = body.chars().filter(|c| c.is_ascii_digit()).collect();
                 if body_digits.len() < 7 || body_digits.len() > 15 {
                     return None;
                 }
@@ -80,7 +79,9 @@ mod tests {
                 &options,
                 &[DimensionKind::PhoneNumber],
             );
-            let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
+            let found = entities
+                .iter()
+                .any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
             assert!(
                 found,
                 "Expected phone number for '{}', got: {:?}",
@@ -103,7 +104,9 @@ mod tests {
                 &options,
                 &[DimensionKind::PhoneNumber],
             );
-            let found = entities.iter().any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
+            let found = entities
+                .iter()
+                .any(|e| matches!(&e.value, crate::types::DimensionValue::PhoneNumber(_)));
             assert!(
                 !found,
                 "Expected NO phone number for '{}', got: {:?}",

@@ -79,9 +79,7 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "fortnight".to_string(),
             pattern: vec![regex(r"(a|one)?\s*fortnight")],
-            production: Box::new(|_| {
-                Some(TokenData::Duration(DurationData::new(14, Grain::Day)))
-            }),
+            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(14, Grain::Day)))),
         },
         // <integer> + '/" : "2'" = 2 minutes, "1"" = 1 second
         Rule {
@@ -167,10 +165,7 @@ pub fn rules() -> Vec<Rule> {
         // <integer> and a half hour(s): "5 and a half hours"
         Rule {
             name: "<integer> and a half hour".to_string(),
-            pattern: vec![
-                predicate(is_natural),
-                regex(r"and (an? )?half hours?"),
-            ],
+            pattern: vec![predicate(is_natural), regex(r"and (an? )?half hours?")],
             production: Box::new(|nodes| {
                 let num = numeral_data(&nodes[0].token_data)?;
                 let v = num.value as i64;
@@ -183,10 +178,7 @@ pub fn rules() -> Vec<Rule> {
         // <integer> and a half minute(s): "5 and a half minutes"
         Rule {
             name: "<integer> and a half minute".to_string(),
-            pattern: vec![
-                predicate(is_natural),
-                regex(r"and (an? )?half min(ute)?s?"),
-            ],
+            pattern: vec![predicate(is_natural), regex(r"and (an? )?half min(ute)?s?")],
             production: Box::new(|nodes| {
                 let num = numeral_data(&nodes[0].token_data)?;
                 let v = num.value as i64;
@@ -397,7 +389,11 @@ mod tests {
             let found = entities.iter().any(|e| {
                 matches!(&e.value, crate::types::DimensionValue::Duration { value, grain, .. } if *value == *expected_val as i64 && grain.as_str() == *expected_unit)
             });
-            assert!(found, "Expected {} {} for '{}', got: {:?}", expected_val, expected_unit, text, entities);
+            assert!(
+                found,
+                "Expected {} {} for '{}', got: {:?}",
+                expected_val, expected_unit, text, entities
+            );
         }
     }
 }

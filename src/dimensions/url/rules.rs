@@ -77,13 +77,8 @@ mod tests {
             ("www.github.com", "github.com"),
             ("cnn.com/info", "cnn.com"),
         ] {
-            let entities = engine::parse_and_resolve(
-                text,
-                &rules,
-                &context,
-                &options,
-                &[DimensionKind::Url],
-            );
+            let entities =
+                engine::parse_and_resolve(text, &rules, &context, &options, &[DimensionKind::Url]);
             let found = entities.iter().any(|e| {
                 matches!(&e.value, crate::types::DimensionValue::Url { domain, .. } if domain == *expected_domain)
             });

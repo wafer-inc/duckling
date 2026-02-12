@@ -1,45 +1,58 @@
 // Ported from Duckling/Quantity/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementPoint, MeasurementValue};
 
 fn check_quantity(text: &str, expected_val: f64, expected_unit: &str) {
     check_quantity_impl(text, expected_val, expected_unit, None);
 }
 
-fn check_quantity_with_product(text: &str, expected_val: f64, expected_unit: &str, expected_product: &str) {
+fn check_quantity_with_product(
+    text: &str,
+    expected_val: f64,
+    expected_unit: &str,
+    expected_product: &str,
+) {
     check_quantity_impl(text, expected_val, expected_unit, Some(expected_product));
 }
 
-fn check_quantity_impl(text: &str, expected_val: f64, expected_unit: &str, expected_product: Option<&str>) {
+fn check_quantity_impl(
+    text: &str,
+    expected_val: f64,
+    expected_unit: &str,
+    expected_product: Option<&str>,
+) {
     let entities = parse_en(text, &[DimensionKind::Quantity]);
-    let found = entities.iter().any(|e| {
-        match &e.value {
-            DimensionValue::Quantity { measurement, product } => {
-                let product_ok = match expected_product {
-                    Some(p) => product.as_deref() == Some(p),
-                    None => true,
-                };
-                if !product_ok { return false; }
-                match measurement {
-                    MeasurementValue::Value { value, unit } => {
-                        (*value - expected_val).abs() < 0.01 && unit == expected_unit
-                    }
-                    MeasurementValue::Interval { from, to } => {
-                        if let Some(MeasurementPoint { value, unit }) = from {
-                            if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                                return true;
-                            }
+    let found = entities.iter().any(|e| match &e.value {
+        DimensionValue::Quantity {
+            measurement,
+            product,
+        } => {
+            let product_ok = match expected_product {
+                Some(p) => product.as_deref() == Some(p),
+                None => true,
+            };
+            if !product_ok {
+                return false;
+            }
+            match measurement {
+                MeasurementValue::Value { value, unit } => {
+                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
+                }
+                MeasurementValue::Interval { from, to } => {
+                    if let Some(MeasurementPoint { value, unit }) = from {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
                         }
-                        if let Some(MeasurementPoint { value, unit }) = to {
-                            if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                                return true;
-                            }
-                        }
-                        false
                     }
+                    if let Some(MeasurementPoint { value, unit }) = to {
+                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                            return true;
+                        }
+                    }
+                    false
                 }
             }
-            _ => false,
         }
+        _ => false,
     });
     assert!(
         found,
@@ -118,7 +131,12 @@ fn test_quantity_three_quarter_cup() {
 fn test_quantity_500g_strawberries() {
     check_quantity_with_product("500 grams of strawberries", 500.0, "gram", "strawberries");
     check_quantity_with_product("500g of strawberries", 500.0, "gram", "strawberries");
-    check_quantity_with_product("0.5 kilograms of strawberries", 500.0, "gram", "strawberries");
+    check_quantity_with_product(
+        "0.5 kilograms of strawberries",
+        500.0,
+        "gram",
+        "strawberries",
+    );
     check_quantity_with_product("0.5 kg of strawberries", 500.0, "gram", "strawberries");
     check_quantity_with_product("500000mg of strawberries", 500.0, "gram", "strawberries");
 }
@@ -126,10 +144,30 @@ fn test_quantity_500g_strawberries() {
 // between Gram (100,1000) (Just "strawberries")
 #[test]
 fn test_quantity_100_1000g_strawberries() {
-    check_quantity_with_product("100-1000 gram of strawberries", 100.0, "gram", "strawberries");
-    check_quantity_with_product("between 100 and 1000 grams of strawberries", 100.0, "gram", "strawberries");
-    check_quantity_with_product("from 100 to 1000 g of strawberries", 100.0, "gram", "strawberries");
-    check_quantity_with_product("100 - 1000 g of strawberries", 100.0, "gram", "strawberries");
+    check_quantity_with_product(
+        "100-1000 gram of strawberries",
+        100.0,
+        "gram",
+        "strawberries",
+    );
+    check_quantity_with_product(
+        "between 100 and 1000 grams of strawberries",
+        100.0,
+        "gram",
+        "strawberries",
+    );
+    check_quantity_with_product(
+        "from 100 to 1000 g of strawberries",
+        100.0,
+        "gram",
+        "strawberries",
+    );
+    check_quantity_with_product(
+        "100 - 1000 g of strawberries",
+        100.0,
+        "gram",
+        "strawberries",
+    );
 }
 
 // between Gram (2,7) Nothing
@@ -167,5 +205,10 @@ fn test_quantity_above_4oz_chocolate() {
     check_quantity_with_product("exceeding 4 oz of chocolate", 4.0, "ounce", "chocolate");
     check_quantity_with_product("at least 4.0 oz of chocolate", 4.0, "ounce", "chocolate");
     check_quantity_with_product("over four ounces of chocolate", 4.0, "ounce", "chocolate");
-    check_quantity_with_product("more than four ounces of chocolate", 4.0, "ounce", "chocolate");
+    check_quantity_with_product(
+        "more than four ounces of chocolate",
+        4.0,
+        "ounce",
+        "chocolate",
+    );
 }

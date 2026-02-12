@@ -34,15 +34,13 @@ impl Corpus {
 
 /// Check a corpus against a set of rules and return failures.
 pub fn check_corpus(corpus: &Corpus, rules: &[Rule], dims: &[DimensionKind]) -> Vec<String> {
-    let options = Options {
-        with_latent: false,
-    };
+    let options = Options { with_latent: false };
     let mut failures = Vec::new();
 
     for (texts, check) in &corpus.examples {
         for text in texts {
             let entities = engine::parse_and_resolve(text, rules, &corpus.context, &options, dims);
-            let any_match = entities.iter().any(|e| check(e));
+            let any_match = entities.iter().any(check);
             if !any_match {
                 let dim_str = dims
                     .iter()

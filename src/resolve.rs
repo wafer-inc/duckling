@@ -1,7 +1,7 @@
-use chrono::{DateTime, Utc};
 use crate::dimensions;
 use crate::locale::Locale;
 use crate::types::{DimensionValue, Entity, Node, TokenData};
+use chrono::{DateTime, Utc};
 
 /// Context for resolving parsed tokens into structured values.
 #[derive(Debug, Clone)]
@@ -45,7 +45,11 @@ pub fn resolve(node: &Node, context: &Context, options: &Options, text: &str) ->
     })
 }
 
-fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Option<DimensionValue> {
+fn resolve_token(
+    token: &TokenData,
+    context: &Context,
+    options: &Options,
+) -> Option<DimensionValue> {
     match token {
         TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
         TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
@@ -59,14 +63,10 @@ fn resolve_token(token: &TokenData, context: &Context, options: &Options) -> Opt
         TokenData::Email(data) => Some(dimensions::email::resolve(data)),
         TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
         TokenData::Url(data) => Some(dimensions::url::resolve(data)),
-        TokenData::CreditCardNumber(data) => {
-            Some(dimensions::credit_card_number::resolve(data))
-        }
+        TokenData::CreditCardNumber(data) => Some(dimensions::credit_card_number::resolve(data)),
         TokenData::TimeGrain(grain) => Some(dimensions::time_grain::resolve(grain)),
         TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
-        TokenData::Time(data) => {
-            dimensions::time::resolve(data, context, options.with_latent)
-        }
+        TokenData::Time(data) => dimensions::time::resolve(data, context, options.with_latent),
         TokenData::RegexMatch(_) => None,
     }
 }

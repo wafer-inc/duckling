@@ -29,9 +29,7 @@ pub fn detect_issuer(digits: &str) -> &'static str {
         return "amex";
     }
     if len >= 16
-        && (digits.starts_with("6011")
-            || digits.starts_with("65")
-            || digits.starts_with("64"))
+        && (digits.starts_with("6011") || digits.starts_with("65") || digits.starts_with("64"))
     {
         return "discover";
     }
@@ -83,7 +81,7 @@ pub fn luhn_check(number: &str) -> bool {
         sum += val;
         double = !double;
     }
-    sum % 10 == 0
+    sum.is_multiple_of(10)
 }
 
 pub fn resolve(data: &CreditCardNumberData) -> DimensionValue {

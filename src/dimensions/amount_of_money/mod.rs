@@ -1,6 +1,6 @@
 pub mod en;
 
-use crate::types::{DimensionValue, MeasurementValue, MeasurementPoint};
+use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Currency {
@@ -205,7 +205,10 @@ pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<DimensionV
         MeasurementValue::Value { value, unit }
     } else if let (Some(from), Some(to)) = (data.min_value, data.max_value) {
         MeasurementValue::Interval {
-            from: Some(MeasurementPoint { value: from, unit: unit.clone() }),
+            from: Some(MeasurementPoint {
+                value: from,
+                unit: unit.clone(),
+            }),
             to: Some(MeasurementPoint { value: to, unit }),
         }
     } else if let Some(from) = data.min_value {

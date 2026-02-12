@@ -55,9 +55,7 @@ fn rules_uncached(dims: &[DimensionKind]) -> Vec<Rule> {
             DimensionKind::Distance => rules.extend(dimensions::distance::en::rules()),
             DimensionKind::Volume => rules.extend(dimensions::volume::en::rules()),
             DimensionKind::Quantity => rules.extend(dimensions::quantity::en::rules()),
-            DimensionKind::AmountOfMoney => {
-                rules.extend(dimensions::amount_of_money::en::rules())
-            }
+            DimensionKind::AmountOfMoney => rules.extend(dimensions::amount_of_money::en::rules()),
             DimensionKind::Email => rules.extend(dimensions::email::rules::rules()),
             DimensionKind::PhoneNumber => rules.extend(dimensions::phone_number::rules::rules()),
             DimensionKind::Url => rules.extend(dimensions::url::rules::rules()),

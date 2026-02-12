@@ -13,20 +13,24 @@ fn volume_data(token_data: &TokenData) -> Option<&VolumeData> {
 
 /// Matches Volume tokens with unit only (no value, no interval).
 fn is_unit_only() -> crate::types::PatternItem {
-    predicate(|td| matches!(td, TokenData::Volume(data)
+    predicate(|td| {
+        matches!(td, TokenData::Volume(data)
         if data.value.is_none()
             && data.unit.is_some()
             && data.min_value.is_none()
-            && data.max_value.is_none()))
+            && data.max_value.is_none())
+    })
 }
 
 /// Matches Volume tokens with a simple value (value + unit, no interval).
 fn is_simple_volume() -> crate::types::PatternItem {
-    predicate(|td| matches!(td, TokenData::Volume(data)
+    predicate(|td| {
+        matches!(td, TokenData::Volume(data)
         if data.value.is_some()
             && data.unit.is_some()
             && data.min_value.is_none()
-            && data.max_value.is_none()))
+            && data.max_value.is_none())
+    })
 }
 
 pub fn rules() -> Vec<Rule> {
@@ -84,11 +88,7 @@ pub fn rules() -> Vec<Rule> {
         // <volume> - <volume> (common interval dash)
         Rule {
             name: "<volume> - <volume>".to_string(),
-            pattern: vec![
-                is_simple_volume(),
-                regex(r#"\-"#),
-                is_simple_volume(),
-            ],
+            pattern: vec![is_simple_volume(), regex(r#"\-"#), is_simple_volume()],
             production: Box::new(|nodes| {
                 let from_data = volume_data(&nodes[0].token_data)?;
                 let to_data = volume_data(&nodes[2].token_data)?;
@@ -104,21 +104,23 @@ pub fn rules() -> Vec<Rule> {
                 ))
             }),
         },
-
         // === Unit-only rules (from Volume/EN/Rules.hs rulesVolumes) ===
-
         Rule {
             name: "<latent vol> ml".to_string(),
             pattern: vec![regex(r#"m(l(s?)|illilit(er|re)s?)"#)],
             production: Box::new(|_| {
-                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Millilitre)))
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Millilitre,
+                )))
             }),
         },
         Rule {
             name: "<vol> hectoliters".to_string(),
             pattern: vec![regex(r#"hectolit(er|re)s?"#)],
             production: Box::new(|_| {
-                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Hectolitre)))
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Hectolitre,
+                )))
             }),
         },
         Rule {
@@ -160,17 +162,20 @@ pub fn rules() -> Vec<Rule> {
             name: "<vol> tablespoons".to_string(),
             pattern: vec![regex(r#"tbsps?|tablespoons?"#)],
             production: Box::new(|_| {
-                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Tablespoon)))
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Tablespoon,
+                )))
             }),
         },
         Rule {
             name: "<vol> teaspoons".to_string(),
             pattern: vec![regex(r#"tsps?|teaspoons?"#)],
             production: Box::new(|_| {
-                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Teaspoon)))
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Teaspoon,
+                )))
             }),
         },
-
         // === Fractional volume rules (from Volume/EN/Rules.hs rulesFractionalVolume) ===
 
         // "a/an <unit>" → 1.0
@@ -236,19 +241,20 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Volume(VolumeData::new(0.1, unit)))
             }),
         },
-
         // === EN-specific rules (from Volume/EN/Rules.hs) ===
 
         // about/approximately <volume>
         Rule {
             name: "about <volume>".to_string(),
             pattern: vec![
-                regex(r#"~|exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost"#),
-                predicate(|td| matches!(td, TokenData::Volume(data) if data.value.is_some() || data.min_value.is_some() || data.max_value.is_some())),
+                regex(
+                    r#"~|exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost"#,
+                ),
+                predicate(
+                    |td| matches!(td, TokenData::Volume(data) if data.value.is_some() || data.min_value.is_some() || data.max_value.is_some()),
+                ),
             ],
-            production: Box::new(|nodes| {
-                Some(nodes[1].token_data.clone())
-            }),
+            production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
         },
         // between|from <numeral> and|to <volume>
         Rule {
@@ -308,9 +314,7 @@ pub fn rules() -> Vec<Rule> {
                 let data = volume_data(&nodes[1].token_data)?;
                 let to = data.value?;
                 let unit = data.unit?;
-                Some(TokenData::Volume(
-                    VolumeData::unit_only(unit).with_max(to),
-                ))
+                Some(TokenData::Volume(VolumeData::unit_only(unit).with_max(to)))
             }),
         },
         // over / above / at least / more than <volume>
@@ -353,18 +357,24 @@ mod tests {
             ("1 cup", 1.0, "cup"),
         ] {
             let entities = engine::parse_and_resolve(
-                text, &rules, &context, &options,
+                text,
+                &rules,
+                &context,
+                &options,
                 &[DimensionKind::Volume],
             );
-            let found = entities.iter().any(|e| {
-                match &e.value {
-                    crate::types::DimensionValue::Volume(crate::types::MeasurementValue::Value { value, unit }) => {
-                        (*value - *expected_val).abs() < 0.01 && unit == *expected_unit
-                    }
-                    _ => false,
-                }
+            let found = entities.iter().any(|e| match &e.value {
+                crate::types::DimensionValue::Volume(crate::types::MeasurementValue::Value {
+                    value,
+                    unit,
+                }) => (*value - *expected_val).abs() < 0.01 && unit == *expected_unit,
+                _ => false,
             });
-            assert!(found, "Expected {} {} for '{}', got: {:?}", expected_val, expected_unit, text, entities);
+            assert!(
+                found,
+                "Expected {} {} for '{}', got: {:?}",
+                expected_val, expected_unit, text, entities
+            );
         }
     }
 }

@@ -3,9 +3,9 @@ use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_numeral(text: &str, expected: f64) {
     let entities = parse_en(text, &[DimensionKind::Numeral]);
-    let found = entities.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Numeral(v) if (*v - expected).abs() < 0.01)
-    });
+    let found = entities
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - expected).abs() < 0.01));
     assert!(
         found,
         "Expected numeral {} for '{}', got: {:?}",

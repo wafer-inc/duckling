@@ -14,10 +14,12 @@ pub(crate) mod testing;
 pub(crate) mod types;
 
 // Re-exports for convenience
-pub use locale::{Lang, Region, Locale};
-pub use resolve::{Context, Options};
-pub use types::{DimensionKind, DimensionValue, Entity, MeasurementValue, MeasurementPoint, TimeValue, TimePoint};
 pub use dimensions::time_grain::Grain;
+pub use locale::{Lang, Locale, Region};
+pub use resolve::{Context, Options};
+pub use types::{
+    DimensionKind, DimensionValue, Entity, MeasurementPoint, MeasurementValue, TimePoint, TimeValue,
+};
 
 /// Parse natural language text and return structured entities.
 ///
@@ -76,18 +78,18 @@ mod integration_tests {
     #[test]
     fn test_parse_numeral() {
         let entities = parse_en("thirty three", &[DimensionKind::Numeral]);
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01)
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01));
         assert!(found, "Expected 33, got: {:?}", entities);
     }
 
     #[test]
     fn test_parse_100k() {
         let entities = parse_en("100K", &[DimensionKind::Numeral]);
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01)
-        });
+        let found = entities.iter().any(
+            |e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01),
+        );
         assert!(found, "Expected 100000, got: {:?}", entities);
     }
 
@@ -104,9 +106,9 @@ mod integration_tests {
     #[test]
     fn test_parse_email() {
         let entities = parse_en("user@example.com", &[DimensionKind::Email]);
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Email(v) if v == "user@example.com")
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Email(v) if v == "user@example.com"));
         assert!(found, "Expected email, got: {:?}", entities);
     }
 
@@ -117,9 +119,9 @@ mod integration_tests {
             &[DimensionKind::Numeral, DimensionKind::Temperature],
         );
 
-        let has_numeral = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 3.0).abs() < 0.01)
-        });
+        let has_numeral = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 3.0).abs() < 0.01));
 
         let has_temp = entities.iter().any(|e| {
             matches!(&e.value, DimensionValue::Temperature(MeasurementValue::Value { value, .. })
@@ -135,11 +137,10 @@ mod integration_tests {
 
     #[test]
     fn test_parse_url() {
-        let entities = parse_en(
-            "visit https://www.example.com/path",
-            &[DimensionKind::Url],
-        );
-        let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Url { .. }));
+        let entities = parse_en("visit https://www.example.com/path", &[DimensionKind::Url]);
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Url { .. }));
         assert!(found, "Expected URL, got: {:?}", entities);
     }
 
@@ -156,9 +157,9 @@ mod integration_tests {
     #[test]
     fn test_parse_ordinal() {
         let entities = parse_en("the 3rd", &[DimensionKind::Ordinal]);
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Ordinal(3))
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Ordinal(3)));
         assert!(found, "Expected 3rd, got: {:?}", entities);
     }
 
@@ -166,7 +167,14 @@ mod integration_tests {
     fn test_parse_duration() {
         let entities = parse_en("3 days", &[DimensionKind::Duration]);
         let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Duration { value: 3, grain: Grain::Day, .. })
+            matches!(
+                &e.value,
+                DimensionValue::Duration {
+                    value: 3,
+                    grain: Grain::Day,
+                    ..
+                }
+            )
         });
         assert!(found, "Expected 3 days, got: {:?}", entities);
     }
@@ -174,7 +182,9 @@ mod integration_tests {
     #[test]
     fn test_parse_time_today() {
         let entities = parse_en("today", &[DimensionKind::Time]);
-        let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::Time(_)));
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Time(_)));
         assert!(found, "Expected time for 'today', got: {:?}", entities);
     }
 

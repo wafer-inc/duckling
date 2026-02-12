@@ -1,5 +1,5 @@
-use crate::types::TokenData;
 use super::TimeData;
+use crate::types::TokenData;
 
 pub fn time_data(token: &TokenData) -> Option<&TimeData> {
     match token {

@@ -45,8 +45,7 @@ fn is_money_with_value(td: &TokenData) -> bool {
 fn is_without_cents(td: &TokenData) -> bool {
     match td {
         TokenData::AmountOfMoney(d) => {
-            d.currency != Currency::Cent
-                && d.value.map(|v| v == v.floor()).unwrap_or(false)
+            d.currency != Currency::Cent && d.value.map(|v| v == v.floor()).unwrap_or(false)
         }
         _ => false,
     }
@@ -76,8 +75,8 @@ fn lookup_currency(s: &str) -> Option<Currency> {
         "dkk" => Some(Currency::DKK),
         "dollar" | "dollars" => Some(Currency::Dollar),
         "egp" => Some(Currency::EGP),
-        "\u{20ac}" | "eur" | "euro" | "euros" | "eurs"
-        | "\u{20ac}ur" | "\u{20ac}uro" | "\u{20ac}uros" | "\u{20ac}urs" => Some(Currency::EUR),
+        "\u{20ac}" | "eur" | "euro" | "euros" | "eurs" | "\u{20ac}ur" | "\u{20ac}uro"
+        | "\u{20ac}uros" | "\u{20ac}urs" => Some(Currency::EUR),
         "gbp" => Some(Currency::GBP),
         "gel" | "lari" | "\u{20be}" => Some(Currency::GEL),
         "hkd" => Some(Currency::HKD),
@@ -140,16 +139,15 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let c = lookup_currency(&text.to_lowercase())?;
-                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(c)))
+                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
+                    c,
+                )))
             }),
         },
         // <amount> <unit>: "10 dollars", "3.14 EUR"
         Rule {
             name: "<amount> <unit>".to_string(),
-            pattern: vec![
-                predicate(is_positive),
-                predicate(is_currency_only),
-            ],
+            pattern: vec![predicate(is_positive), predicate(is_currency_only)],
             production: Box::new(|nodes| {
                 let num = numeral_data(&nodes[0].token_data)?;
                 let d = money_data(&nodes[1].token_data)?;
@@ -161,10 +159,7 @@ pub fn rules() -> Vec<Rule> {
         // <unit> <amount>: "$10", "EUR 20"
         Rule {
             name: "<unit> <amount>".to_string(),
-            pattern: vec![
-                predicate(is_currency_only),
-                predicate(is_positive),
-            ],
+            pattern: vec![predicate(is_currency_only), predicate(is_positive)],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[0].token_data)?;
                 let num = numeral_data(&nodes[1].token_data)?;
@@ -173,7 +168,6 @@ pub fn rules() -> Vec<Rule> {
                 ))
             }),
         },
-
         // === EN-specific rules (from AmountOfMoney/EN/Rules.hs) ===
 
         // pounds: "pound", "pounds"
@@ -201,7 +195,9 @@ pub fn rules() -> Vec<Rule> {
                     "lebanese" => Currency::LBP,
                     _ => return None,
                 };
-                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(c)))
+                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
+                    c,
+                )))
             }),
         },
         // EGP abbreviation: "LE", "L.E", "l.e."
@@ -239,7 +235,9 @@ pub fn rules() -> Vec<Rule> {
                     "saudi" => Currency::SAR,
                     _ => return None,
                 };
-                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(c)))
+                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
+                    c,
+                )))
             }),
         },
         // dinars: "kuwaiti dinar"
@@ -256,7 +254,9 @@ pub fn rules() -> Vec<Rule> {
                     "kuwaiti" => Currency::KWD,
                     _ => return None,
                 };
-                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(c)))
+                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
+                    c,
+                )))
             }),
         },
         // dirham: "dirhams"
@@ -357,8 +357,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![
                 predicate(is_without_cents),
                 predicate(|td| {
-                    is_natural(td)
-                        && matches!(td, TokenData::Numeral(d) if d.value < 100.0)
+                    is_natural(td) && matches!(td, TokenData::Numeral(d) if d.value < 100.0)
                 }),
             ],
             production: Box::new(|nodes| {
@@ -374,8 +373,7 @@ pub fn rules() -> Vec<Rule> {
                 predicate(is_without_cents),
                 regex(r"and"),
                 predicate(|td| {
-                    is_natural(td)
-                        && matches!(td, TokenData::Numeral(d) if d.value < 100.0)
+                    is_natural(td) && matches!(td, TokenData::Numeral(d) if d.value < 100.0)
                 }),
             ],
             production: Box::new(|nodes| {
@@ -399,7 +397,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "about|exactly <amount-of-money>".to_string(),
             pattern: vec![
-                regex(r"exactly|precisely|about|approx(\.|imately)?|close to|near( to)?|around|almost"),
+                regex(
+                    r"exactly|precisely|about|approx(\.|imately)?|close to|near( to)?|around|almost",
+                ),
                 predicate(is_money_with_value),
             ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
@@ -421,8 +421,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d.currency)
-                        .with_interval(num.value, to),
+                    AmountOfMoneyData::currency_only(d.currency).with_interval(num.value, to),
                 ))
             }),
         },
@@ -444,8 +443,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d1.currency)
-                        .with_interval(from, to),
+                    AmountOfMoneyData::currency_only(d1.currency).with_interval(from, to),
                 ))
             }),
         },
@@ -465,8 +463,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d.currency)
-                        .with_interval(num.value, to),
+                    AmountOfMoneyData::currency_only(d.currency).with_interval(num.value, to),
                 ))
             }),
         },
@@ -487,8 +484,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d1.currency)
-                        .with_interval(from, to),
+                    AmountOfMoneyData::currency_only(d1.currency).with_interval(from, to),
                 ))
             }),
         },
@@ -553,13 +549,11 @@ mod tests {
                 &options,
                 &[DimensionKind::AmountOfMoney],
             );
-            let found = entities.iter().any(|e| {
-                match &e.value {
-                    crate::types::DimensionValue::AmountOfMoney(crate::types::MeasurementValue::Value { value, unit }) => {
-                        (*value - expected_val).abs() < 0.01 && unit == *expected_unit
-                    }
-                    _ => false,
-                }
+            let found = entities.iter().any(|e| match &e.value {
+                crate::types::DimensionValue::AmountOfMoney(
+                    crate::types::MeasurementValue::Value { value, unit },
+                ) => (*value - expected_val).abs() < 0.01 && unit == *expected_unit,
+                _ => false,
             });
             assert!(
                 found,

@@ -3,9 +3,9 @@ use duckling::{parse_en, DimensionKind, DimensionValue};
 
 fn check_ordinal(text: &str, expected: i64) {
     let entities = parse_en(text, &[DimensionKind::Ordinal]);
-    let found = entities.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Ordinal(v) if *v == expected)
-    });
+    let found = entities
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::Ordinal(v) if *v == expected));
     assert!(
         found,
         "Expected ordinal {} for '{}', got: {:?}",

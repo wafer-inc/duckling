@@ -90,9 +90,9 @@ impl Grain {
             Grain::Hour => n * 3600,
             Grain::Day => n * 86400,
             Grain::Week => n * 604800,
-            Grain::Month => n * 2592000,    // 30 days
-            Grain::Quarter => n * 7776000,  // 90 days
-            Grain::Year => n * 31536000,    // 365 days
+            Grain::Month => n * 2592000,   // 30 days
+            Grain::Quarter => n * 7776000, // 90 days
+            Grain::Year => n * 31536000,   // 365 days
         }
     }
 

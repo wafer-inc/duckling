@@ -1,30 +1,28 @@
 // Ported from Duckling/Distance/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementPoint, MeasurementValue};
 
 fn check_distance(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::Distance]);
-    let found = entities.iter().any(|e| {
-        match &e.value {
-            DimensionValue::Distance(mv) => match mv {
-                MeasurementValue::Value { value, unit } => {
-                    (*value - expected_val).abs() < 0.01 && unit == expected_unit
-                }
-                MeasurementValue::Interval { from, to } => {
-                    if let Some(MeasurementPoint { value, unit }) = from {
-                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                            return true;
-                        }
-                    }
-                    if let Some(MeasurementPoint { value, unit }) = to {
-                        if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
-                            return true;
-                        }
-                    }
-                    false
-                }
+    let found = entities.iter().any(|e| match &e.value {
+        DimensionValue::Distance(mv) => match mv {
+            MeasurementValue::Value { value, unit } => {
+                (*value - expected_val).abs() < 0.01 && unit == expected_unit
             }
-            _ => false,
-        }
+            MeasurementValue::Interval { from, to } => {
+                if let Some(MeasurementPoint { value, unit }) = from {
+                    if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                        return true;
+                    }
+                }
+                if let Some(MeasurementPoint { value, unit }) = to {
+                    if (*value - expected_val).abs() < 0.01 && unit == expected_unit {
+                        return true;
+                    }
+                }
+                false
+            }
+        },
+        _ => false,
     });
     assert!(
         found,
@@ -122,7 +120,11 @@ fn test_distance_composite_yards_feet() {
 fn test_distance_composite_km_m_cm() {
     check_distance("10 kms 8 metres 6 cm", 1000806.0, "centimetre");
     check_distance("10 kms, 8 meters, 6 cm", 1000806.0, "centimetre");
-    check_distance("10 kms, 8 meters and 6 centimeters", 1000806.0, "centimetre");
+    check_distance(
+        "10 kms, 8 meters and 6 centimeters",
+        1000806.0,
+        "centimetre",
+    );
 }
 
 // 1 meter and 1 foot = 1.3048 metres

@@ -1,5 +1,5 @@
 // Ported from Duckling/AmountOfMoney/EN/Corpus.hs
-use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue, MeasurementPoint};
+use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementPoint, MeasurementValue};
 
 fn check_money(text: &str, expected_val: f64, expected_unit: &str) {
     let entities = parse_en(text, &[DimensionKind::AmountOfMoney]);
@@ -23,15 +23,20 @@ fn check_money(text: &str, expected_val: f64, expected_unit: &str) {
                     }
                     false
                 }
-            }
+            },
             _ => false,
         }
     });
     assert!(
         found,
         "Expected money {} {} for '{}', got: {:?}",
-        expected_val, expected_unit, text,
-        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+        expected_val,
+        expected_unit,
+        text,
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
     );
 }
 

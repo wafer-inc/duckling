@@ -1,5 +1,5 @@
-use crate::types::TokenData;
 use crate::dimensions::numeral::NumeralData;
+use crate::types::TokenData;
 
 pub fn numeral_data(token: &TokenData) -> Option<&NumeralData> {
     match token {
@@ -47,10 +47,7 @@ pub fn number_between(low: f64, high: f64) -> Box<dyn Fn(&TokenData) -> bool + S
     })
 }
 
-pub fn number_with(
-    low: f64,
-    high: f64,
-) -> Box<dyn Fn(&TokenData) -> bool + Send + Sync> {
+pub fn number_with(low: f64, high: f64) -> Box<dyn Fn(&TokenData) -> bool + Send + Sync> {
     number_between(low, high)
 }
 

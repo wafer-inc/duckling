@@ -10,19 +10,29 @@ fn check_cc(text: &str, expected_number: &str, expected_issuer: &str) {
     assert!(
         found,
         "Expected credit card number '{}' issuer '{}' for '{}', got: {:?}",
-        expected_number, expected_issuer, text,
-        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+        expected_number,
+        expected_issuer,
+        text,
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
     );
 }
 
 fn check_no_cc(text: &str) {
     let entities = parse_en(text, &[DimensionKind::CreditCardNumber]);
-    let found = entities.iter().any(|e| matches!(&e.value, DimensionValue::CreditCardNumber { .. }));
+    let found = entities
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::CreditCardNumber { .. }));
     assert!(
         !found,
         "Expected NO credit card for '{}', but got: {:?}",
         text,
-        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
     );
 }
 

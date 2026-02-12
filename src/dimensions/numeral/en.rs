@@ -19,7 +19,9 @@ pub fn rules() -> Vec<Rule> {
         // === Integer words (0..9) ===
         Rule {
             name: "integer (0..9)".to_string(),
-            pattern: vec![regex(r#"(zero|naught|nought|nil|none|zilch|one|single|two|three|four|five|six|seven|eight|nine)"#)],
+            pattern: vec![regex(
+                r#"(zero|naught|nought|nil|none|zilch|one|single|two|three|four|five|six|seven|eight|nine)"#,
+            )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -49,7 +51,9 @@ pub fn rules() -> Vec<Rule> {
         // === Integer words (10..19) — longer alternatives first ===
         Rule {
             name: "integer (10..19)".to_string(),
-            pattern: vec![regex(r#"(thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|ten|eleven|twelve)"#)],
+            pattern: vec![regex(
+                r#"(thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|ten|eleven|twelve)"#,
+            )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -74,7 +78,9 @@ pub fn rules() -> Vec<Rule> {
         // === Integer words (20..90 tens) ===
         Rule {
             name: "integer (20..90)".to_string(),
-            pattern: vec![regex(r#"(twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"#)],
+            pattern: vec![regex(
+                r#"(twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"#,
+            )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -98,7 +104,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "a few".to_string(),
             pattern: vec![regex(r#"(a )?few"#)],
-            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(3.0).with_quantifier()))),
+            production: Box::new(|_| {
+                Some(TokenData::Numeral(NumeralData::new(3.0).with_quantifier()))
+            }),
         },
         // Compose tens and units: twenty one, thirty-two
         Rule {
@@ -107,7 +115,7 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|t| {
                     if let TokenData::Numeral(d) = t {
                         let v = d.value;
-                        v >= 20.0 && v <= 90.0 && v % 10.0 == 0.0
+                        (20.0..=90.0).contains(&v) && v % 10.0 == 0.0
                     } else {
                         false
                     }
@@ -134,7 +142,7 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|t| {
                     if let TokenData::Numeral(d) = t {
                         let v = d.value;
-                        v >= 20.0 && v <= 90.0 && v % 10.0 == 0.0
+                        (20.0..=90.0).contains(&v) && v % 10.0 == 0.0
                     } else {
                         false
                     }
@@ -158,7 +166,9 @@ pub fn rules() -> Vec<Rule> {
             name: "one eleven (skip hundreds)".to_string(),
             pattern: vec![
                 regex(r"(one|two|three|four|five|six|seven|eight|nine)"),
-                regex(r"(ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)"),
+                regex(
+                    r"(ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|fou?rty|fifty|sixty|seventy|eighty|ninety)",
+                ),
             ],
             production: Box::new(|nodes| {
                 let m1 = match &nodes[0].token_data {
@@ -171,7 +181,9 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let hundreds = word_to_number(m1)?;
                 let rest = word_to_number(m2)?;
-                Some(TokenData::Numeral(NumeralData::new(hundreds * 100.0 + rest)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    hundreds * 100.0 + rest,
+                )))
             }),
         },
         // Skip hundreds 2: "one twenty two" → 122
@@ -198,7 +210,9 @@ pub fn rules() -> Vec<Rule> {
                 let hundreds = word_to_number(m1)?;
                 let tens = word_to_number(m2)?;
                 let units = word_to_number(m3)?;
-                Some(TokenData::Numeral(NumeralData::new(hundreds * 100.0 + tens + units)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    hundreds * 100.0 + tens + units,
+                )))
             }),
         },
         // Numeric digits
@@ -281,10 +295,7 @@ pub fn rules() -> Vec<Rule> {
         // Negative numbers
         Rule {
             name: "negative number".to_string(),
-            pattern: vec![
-                regex(r#"(-|minus|negative)\s?"#),
-                predicate(is_positive),
-            ],
+            pattern: vec![regex(r#"(-|minus|negative)\s?"#), predicate(is_positive)],
             production: Box::new(|nodes| {
                 let data = numeral_data(&nodes[1].token_data)?;
                 Some(TokenData::Numeral(NumeralData::new(-data.value)))
@@ -293,7 +304,9 @@ pub fn rules() -> Vec<Rule> {
         // === Powers of ten (unified): hundred, thousand, lakh, million, crore, billion, trillion ===
         Rule {
             name: "powers of tens".to_string(),
-            pattern: vec![regex(r#"(hundred|thousand|l(ac|(a?kh)?)|million|((k|c)r(ore)?|koti)|billion|trillion)s?"#)],
+            pattern: vec![regex(
+                r#"(hundred|thousand|l(ac|(a?kh)?)|million|((k|c)r(ore)?|koti)|billion|trillion)s?"#,
+            )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -331,7 +344,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex(r#"(a )?dozens?( of)?"#)],
             production: Box::new(|_nodes| {
                 Some(TokenData::Numeral(
-                    NumeralData::new(12.0).with_multipliable(true).with_quantifier(),
+                    NumeralData::new(12.0)
+                        .with_multipliable(true)
+                        .with_quantifier(),
                 ))
             }),
         },
@@ -365,10 +380,7 @@ pub fn rules() -> Vec<Rule> {
         // === Compose by multiplication: "five hundred", "thirty lakh", "200 dozens" ===
         Rule {
             name: "compose by multiplication".to_string(),
-            pattern: vec![
-                predicate(is_positive),
-                predicate(is_multipliable),
-            ],
+            pattern: vec![predicate(is_positive), predicate(is_multipliable)],
             production: Box::new(|nodes| {
                 let n1 = numeral_data(&nodes[0].token_data)?;
                 let n2 = numeral_data(&nodes[1].token_data)?;
@@ -434,9 +446,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<integer> '('<integer>')'".to_string(),
             pattern: vec![
-                predicate(|td| is_natural(td)),
+                predicate(is_natural),
                 regex(r"\("),
-                predicate(|td| is_natural(td)),
+                predicate(is_natural),
                 regex(r"\)"),
             ],
             production: Box::new(|nodes| {
@@ -508,17 +520,20 @@ mod tests {
         };
         let mut corpus = Corpus::new(context);
 
-        corpus.add(vec!["zero", "Zero", "ZERO"], |e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if *v == 0.0)
-        });
+        corpus.add(
+            vec!["zero", "Zero", "ZERO"],
+            |e| matches!(&e.value, DimensionValue::Numeral(v) if *v == 0.0),
+        );
 
-        corpus.add(vec!["one", "One"], |e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if *v == 1.0)
-        });
+        corpus.add(
+            vec!["one", "One"],
+            |e| matches!(&e.value, DimensionValue::Numeral(v) if *v == 1.0),
+        );
 
-        corpus.add(vec!["fifteen", "Fifteen"], |e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if *v == 15.0)
-        });
+        corpus.add(
+            vec!["fifteen", "Fifteen"],
+            |e| matches!(&e.value, DimensionValue::Numeral(v) if *v == 15.0),
+        );
 
         let rules = build_rules();
         let failures = check_corpus(&corpus, &rules, &[DimensionKind::Numeral]);
@@ -528,9 +543,7 @@ mod tests {
     #[test]
     fn test_thirty_three() {
         let rules = build_rules();
-        let options = Options {
-            with_latent: false,
-        };
+        let options = Options { with_latent: false };
         let context = Context::default();
         let entities = engine::parse_and_resolve(
             "thirty three",
@@ -539,34 +552,30 @@ mod tests {
             &options,
             &[DimensionKind::Numeral],
         );
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01)
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 33.0).abs() < 0.01));
         assert!(found, "Expected to find 33, got: {:?}", entities);
     }
 
     #[test]
     fn test_numeric_integers() {
         let rules = build_rules();
-        let options = Options {
-            with_latent: false,
-        };
+        let options = Options { with_latent: false };
         let context = Context::default();
 
         let entities =
             engine::parse_and_resolve("42", &rules, &context, &options, &[DimensionKind::Numeral]);
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 42.0).abs() < 0.01)
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 42.0).abs() < 0.01));
         assert!(found, "Expected 42, got: {:?}", entities);
     }
 
     #[test]
     fn test_100k() {
         let rules = build_rules();
-        let options = Options {
-            with_latent: false,
-        };
+        let options = Options { with_latent: false };
         let context = Context::default();
 
         let entities = engine::parse_and_resolve(
@@ -576,18 +585,16 @@ mod tests {
             &options,
             &[DimensionKind::Numeral],
         );
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01)
-        });
+        let found = entities.iter().any(
+            |e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 100_000.0).abs() < 0.01),
+        );
         assert!(found, "Expected 100000, got: {:?}", entities);
     }
 
     #[test]
     fn test_five_hundred() {
         let rules = build_rules();
-        let options = Options {
-            with_latent: false,
-        };
+        let options = Options { with_latent: false };
         let context = Context::default();
 
         let entities = engine::parse_and_resolve(
@@ -597,9 +604,9 @@ mod tests {
             &options,
             &[DimensionKind::Numeral],
         );
-        let found = entities.iter().any(|e| {
-            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 500.0).abs() < 0.01)
-        });
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 500.0).abs() < 0.01));
         assert!(found, "Expected 500, got: {:?}", entities);
     }
 }

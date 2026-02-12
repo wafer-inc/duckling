@@ -40,7 +40,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex(r"mi(le(s)?)?")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Mile)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Mile),
+                ))
             }),
         },
         Rule {
@@ -48,7 +50,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex(r"y(ar)?ds?")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Yard)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Yard),
+                ))
             }),
         },
         Rule {
@@ -56,7 +60,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex(r"('|f(oo|ee)?ts?)")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Foot)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Foot),
+                ))
             }),
         },
         Rule {
@@ -67,7 +73,9 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Inch)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Inch),
+                ))
             }),
         },
         // Metric units
@@ -79,40 +87,39 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Kilometre)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Kilometre),
+                ))
             }),
         },
         Rule {
             name: "meters".to_string(),
-            pattern: vec![
-                dim(DimensionKind::Distance),
-                regex(r"met(er|re)s?"),
-            ],
+            pattern: vec![dim(DimensionKind::Distance), regex(r"met(er|re)s?")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
             name: "centimeters".to_string(),
-            pattern: vec![
-                dim(DimensionKind::Distance),
-                regex(r"cm|centimet(er|re)s?"),
-            ],
+            pattern: vec![dim(DimensionKind::Distance), regex(r"cm|centimet(er|re)s?")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Centimetre)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Centimetre),
+                ))
             }),
         },
         Rule {
             name: "millimeters".to_string(),
-            pattern: vec![
-                dim(DimensionKind::Distance),
-                regex(r"mm|millimet(er|re)s?"),
-            ],
+            pattern: vec![dim(DimensionKind::Distance), regex(r"mm|millimet(er|re)s?")],
             production: Box::new(|nodes| {
                 let dd = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(dd.clone().with_unit(DistanceUnit::Millimetre)))
+                Some(TokenData::Distance(
+                    dd.clone().with_unit(DistanceUnit::Millimetre),
+                ))
             }),
         },
         // Ambiguous "m" (miles or metres)
@@ -128,11 +135,7 @@ pub fn rules() -> Vec<Rule> {
         // <distance> ,|and <distance>
         Rule {
             name: "composite <distance> (with ,/and)".to_string(),
-            pattern: vec![
-                is_simple_distance(),
-                regex(r",|and"),
-                is_simple_distance(),
-            ],
+            pattern: vec![is_simple_distance(), regex(r",|and"), is_simple_distance()],
             production: Box::new(|nodes| {
                 let d1 = distance_data(&nodes[0].token_data)?;
                 let d2 = distance_data(&nodes[2].token_data)?;
@@ -169,7 +172,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "about <distance>".to_string(),
             pattern: vec![
-                regex(r"exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost"),
+                regex(
+                    r"exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost",
+                ),
                 dim(DimensionKind::Distance),
             ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
@@ -247,11 +252,7 @@ pub fn rules() -> Vec<Rule> {
         // <distance> - <distance>
         Rule {
             name: "<distance> - <distance>".to_string(),
-            pattern: vec![
-                is_simple_distance(),
-                regex(r"\-"),
-                is_simple_distance(),
-            ],
+            pattern: vec![is_simple_distance(), regex(r"\-"), is_simple_distance()],
             production: Box::new(|nodes| {
                 let from_d = distance_data(&nodes[0].token_data)?;
                 let to_d = distance_data(&nodes[2].token_data)?;
@@ -329,13 +330,12 @@ mod tests {
                 &options,
                 &[DimensionKind::Distance],
             );
-            let found = entities.iter().any(|e| {
-                match &e.value {
-                    crate::types::DimensionValue::Distance(crate::types::MeasurementValue::Value { value, unit }) => {
-                        (*value - *expected_val).abs() < 0.01 && unit == *expected_unit
-                    }
-                    _ => false,
-                }
+            let found = entities.iter().any(|e| match &e.value {
+                crate::types::DimensionValue::Distance(crate::types::MeasurementValue::Value {
+                    value,
+                    unit,
+                }) => (*value - *expected_val).abs() < 0.01 && unit == *expected_unit,
+                _ => false,
             });
             assert!(
                 found,

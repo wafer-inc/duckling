@@ -8,9 +8,7 @@ pub fn rules() -> Vec<Rule> {
         // Standard email: user@example.com
         Rule {
             name: "email".to_string(),
-            pattern: vec![regex(
-                r"([\w._+-]+@[\w_-]+(\.[\w_-]+)+)",
-            )],
+            pattern: vec![regex(r"([\w._+-]+@[\w_-]+(\.[\w_-]+)+)")],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -80,9 +78,9 @@ mod tests {
                 &options,
                 &[DimensionKind::Email],
             );
-            let found = entities.iter().any(|e| {
-                matches!(&e.value, crate::types::DimensionValue::Email(v) if v == *email)
-            });
+            let found = entities
+                .iter()
+                .any(|e| matches!(&e.value, crate::types::DimensionValue::Email(v) if v == *email));
             assert!(found, "Expected email '{}', got: {:?}", email, entities);
         }
     }

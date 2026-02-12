@@ -202,14 +202,8 @@ fn match_rule(
                     }
                 } else {
                     // Continue matching remaining patterns
-                    let continuations = match_remaining(
-                        doc,
-                        rule,
-                        stash,
-                        1,
-                        range.end,
-                        vec![regex_node],
-                    );
+                    let continuations =
+                        match_remaining(doc, rule, stash, 1, range.end, vec![regex_node]);
                     results.extend(continuations);
                 }
             }
@@ -365,9 +359,7 @@ fn match_remaining(
         PatternItem::Predicate(pred) => {
             // Use position-filtered iteration instead of scanning all nodes
             for node in stash.nodes_starting_from(after_pos) {
-                if pred(&node.token_data)
-                    && doc.is_adjacent(after_pos, node.range.start)
-                {
+                if pred(&node.token_data) && doc.is_adjacent(after_pos, node.range.start) {
                     let mut next_matched = matched_so_far.clone();
                     next_matched.push(node.clone());
                     let cont = match_remaining(

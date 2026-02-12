@@ -23,11 +23,13 @@ fn gram_multiplier(matched: &str) -> f64 {
 
 /// Matches simple Quantity tokens (has value and unit, no interval).
 fn is_simple_quantity() -> crate::types::PatternItem {
-    predicate(|td| matches!(td, TokenData::Quantity(data)
+    predicate(|td| {
+        matches!(td, TokenData::Quantity(data)
         if data.value.is_some()
             && data.unit.is_some()
             && data.min_value.is_none()
-            && data.max_value.is_none()))
+            && data.max_value.is_none())
+    })
 }
 
 pub fn rules() -> Vec<Rule> {
@@ -43,7 +45,10 @@ pub fn rules() -> Vec<Rule> {
                 if data.value <= 0.0 {
                     return None;
                 }
-                Some(TokenData::Quantity(QuantityData::new(data.value, QuantityUnit::Cup)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    data.value,
+                    QuantityUnit::Cup,
+                )))
             }),
         },
         // <number> grams/kg/mg
@@ -62,8 +67,11 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                let value = data.value * gram_multiplier(&matched);
-                Some(TokenData::Quantity(QuantityData::new(value, QuantityUnit::Gram)))
+                let value = data.value * gram_multiplier(matched);
+                Some(TokenData::Quantity(QuantityData::new(
+                    value,
+                    QuantityUnit::Gram,
+                )))
             }),
         },
         // <number> pounds
@@ -75,7 +83,10 @@ pub fn rules() -> Vec<Rule> {
                 if data.value <= 0.0 {
                     return None;
                 }
-                Some(TokenData::Quantity(QuantityData::new(data.value, QuantityUnit::Pound)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    data.value,
+                    QuantityUnit::Pound,
+                )))
             }),
         },
         // <number> ounces
@@ -87,53 +98,64 @@ pub fn rules() -> Vec<Rule> {
                 if data.value <= 0.0 {
                     return None;
                 }
-                Some(TokenData::Quantity(QuantityData::new(data.value, QuantityUnit::Ounce)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    data.value,
+                    QuantityUnit::Ounce,
+                )))
             }),
         },
-
         // === "a/an" + unit rules (ruleAQuantity) ===
-
         Rule {
             name: "a <quantity> cups".to_string(),
             pattern: vec![regex(r"an? (cups?)")],
             production: Box::new(|_| {
-                Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Cup)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Cup,
+                )))
             }),
         },
         Rule {
             name: "a <quantity> grams".to_string(),
-            pattern: vec![regex(r"an? (((m(illi)?[.]?)|(k(ilo)?)[.]?)?g(ram)?s?[.]?)[.]?")],
+            pattern: vec![regex(
+                r"an? (((m(illi)?[.]?)|(k(ilo)?)[.]?)?g(ram)?s?[.]?)[.]?",
+            )],
             production: Box::new(|nodes| {
                 let matched = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                let value = gram_multiplier(&matched);
-                Some(TokenData::Quantity(QuantityData::new(value, QuantityUnit::Gram)))
+                let value = gram_multiplier(matched);
+                Some(TokenData::Quantity(QuantityData::new(
+                    value,
+                    QuantityUnit::Gram,
+                )))
             }),
         },
         Rule {
             name: "a <quantity> lb".to_string(),
             pattern: vec![regex(r"an? ((lb|pound)s?)")],
             production: Box::new(|_| {
-                Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Pound)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Pound,
+                )))
             }),
         },
         Rule {
             name: "a <quantity> oz".to_string(),
             pattern: vec![regex(r"an? ((ounces?)|oz)")],
             production: Box::new(|_| {
-                Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Ounce)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Ounce,
+                )))
             }),
         },
-
         // === <quantity> of product ===
         Rule {
             name: "<quantity> of product".to_string(),
-            pattern: vec![
-                dim(DimensionKind::Quantity),
-                regex(r"of (\w+)"),
-            ],
+            pattern: vec![dim(DimensionKind::Quantity), regex(r"of (\w+)")],
             production: Box::new(|nodes| {
                 let qd = quantity_data(&nodes[0].token_data)?;
                 let product = match &nodes[1].token_data {
@@ -145,19 +167,17 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Quantity(result))
             }),
         },
-
         // === Precision ===
         Rule {
             name: "about <quantity>".to_string(),
             pattern: vec![
-                regex(r"~|exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost"),
+                regex(
+                    r"~|exactly|precisely|about|approx(\.?|imately)?|close to|near( to)?|around|almost",
+                ),
                 dim(DimensionKind::Quantity),
             ],
-            production: Box::new(|nodes| {
-                Some(nodes[1].token_data.clone())
-            }),
+            production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
         },
-
         // === Interval rules ===
 
         // between|from <numeral> and|to <quantity>
@@ -232,11 +252,7 @@ pub fn rules() -> Vec<Rule> {
         // <quantity> - <quantity>
         Rule {
             name: "<quantity> - <quantity>".to_string(),
-            pattern: vec![
-                is_simple_quantity(),
-                regex(r"\-"),
-                is_simple_quantity(),
-            ],
+            pattern: vec![is_simple_quantity(), regex(r"\-"), is_simple_quantity()],
             production: Box::new(|nodes| {
                 let from_data = quantity_data(&nodes[0].token_data)?;
                 let to_data = quantity_data(&nodes[2].token_data)?;
@@ -308,13 +324,12 @@ mod tests {
             &options,
             &[DimensionKind::Quantity],
         );
-        let found = entities.iter().any(|e| {
-            match &e.value {
-                crate::types::DimensionValue::Quantity { measurement: crate::types::MeasurementValue::Value { value, unit }, .. } => {
-                    (*value - 5.0).abs() < 0.01 && unit == "pound"
-                }
-                _ => false,
-            }
+        let found = entities.iter().any(|e| match &e.value {
+            crate::types::DimensionValue::Quantity {
+                measurement: crate::types::MeasurementValue::Value { value, unit },
+                ..
+            } => (*value - 5.0).abs() < 0.01 && unit == "pound",
+            _ => false,
         });
         assert!(found, "Expected 5 pounds, got: {:?}", entities);
     }

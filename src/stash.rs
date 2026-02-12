@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use crate::types::Node;
+use std::collections::BTreeMap;
 
 /// A Stash stores parsed nodes keyed by their start position.
 /// This allows efficient lookup of nodes at a given position.

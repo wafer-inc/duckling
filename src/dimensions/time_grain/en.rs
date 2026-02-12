@@ -81,7 +81,11 @@ mod tests {
             let found = entities.iter().any(|e| {
                 matches!(&e.value, crate::types::DimensionValue::TimeGrain(g) if g.as_str() == *expected_grain)
             });
-            assert!(found, "Expected grain '{}' for '{}', got: {:?}", expected_grain, text, entities);
+            assert!(
+                found,
+                "Expected grain '{}' for '{}', got: {:?}",
+                expected_grain, text, entities
+            );
         }
     }
 }

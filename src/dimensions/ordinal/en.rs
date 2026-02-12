@@ -154,7 +154,11 @@ mod tests {
             let found = entities
                 .iter()
                 .any(|e| matches!(&e.value, DimensionValue::Ordinal(v) if *v == *expected));
-            assert!(found, "Expected ordinal {} for '{}', got: {:?}", expected, text, entities);
+            assert!(
+                found,
+                "Expected ordinal {} for '{}', got: {:?}",
+                expected, text, entities
+            );
         }
     }
 }
