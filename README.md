@@ -2,7 +2,11 @@
 
 A Rust port of Facebook's [Duckling](https://github.com/facebook/duckling) — a library for parsing natural language into structured data.
 
-Given a string like `"tomorrow at 3pm"` or `"42 degrees fahrenheit"`, Duckling extracts "dimensions" such as URLs and times that may be of interest.
+Given a string like `"tomorrow at 3pm"` or `"42 degrees fahrenheit"`, Duckling extracts "dimensions" such as URLs and times.
+
+## Supported dimensions
+
+Time, Numeral, Ordinal, Temperature, Distance, Volume, Quantity, AmountOfMoney, Duration, Email, PhoneNumber, Url, CreditCardNumber.
 
 ## Usage
 
@@ -47,10 +51,6 @@ assert_eq!(results, vec![Entity {
     value: DimensionValue::Numeral(42.0),
 }]);
 ```
-
-## Supported dimensions
-
-Time, Numeral, Ordinal, Temperature, Distance, Volume, Quantity, AmountOfMoney, Duration, Email, PhoneNumber, Url, CreditCardNumber.
 
 ## Time: instant vs naive
 
