@@ -6,17 +6,26 @@ use crate::types::DimensionValue;
 /// Ordering matches Haskell Duckling's derived Ord.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Grain {
+    /// Seconds.
     Second,
+    /// Minutes.
     Minute,
+    /// Hours.
     Hour,
+    /// Days.
     Day,
+    /// Weeks.
     Week,
+    /// Months.
     Month,
+    /// Quarters (3 months).
     Quarter,
+    /// Years.
     Year,
 }
 
 impl Grain {
+    /// Returns the grain as a string (e.g. `"hour"`, `"day"`).
     pub fn as_str(&self) -> &'static str {
         match self {
             Grain::Second => "second",
@@ -30,6 +39,7 @@ impl Grain {
         }
     }
 
+    /// Parses a grain from a string.
     pub fn from_str(s: &str) -> Grain {
         match s {
             "second" => Grain::Second,

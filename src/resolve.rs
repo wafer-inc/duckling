@@ -6,7 +6,9 @@ use crate::types::{DimensionValue, Entity, Node, TokenData};
 /// Context for resolving parsed tokens into structured values.
 #[derive(Debug, Clone)]
 pub struct Context {
+    /// The reference time for resolving relative expressions like "tomorrow" or "in 2 hours".
     pub reference_time: DateTime<Utc>,
+    /// The locale used during resolution.
     pub locale: Locale,
     /// Context timezone offset in minutes from UTC (e.g., -120 for UTC-2)
     pub timezone_offset_minutes: i32,
@@ -25,6 +27,7 @@ impl Default for Context {
 /// Options for controlling parsing behavior.
 #[derive(Debug, Clone, Default)]
 pub struct Options {
+    /// Whether to include latent (ambiguous) matches in results.
     pub with_latent: bool,
 }
 

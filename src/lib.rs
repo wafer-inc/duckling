@@ -1,16 +1,17 @@
 #![doc = include_str!("../README.md")]
+#![warn(missing_docs)]
 
-pub mod dimensions;
-pub mod document;
-pub mod engine;
-pub mod lang;
-pub mod locale;
-pub mod pattern;
-pub mod ranking;
-pub mod resolve;
-pub mod stash;
-pub mod testing;
-pub mod types;
+pub(crate) mod dimensions;
+pub(crate) mod document;
+pub(crate) mod engine;
+pub(crate) mod lang;
+pub(crate) mod locale;
+pub(crate) mod pattern;
+pub(crate) mod ranking;
+pub(crate) mod resolve;
+pub(crate) mod stash;
+pub(crate) mod testing;
+pub(crate) mod types;
 
 // Re-exports for convenience
 pub use locale::{Lang, Region, Locale};

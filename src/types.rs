@@ -16,21 +16,36 @@ use crate::dimensions::time_grain::Grain;
 use crate::dimensions::url::UrlData;
 use crate::dimensions::volume::VolumeData;
 
+/// The kind of dimension to extract from text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DimensionKind {
+    /// Numbers: "forty-two", "3.5", "100K"
     Numeral,
+    /// Ordinals: "first", "3rd", "22nd"
     Ordinal,
+    /// Temperatures: "80 degrees fahrenheit", "3°C"
     Temperature,
+    /// Distances: "5 miles", "3 kilometers"
     Distance,
+    /// Volumes: "2 gallons", "500ml"
     Volume,
+    /// Quantities with product: "5 pounds of sugar"
     Quantity,
+    /// Money: "$42.50", "3 euros"
     AmountOfMoney,
+    /// Email addresses: "user@example.com"
     Email,
+    /// Phone numbers: "(555) 123-4567"
     PhoneNumber,
+    /// URLs: `"https://example.com"`
     Url,
+    /// Credit card numbers
     CreditCardNumber,
+    /// Time grains: "day", "week", "month"
     TimeGrain,
+    /// Durations: "3 days", "2 hours"
     Duration,
+    /// Times and dates: "tomorrow at 3pm", "in 2 hours"
     Time,
 }
 
@@ -69,13 +84,28 @@ impl fmt::Display for DimensionKind {
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum MeasurementValue {
-    Value { value: f64, unit: String },
-    Interval { from: Option<MeasurementPoint>, to: Option<MeasurementPoint> },
+    /// An exact measurement.
+    Value {
+        /// The numeric value.
+        value: f64,
+        /// The unit (e.g. "fahrenheit", "mile", "USD").
+        unit: String,
+    },
+    /// A range of measurements (e.g. "between 3 and 5 dollars").
+    Interval {
+        /// The lower bound, if any.
+        from: Option<MeasurementPoint>,
+        /// The upper bound, if any.
+        to: Option<MeasurementPoint>,
+    },
 }
 
+/// A single endpoint in a [`MeasurementValue::Interval`].
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct MeasurementPoint {
+    /// The numeric value.
     pub value: f64,
+    /// The unit.
     pub unit: String,
 }
 
@@ -109,11 +139,24 @@ pub struct MeasurementPoint {
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimePoint {
-    Instant { value: DateTime<Utc>, grain: Grain },
-    Naive { value: NaiveDateTime, grain: Grain },
+    /// An absolute UTC moment (e.g. "now", "in 2 hours", "5pm EST").
+    Instant {
+        /// The UTC datetime.
+        value: DateTime<Utc>,
+        /// The precision grain.
+        grain: Grain,
+    },
+    /// A wall-clock/calendar time with no timezone assumption (e.g. "5pm", "tomorrow", "March 15th").
+    Naive {
+        /// The naive datetime.
+        value: NaiveDateTime,
+        /// The precision grain.
+        grain: Grain,
+    },
 }
 
 impl TimePoint {
+    /// Returns the precision grain of this time point.
     pub fn grain(&self) -> Grain {
         match self {
             TimePoint::Instant { grain, .. } | TimePoint::Naive { grain, .. } => *grain,
@@ -157,8 +200,15 @@ impl TimePoint {
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimeValue {
+    /// A single time point.
     Single(TimePoint),
-    Interval { from: Option<TimePoint>, to: Option<TimePoint> },
+    /// A time interval.
+    Interval {
+        /// The start of the interval, if bounded.
+        from: Option<TimePoint>,
+        /// The end of the interval, if bounded.
+        to: Option<TimePoint>,
+    },
 }
 
 /// The resolved value of a parsed entity.
@@ -180,23 +230,60 @@ pub enum TimeValue {
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum DimensionValue {
+    /// A numeric value.
     Numeral(f64),
+    /// An ordinal value.
     Ordinal(i64),
+    /// A temperature measurement.
     Temperature(MeasurementValue),
+    /// A distance measurement.
     Distance(MeasurementValue),
+    /// A volume measurement.
     Volume(MeasurementValue),
-    Quantity { measurement: MeasurementValue, product: Option<String> },
+    /// A quantity with an optional product name.
+    Quantity {
+        /// The measurement value.
+        measurement: MeasurementValue,
+        /// The product (e.g. "sugar" in "5 pounds of sugar").
+        product: Option<String>,
+    },
+    /// An amount of money.
     AmountOfMoney(MeasurementValue),
+    /// An email address.
     Email(String),
+    /// A phone number.
     PhoneNumber(String),
-    Url { value: String, domain: String },
-    CreditCardNumber { value: String, issuer: String },
+    /// A URL.
+    Url {
+        /// The full URL.
+        value: String,
+        /// The domain.
+        domain: String,
+    },
+    /// A credit card number.
+    CreditCardNumber {
+        /// The card number.
+        value: String,
+        /// The card issuer (e.g. "visa", "mastercard").
+        issuer: String,
+    },
+    /// A time grain.
     TimeGrain(Grain),
-    Duration { value: i64, grain: Grain, normalized_seconds: i64 },
+    /// A duration.
+    Duration {
+        /// The count (e.g. 3 in "3 days").
+        value: i64,
+        /// The grain (e.g. Day in "3 days").
+        grain: Grain,
+        /// The duration normalized to seconds.
+        normalized_seconds: i64,
+    },
+    /// A time or date.
     Time(TimeValue),
 }
 
 impl DimensionValue {
+    /// Returns the [`DimensionKind`] for this value.
     pub fn dim_kind(&self) -> DimensionKind {
         match self {
             DimensionValue::Numeral(_) => DimensionKind::Numeral,
@@ -218,7 +305,7 @@ impl DimensionValue {
 }
 
 #[derive(Debug, Clone)]
-pub enum TokenData {
+pub(crate) enum TokenData {
     Numeral(NumeralData),
     Ordinal(OrdinalData),
     Temperature(TemperatureData),
@@ -237,7 +324,7 @@ pub enum TokenData {
 }
 
 impl TokenData {
-    pub fn dimension_kind(&self) -> Option<DimensionKind> {
+    pub(crate) fn dimension_kind(&self) -> Option<DimensionKind> {
         match self {
             TokenData::Numeral(_) => Some(DimensionKind::Numeral),
             TokenData::Ordinal(_) => Some(DimensionKind::Ordinal),
@@ -259,50 +346,50 @@ impl TokenData {
 }
 
 #[derive(Debug, Clone)]
-pub struct RegexMatchData {
-    pub groups: Vec<Option<String>>,
+pub(crate) struct RegexMatchData {
+    pub(crate) groups: Vec<Option<String>>,
 }
 
 impl RegexMatchData {
-    pub fn group(&self, idx: usize) -> Option<&str> {
+    pub(crate) fn group(&self, idx: usize) -> Option<&str> {
         self.groups.get(idx).and_then(|g| g.as_deref())
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Range {
-    pub start: usize,
-    pub end: usize,
+pub(crate) struct Range {
+    pub(crate) start: usize,
+    pub(crate) end: usize,
 }
 
 impl Range {
-    pub fn new(start: usize, end: usize) -> Self {
+    pub(crate) fn new(start: usize, end: usize) -> Self {
         Range { start, end }
     }
 
-    pub fn len(&self) -> usize {
+    pub(crate) fn len(&self) -> usize {
         self.end - self.start
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub(crate) fn is_empty(&self) -> bool {
         self.start == self.end
     }
 
-    pub fn overlaps(&self, other: &Range) -> bool {
+    pub(crate) fn overlaps(&self, other: &Range) -> bool {
         self.start < other.end && other.start < self.end
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Node {
-    pub range: Range,
-    pub token_data: TokenData,
-    pub children: Vec<Node>,
-    pub rule_name: Option<String>,
+pub(crate) struct Node {
+    pub(crate) range: Range,
+    pub(crate) token_data: TokenData,
+    pub(crate) children: Vec<Node>,
+    pub(crate) rule_name: Option<String>,
 }
 
 impl Node {
-    pub fn new(range: Range, token_data: TokenData) -> Self {
+    pub(crate) fn new(range: Range, token_data: TokenData) -> Self {
         Node {
             range,
             token_data,
@@ -312,10 +399,10 @@ impl Node {
     }
 }
 
-pub type Predicate = Box<dyn Fn(&TokenData) -> bool + Send + Sync>;
-pub type Production = Box<dyn Fn(&[&Node]) -> Option<TokenData> + Send + Sync>;
+pub(crate) type Predicate = Box<dyn Fn(&TokenData) -> bool + Send + Sync>;
+pub(crate) type Production = Box<dyn Fn(&[&Node]) -> Option<TokenData> + Send + Sync>;
 
-pub enum PatternItem {
+pub(crate) enum PatternItem {
     Regex(regex::Regex),
     Dimension(DimensionKind),
     Predicate(Predicate),
@@ -331,10 +418,10 @@ impl fmt::Debug for PatternItem {
     }
 }
 
-pub struct Rule {
-    pub name: String,
-    pub pattern: Vec<PatternItem>,
-    pub production: Production,
+pub(crate) struct Rule {
+    pub(crate) name: String,
+    pub(crate) pattern: Vec<PatternItem>,
+    pub(crate) production: Production,
 }
 
 impl fmt::Debug for Rule {
@@ -358,10 +445,15 @@ impl fmt::Debug for Rule {
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Entity {
+    /// The matched text.
     pub body: String,
+    /// Byte offset of the match start.
     pub start: usize,
+    /// Byte offset of the match end.
     pub end: usize,
+    /// The resolved structured value.
     pub value: DimensionValue,
+    /// Whether this is a latent (ambiguous) match.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub latent: Option<bool>,
 }
