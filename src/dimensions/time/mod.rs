@@ -25,6 +25,7 @@ pub enum IntervalDirection {
 pub enum EarlyLate {
     Early,
     Late,
+    Mid,
 }
 
 #[derive(Debug, Clone)]
@@ -215,7 +216,11 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             let to_dt = if *open { to_dt } else {
                 adjust_interval_end_with_from(to_dt, &to_data.form, &from_data.form)
             };
-            Some(make_interval(from_dt, to_dt, from_grain))
+            // Use the finer grain of from and to (matching Haskell: min g1 g2)
+            let to_grain = form_grain(&to_data.form);
+            let from_g = form_grain(&from_data.form);
+            let interval_grain = if from_g < to_grain { from_g } else { to_grain };
+            Some(make_interval(from_dt, to_dt, interval_grain.as_str()))
         }
         TimeForm::NthGrain { n, grain, past, interval: true } => {
             let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time);
@@ -239,7 +244,9 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             let from = grain_start(ref_time, g.lower());
             let to = {
                 let period_start = grain_start(ref_time, *g);
-                add_grain(period_start, *g, 1)
+                let next = add_grain(period_start, *g, 1);
+                // For "rest of the week", end on Sunday (not Monday)
+                if *g == Grain::Week { next - Duration::days(1) } else { next }
             };
             // "rest of the week" truncates "from" to day boundary
             let from = if *g >= Grain::Day { grain_start(ref_time, Grain::Day) } else { from };
@@ -253,6 +260,32 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
         }
         TimeForm::Season(s) => {
             let (from, to) = resolve_season_interval(*s, ref_time, data.direction);
+            Some(make_interval(from, to, "day"))
+        }
+        // early/mid/late + Month → interval (e.g., "early March", "late October")
+        TimeForm::Month(m) if data.early_late.is_some() => {
+            let (month_start, _) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+            let y = month_start.year();
+            let m = month_start.month();
+            let month_end = add_grain(
+                NaiveDate::from_ymd_opt(y, m, 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc(),
+                Grain::Month, 1
+            );
+            let (from, to) = match data.early_late {
+                Some(EarlyLate::Early) => {
+                    // Beginning of month: day 1 to day 11
+                    (make_date(y, m, 1), make_date(y, m, 11))
+                }
+                Some(EarlyLate::Mid) => {
+                    // Middle of month: day 11 to day 21
+                    (make_date(y, m, 11), make_date(y, m, 21))
+                }
+                Some(EarlyLate::Late) => {
+                    // End of month: day 21 to end
+                    (make_date(y, m, 21), month_end)
+                }
+                None => (make_date(y, m, 1), month_end), // shouldn't happen
+            };
             Some(make_interval(from, to, "day"))
         }
         TimeForm::Composed(primary, secondary) => {
@@ -326,22 +359,7 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             }
             None // not an interval composed form
         }
-        TimeForm::LastCycleOfTime { grain, base } => {
-            // "last week of September" → interval of the last week within the period
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
-            let base_start = grain_start(base_dt, target_grain(&base.form));
-            let base_end = add_grain(base_start, target_grain(&base.form), 1);
-            let from = add_grain(base_end, *grain, -1);
-            Some(make_interval(from, base_end, grain.lower().as_str()))
-        }
-        TimeForm::NthGrainOfTime { n, grain, base } => {
-            // "first week of October 2014" → interval
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
-            let base_start = grain_start(base_dt, target_grain(&base.form));
-            let from = add_grain(base_start, *grain, *n - 1);
-            let to = add_grain(from, *grain, 1);
-            Some(make_interval(from, to, grain.lower().as_str()))
-        }
+        // NthGrainOfTime and LastCycleOfTime are resolved as simple values in resolve_simple_datetime
         TimeForm::Holiday(name, year_opt) => {
             let year = year_opt.unwrap_or_else(|| holiday_default_year(name, ref_time));
             // Check for minute-level intervals (Earth Hour)
@@ -355,6 +373,28 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
                 return Some(make_interval(from_dt, to_dt, "day"));
             }
             None
+        }
+        // "last weekend of July" → weekend interval
+        TimeForm::LastDOWOfTime { dow: 5, base } => {
+            // dow=5 (Saturday) means weekend. Find last Saturday, build weekend interval.
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_start = match &base.form {
+                TimeForm::Month(_) => {
+                    NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
+                        .unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc()
+                }
+                TimeForm::GrainOffset { grain: Grain::Month, offset } => {
+                    let first = start_of_month(ref_time);
+                    add_months(first, *offset)
+                }
+                _ => grain_start(base_dt, Grain::Month),
+            };
+            let sat = last_dow_of_month(base_start.year(), base_start.month(), 5);
+            let friday = sat - chrono::Duration::days(1);
+            let from = friday.and_hms_opt(18, 0, 0).unwrap().and_utc();
+            let monday = sat + chrono::Duration::days(2);
+            let to = monday.and_hms_opt(0, 0, 0).unwrap().and_utc();
+            Some(make_interval(from, to, "hour"))
         }
         _ => None,
     }
@@ -627,17 +667,31 @@ fn resolve_simple_datetime(
         }
         TimeForm::NDOWsFromTime { n, dow, base } => {
             // "2 Sundays from now" = find the Nth DOW after base
+            // "2 Thursdays ago" = find the Nth DOW before base (n is negative)
             let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
             let base_dow = base_dt.weekday().num_days_from_monday();
             let target_dow = *dow;
-            let days_ahead = ((target_dow as i64 - base_dow as i64) % 7 + 7) % 7;
-            let first = if days_ahead == 0 {
-                base_dt + Duration::days(7) // same DOW → next week
+            if *n > 0 {
+                let days_ahead = ((target_dow as i64 - base_dow as i64) % 7 + 7) % 7;
+                let first = if days_ahead == 0 {
+                    base_dt + Duration::days(7) // same DOW → next week
+                } else {
+                    base_dt + Duration::days(days_ahead)
+                };
+                let dt = first + Duration::weeks((*n as i64) - 1);
+                (midnight(dt), "day")
             } else {
-                base_dt + Duration::days(days_ahead)
-            };
-            let dt = first + Duration::weeks((*n as i64) - 1);
-            (midnight(dt), "day")
+                // Past: find Nth DOW before base
+                let abs_n = (-*n) as i64;
+                let days_back = ((base_dow as i64 - target_dow as i64) % 7 + 7) % 7;
+                let first = if days_back == 0 {
+                    base_dt - Duration::days(7) // same DOW → last week
+                } else {
+                    base_dt - Duration::days(days_back)
+                };
+                let dt = first - Duration::weeks(abs_n - 1);
+                (midnight(dt), "day")
+            }
         }
         TimeForm::NthClosestToTime { n, dow, base } => {
             // "closest Monday to Oct 5th"
@@ -667,11 +721,25 @@ fn resolve_simple_datetime(
             }
         }
         TimeForm::NthGrainOfTime { n, grain, base } => {
-            // "first week of October 2014"
+            // "first week of October 2014" → first Monday-aligned week within October
             let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
             let base_start = grain_start(base_dt, target_grain(&base.form));
-            let dt = add_grain(base_start, *grain, *n - 1);
-            (dt, grain.as_str())
+            if *grain == Grain::Week {
+                // Find first Monday on or after base_start
+                let dow = base_start.weekday().num_days_from_monday();
+                let first_monday = if dow == 0 { base_start } else {
+                    base_start + Duration::days((7 - dow) as i64)
+                };
+                let dt = first_monday + Duration::weeks((*n - 1) as i64);
+                (dt, "week")
+            } else if *grain == Grain::Day {
+                // "third day of october" = Oct 3
+                let dt = add_grain(base_start, Grain::Day, *n - 1);
+                (dt, "day")
+            } else {
+                let dt = add_grain(base_start, *grain, *n - 1);
+                (dt, grain.as_str())
+            }
         }
         TimeForm::NthLastDayOfTime { n, base } => {
             // "last day of October 2015", "5th last day of May"
@@ -692,12 +760,26 @@ fn resolve_simple_datetime(
             (dt, "day")
         }
         TimeForm::LastCycleOfTime { grain, base } => {
-            // "last week of September" → interval
+            // "last week of September" → last full week within the period
             let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
             let base_start = grain_start(base_dt, target_grain(&base.form));
             let base_end = add_grain(base_start, target_grain(&base.form), 1);
-            let dt = add_grain(base_end, *grain, -1);
-            (dt, grain.as_str())
+            if *grain == Grain::Week {
+                // Find last Monday such that the week (Mon-Sun) fits within the period
+                // Start from base_end and go backwards
+                let end_dow = base_end.weekday().num_days_from_monday();
+                // Last Monday before base_end
+                let last_mon = base_end - Duration::days(end_dow as i64 + 7);
+                // If this week fits in the period (Sun <= base_end - 1 day), use it
+                let week_end = last_mon + Duration::days(7); // next Monday = exclusive end
+                let dt = if week_end <= base_end { last_mon } else {
+                    last_mon - Duration::weeks(1)
+                };
+                (dt, "week")
+            } else {
+                let dt = add_grain(base_end, *grain, -1);
+                (dt, grain.as_str())
+            }
         }
         TimeForm::Composed(primary, secondary) => {
             resolve_composed(primary, secondary, ref_time)
@@ -1008,7 +1090,8 @@ fn resolve_composed(
             let is_day_level_base = matches!(&primary.form,
                 TimeForm::Holiday(..) | TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_)
                 | TimeForm::DayOfWeek(_) | TimeForm::Tomorrow | TimeForm::Yesterday
-                | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday);
+                | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday
+                | TimeForm::Today);
             if is_day_level_base && *grain >= Grain::Day {
                 return (grain_start(result, Grain::Day), "day");
             }
@@ -1440,9 +1523,9 @@ fn resolve_season_interval(
         }
         None => {
             if season == 99 {
-                // Generic "season" → use current season
+                // Generic "season" → use current season with slightly different dates
                 let current = current_season_number(ref_time);
-                season_dates(current, year, None)
+                generic_season_dates(current, year)
             } else {
                 // Specific season like "this Summer" → use that season
                 // If the season hasn't started yet this year, show this year's
@@ -1481,6 +1564,17 @@ fn season_dates(season: u32, year: i32, direction: Option<Direction>) -> (DateTi
             }
         }
         3 => (make_date(year - 1, 12, 21), make_date(year, 3, 21)),
+        _ => (make_date(year, 1, 1), make_date(year, 4, 1)),
+    }
+}
+
+/// Generic "this season" / "current season" uses slightly different boundary dates
+fn generic_season_dates(season: u32, year: i32) -> (DateTime<Utc>, DateTime<Utc>) {
+    match season {
+        0 => (make_date(year, 3, 20), make_date(year, 6, 20)),
+        1 => (make_date(year, 6, 21), make_date(year, 9, 24)),
+        2 => (make_date(year, 9, 23), make_date(year, 12, 20)),
+        3 => (make_date(year - 1, 12, 21), make_date(year, 3, 19)),
         _ => (make_date(year, 1, 1), make_date(year, 4, 1)),
     }
 }
