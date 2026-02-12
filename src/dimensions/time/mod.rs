@@ -1368,23 +1368,19 @@ fn resolve_dow(dow: u32, ref_time: DateTime<Utc>, direction: Option<Direction>) 
         }
         Some(Direction::Past) => {
             // "last DOW": most recent past, excluding today
-            let back = if target < current {
-                current - target
-            } else if target > current {
-                7 - (target - current)
-            } else {
-                7 // same day = last week
+            let back = match target.cmp(&current) {
+                std::cmp::Ordering::Less => current - target,
+                std::cmp::Ordering::Greater => 7 - (target - current),
+                std::cmp::Ordering::Equal => 7, // same day = last week
             };
             -(back as i64)
         }
         None => {
             // Plain DOW: nearest future, skip today
-            let ahead = if target > current {
-                target - current
-            } else if target < current {
-                7 - (current - target)
-            } else {
-                7 // same day = next week
+            let ahead = match target.cmp(&current) {
+                std::cmp::Ordering::Greater => target - current,
+                std::cmp::Ordering::Less => 7 - (current - target),
+                std::cmp::Ordering::Equal => 7, // same day = next week
             };
             ahead as i64
         }
