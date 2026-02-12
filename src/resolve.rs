@@ -8,6 +8,8 @@ use crate::types::{Entity, Node, ResolvedValue, TokenData};
 pub struct Context {
     pub reference_time: DateTime<Utc>,
     pub locale: Locale,
+    /// Context timezone offset in minutes from UTC (e.g., -120 for UTC-2)
+    pub timezone_offset_minutes: i32,
 }
 
 impl Default for Context {
@@ -15,6 +17,7 @@ impl Default for Context {
         Context {
             reference_time: Utc::now(),
             locale: Locale::default(),
+            timezone_offset_minutes: 0,
         }
     }
 }

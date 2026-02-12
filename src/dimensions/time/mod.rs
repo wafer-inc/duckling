@@ -35,6 +35,8 @@ pub struct TimeData {
     pub latent: bool,
     pub open_interval_direction: Option<IntervalDirection>,
     pub early_late: Option<EarlyLate>,
+    /// Timezone name (e.g., "CET", "GMT", "PST") — set by timezone rule
+    pub timezone: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -75,12 +77,17 @@ pub enum TimeForm {
     LastCycleOfTime { grain: Grain, base: Box<TimeData> },
     // "2 Sundays from now", "3 Fridays from now"
     NDOWsFromTime { n: i32, dow: u32, base: Box<TimeData> },
-    // "closest Monday to Oct 5th"
-    NthClosestToTime { n: i32, dow: u32, base: Box<TimeData> },
+    // "closest Monday to Oct 5th", "closest xmas to today"
+    NthClosestToTime { n: i32, target: Box<TimeData>, base: Box<TimeData> },
     // "Nth week of month" (e.g., "first week of October 2014")
     NthGrainOfTime { n: i32, grain: Grain, base: Box<TimeData> },
     // "last day of October", "5th last day of May"
     NthLastDayOfTime { n: i32, base: Box<TimeData> },
+    // Haskell: durationAfter — "<duration> after <time>"
+    // Shifts each occurrence of base by n grains, picks nearest future
+    DurationAfter { n: i64, grain: Grain, base: Box<TimeData> },
+    // Haskell: cycleNthAfter with negative n — "<ordinal> last <grain> of <time>"
+    NthLastCycleOfTime { n: i32, grain: Grain, base: Box<TimeData> },
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -98,6 +105,7 @@ impl TimeData {
             latent: false,
             open_interval_direction: None,
             early_late: None,
+            timezone: None,
         }
     }
 
@@ -108,6 +116,7 @@ impl TimeData {
             latent: true,
             open_interval_direction: None,
             early_late: None,
+            timezone: None,
         }
     }
 
@@ -127,10 +136,24 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     }
     let ref_time = context.reference_time;
 
+    // Timezone shift: Haskell's shiftTimezone formula
+    // result = time + (contextOffset - providedOffset) minutes
+    // This mirrors Haskell where shiftTimezone wraps the predicate so shifted
+    // values are produced whenever that TimeData is resolved.
+    let tz_shift = tz_shift_for(data, context);
+    let has_tz = tz_shift.is_some();
+    let apply_tz = |dt: DateTime<Utc>| -> DateTime<Utc> {
+        match tz_shift {
+            Some(shift) => dt + shift,
+            None => dt,
+        }
+    };
+
     // 1. Open intervals (ASAP, after/before/since/until + time)
     if let Some(dir) = data.open_interval_direction {
         let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
-        let formatted = fmt_dt(dt);
+        let formatted = fmt_dt(apply_tz(dt));
+        let grain = if has_tz { "minute" } else { grain };
         return match dir {
             IntervalDirection::After => Some(ResolvedValue {
                 kind: "value".to_string(),
@@ -149,21 +172,72 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
         };
     }
 
-    // 2. Try to resolve as interval
-    if let Some(iv) = try_resolve_as_interval(data, ref_time) {
+    // 2. Try to resolve as interval (pass context for per-endpoint timezone)
+    if let Some(iv) = try_resolve_as_interval(data, ref_time, context) {
         return Some(iv);
     }
 
     // 3. Simple value
     let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+    let grain = if has_tz { "minute" } else { grain };
     Some(ResolvedValue {
         kind: "value".to_string(),
         value: serde_json::json!({
-            "value": fmt_dt(dt),
+            "value": fmt_dt(apply_tz(dt)),
             "grain": grain,
             "type": "value",
         }),
     })
+}
+
+/// Map timezone abbreviation to UTC offset in minutes
+fn timezone_offset_minutes(tz: &str) -> Option<i32> {
+    match tz.to_uppercase().as_str() {
+        "UTC" | "GMT" | "WET" => Some(0),
+        "CET" => Some(60),
+        "CEST" | "EET" => Some(120),
+        "IST" => Some(330), // Indian Standard Time (UTC+5:30)
+        "EEST" => Some(180),
+        "EST" => Some(-300),
+        "EDT" => Some(-240),
+        "CST" => Some(-360),
+        "CDT" => Some(-300),
+        "MST" => Some(-420),
+        "MDT" => Some(-360),
+        "PST" => Some(-480),
+        "PDT" => Some(-420),
+        "BST" | "WEST" => Some(60),
+        "JST" | "KST" => Some(540),
+        "HKT" | "SGT" => Some(480),
+        "AEST" => Some(600),
+        "AEDT" => Some(660),
+        "ACST" => Some(570),
+        "ACDT" => Some(630),
+        "AWST" => Some(480),
+        "NZST" => Some(720),
+        "NZDT" => Some(780),
+        _ => None,
+    }
+}
+
+/// Compute timezone shift for a TimeData, matching Haskell's shiftTimezone.
+/// Each TimeData carries its own timezone (like Haskell's per-predicate shift).
+fn tz_shift_for(data: &TimeData, context: &Context) -> Option<Duration> {
+    data.timezone.as_ref().and_then(|tz_name| {
+        let provided_offset = timezone_offset_minutes(tz_name)?;
+        let ctx_offset = context.timezone_offset_minutes;
+        Some(Duration::minutes((ctx_offset - provided_offset) as i64))
+    })
+}
+
+/// Resolve a TimeData to a datetime, applying its timezone shift if present.
+/// This mirrors Haskell where each predicate carries its own shiftTimezone wrapper.
+fn resolve_dt_with_tz(data: &TimeData, ref_time: DateTime<Utc>, context: &Context) -> (DateTime<Utc>, &'static str) {
+    let (dt, grain) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+    match tz_shift_for(data, context) {
+        Some(shift) => (dt + shift, "minute"),
+        None => (dt, grain),
+    }
 }
 
 fn fmt_dt(dt: DateTime<Utc>) -> String {
@@ -174,13 +248,12 @@ fn fmt_dt(dt: DateTime<Utc>) -> String {
 // Interval resolution
 // ============================================================
 
-fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<ResolvedValue> {
+fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &Context) -> Option<ResolvedValue> {
     match &data.form {
         TimeForm::Interval(from_data, to_data, open) => {
             // Special case: from=Now → "by <time>" open interval
             if matches!(&from_data.form, TimeForm::Now) {
                 let from_dt = ref_time;
-                // For "to", if it's a BeginEnd, resolve to interval and take end point
                 let to_dt = match &to_data.form {
                     TimeForm::BeginEnd { begin, target } => {
                         let (_, end) = resolve_begin_end(*begin, target, ref_time, to_data.direction);
@@ -196,6 +269,11 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
 
             let (mut from_dt, from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
             let (mut to_dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+
+            // Apply per-endpoint timezone shifts (Haskell: each predicate carries its own shift)
+            let from_tz = tz_shift_for(from_data, context);
+            let to_tz = tz_shift_for(to_data, context);
+            let has_endpoint_tz = from_tz.is_some() || to_tz.is_some();
 
             // Get the raw hours for AM/PM disambiguation
             let from_hour = match &from_data.form {
@@ -264,11 +342,16 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             let to_dt = if *open { to_dt } else {
                 adjust_interval_end_with_from(to_dt, &to_data.form, &from_data.form)
             };
+
+            // Apply per-endpoint timezone shifts after all disambiguation
+            if let Some(shift) = from_tz { from_dt = from_dt + shift; }
+            let to_dt = match to_tz { Some(shift) => to_dt + shift, None => to_dt };
+
             // Use the finer grain of from and to (matching Haskell: min g1 g2)
             let to_grain = form_grain(&to_data.form);
             let from_g = form_grain(&from_data.form);
-            let interval_grain = if from_g < to_grain { from_g } else { to_grain };
-            Some(make_interval(from_dt, to_dt, interval_grain.as_str()))
+            let interval_grain = if has_endpoint_tz { "minute" } else if from_g < to_grain { from_g.as_str() } else { to_grain.as_str() };
+            Some(make_interval(from_dt, to_dt, interval_grain))
         }
         TimeForm::NthGrain { n, grain, past, interval: true } => {
             let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time);
@@ -452,7 +535,7 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
         }
         // NthGrainOfTime and LastCycleOfTime are resolved as simple values in resolve_simple_datetime
         TimeForm::Holiday(name, year_opt) => {
-            let year = year_opt.unwrap_or_else(|| holiday_default_year(name, ref_time));
+            let year = year_opt.unwrap_or(ref_time.year());
             // Check for minute-level intervals (Earth Hour)
             if let Some((from_dt, to_dt)) = resolve_holiday_minute_interval(name, year) {
                 return Some(make_interval(from_dt, to_dt, "minute"));
@@ -572,6 +655,7 @@ fn form_grain(f: &TimeForm) -> Grain {
         TimeForm::Hour(_, _) | TimeForm::PartOfDay(_) => Grain::Hour,
         TimeForm::HourMinute(_, _, _) => Grain::Minute,
         TimeForm::HourMinuteSecond(_, _, _) => Grain::Second,
+        TimeForm::DurationAfter { grain, .. } => *grain,
         _ => Grain::Day,
     }
 }
@@ -713,10 +797,15 @@ fn resolve_simple_datetime(
             (dt, "quarter")
         }
         TimeForm::Holiday(name, year_opt) => {
-            let year = year_opt.unwrap_or_else(|| holiday_default_year(name, ref_time));
-            match resolve_holiday(name, year) {
-                Some(date) => (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
-                None => (midnight(ref_time), "day"),
+            if let Some(year) = year_opt {
+                // Explicit year: resolve holiday for that year
+                match resolve_holiday(name, *year) {
+                    Some(date) => (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
+                    None => (midnight(ref_time), "day"),
+                }
+            } else {
+                // No explicit year: use direction to pick the right occurrence
+                resolve_holiday_with_direction(name, ref_time, direction)
             }
         }
         TimeForm::PartOfDay(_) => {
@@ -814,32 +903,25 @@ fn resolve_simple_datetime(
                 (midnight(dt), "day")
             }
         }
-        TimeForm::NthClosestToTime { n, dow, base } => {
-            // "closest Monday to Oct 5th"
+        TimeForm::NthClosestToTime { n, target, base } => {
+            // Haskell: predNthClosest — merge past/future candidates sorted by distance
             let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
-            let dt = closest_dow(base_dt.date_naive(), *dow);
-            // For n > 1, we need the Nth closest — alternate past and future
-            if *n <= 1 {
-                (dt.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
-            } else {
-                // Find all occurrences of DOW near base, sorted by distance
-                let base_date = base_dt.date_naive();
-                let mut candidates: Vec<NaiveDate> = Vec::new();
-                for i in -10..=10i64 {
-                    let d = NaiveDate::from_ymd_opt(base_date.year(), base_date.month(), base_date.day())
-                        .unwrap() + chrono::Duration::weeks(i);
-                    // Find the DOW in this week
-                    let d_dow = d.weekday().num_days_from_monday();
-                    let offset = (*dow as i64 - d_dow as i64 + 7) % 7;
-                    let candidate = d + chrono::Duration::days(offset);
-                    if !candidates.contains(&candidate) {
-                        candidates.push(candidate);
-                    }
+            // Generate candidates by resolving the target at multiple offsets
+            let mut candidates: Vec<DateTime<Utc>> = Vec::new();
+            let target_grain_val = form_grain(&target.form);
+            // Generate candidates in both directions from base
+            for i in -10..=10i32 {
+                let offset_ref = add_grain(base_dt, target_grain_val, i);
+                let (dt, _) = resolve_simple_datetime(&target.form, offset_ref, None);
+                if !candidates.iter().any(|c| (*c - dt).num_seconds().abs() < 3600) {
+                    candidates.push(dt);
                 }
-                candidates.sort_by_key(|c| ((*c - base_date).num_days()).abs());
-                let result = candidates.get((*n - 1) as usize).copied().unwrap_or(base_date);
-                (result.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
             }
+            candidates.sort_by_key(|c| ((*c - base_dt).num_seconds()).abs());
+            let idx = ((*n).max(1) - 1) as usize;
+            let result = candidates.get(idx).copied().unwrap_or(base_dt);
+            let out_grain = form_grain(&target.form);
+            (result, out_grain.as_str())
         }
         TimeForm::NthGrainOfTime { n, grain, base } => {
             // "first week of October 2014" → first Monday-aligned week within October
@@ -899,6 +981,65 @@ fn resolve_simple_datetime(
                 (dt, "week")
             } else {
                 let dt = add_grain(base_end, *grain, -1);
+                (dt, grain.as_str())
+            }
+        }
+        TimeForm::DurationAfter { n, grain, base } => {
+            // Haskell: durationAfter — shift each occurrence of base by duration, pick nearest future
+            let (future_base, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (past_base, _) = resolve_simple_datetime(&base.form, ref_time, Some(Direction::Past));
+            let add_dur = |dt: DateTime<Utc>| -> DateTime<Utc> {
+                match grain {
+                    Grain::Year => add_years(dt, *n as i32),
+                    Grain::Month => add_months(dt, *n as i32),
+                    Grain::Quarter => add_months(dt, *n as i32 * 3),
+                    Grain::Week => dt + Duration::weeks(*n),
+                    Grain::Day => dt + Duration::days(*n),
+                    Grain::Hour => dt + Duration::hours(*n),
+                    Grain::Minute => dt + Duration::minutes(*n),
+                    Grain::Second => dt + Duration::seconds(*n),
+                }
+            };
+            let future_result = add_dur(future_base);
+            let past_result = add_dur(past_base);
+            // Pick nearest-future result
+            let result = if past_result >= ref_time && (future_result < ref_time || past_result <= future_result) {
+                past_result
+            } else {
+                future_result
+            };
+            // Haskell: mergeDuration uses min(base_grain, duration_grain) for TimeObject grain
+            let base_grain = form_grain(&base.form);
+            let out_grain = if base_grain < *grain { base_grain } else { *grain };
+            (result, out_grain.as_str())
+        }
+        TimeForm::NthLastCycleOfTime { n, grain, base } => {
+            // Haskell: cycleNthAfter True grain (-n) $ cycleNthAfter True (timeGrain td) 1 td
+            // Position at end of base period, count backward n complete cycles of grain
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let base_grain = target_grain(&base.form);
+            let base_start = grain_start(base_dt, base_grain);
+            let base_end = add_grain(base_start, base_grain, 1);
+            if *grain == Grain::Week {
+                // Find the last COMPLETE week within the period (Mon+7 <= base_end)
+                let end_dow = base_end.weekday().num_days_from_monday();
+                let last_mon = if end_dow == 0 {
+                    base_end - Duration::weeks(1)
+                } else {
+                    base_end - Duration::days(end_dow as i64)
+                };
+                // Check if this week fits completely
+                let last_complete_mon = if last_mon + Duration::weeks(1) <= base_end {
+                    last_mon
+                } else {
+                    last_mon - Duration::weeks(1)
+                };
+                // Go back (n-1) more weeks
+                let dt = last_complete_mon - Duration::weeks((*n - 1) as i64);
+                (dt, "week")
+            } else {
+                // For day grain: go back n grains from end of period
+                let dt = add_grain(base_end, *grain, -(*n));
                 (dt, grain.as_str())
             }
         }
@@ -1187,6 +1328,47 @@ fn resolve_composed(
     // If secondary is a date-like form, use secondary for the date context
     match &secondary.form {
         TimeForm::RelativeGrain { n, grain } => {
+            // Special case: Holiday + duration (Haskell: intersect td (inDurationInterval dd))
+            // "thanksgiving in a year" → find thanksgiving in the year of (ref + 1yr)
+            // "thanksgiving 3 months ago" → find thanksgiving in the year of (ref - 3months)
+            // "three days after easter" → find nearest easter, add 3 days
+            if let TimeForm::Holiday(name, _) = &primary.form {
+                if *grain >= Grain::Day {
+                    // For day-level durations (days, weeks), add to nearest holiday occurrence
+                    if *grain == Grain::Day || *grain == Grain::Week {
+                        let (future_base, _) = resolve_holiday_with_direction(name, ref_time, None);
+                        let (past_base, _) = resolve_holiday_with_direction(name, ref_time, Some(Direction::Past));
+                        let add_dur = |base: DateTime<Utc>| -> DateTime<Utc> {
+                            match grain {
+                                Grain::Week => base + Duration::weeks(*n),
+                                Grain::Day => base + Duration::days(*n),
+                                _ => base,
+                            }
+                        };
+                        let future_result = add_dur(future_base);
+                        let past_result = add_dur(past_base);
+                        let result = if past_result >= ref_time && (future_result < ref_time || past_result <= future_result) {
+                            past_result
+                        } else {
+                            future_result
+                        };
+                        return (result, "day");
+                    }
+                    // For month/year/quarter durations: compute target time, find holiday in target year
+                    // Matches Haskell's intersect(holiday, inDurationInterval(dd))
+                    let target_time = match grain {
+                        Grain::Year => add_years(ref_time, *n as i32),
+                        Grain::Month => add_months(ref_time, *n as i32),
+                        Grain::Quarter => add_months(ref_time, *n as i32 * 3),
+                        _ => ref_time,
+                    };
+                    let target_year = target_time.year();
+                    if let Some(date) = resolve_holiday(name, target_year) {
+                        return (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day");
+                    }
+                }
+            }
+
             // "today in one hour" → add to ref_time (not midnight)
             // "3 years from today" → add years but keep today's date
             let is_day_level_base = matches!(&primary.form,
@@ -1314,6 +1496,13 @@ fn resolve_composed(
 
     // Any date-like + Year → resolve date in that year
     if let TimeForm::Year(y) = &secondary.form {
+        // Holiday + Year: re-resolve the holiday for the target year
+        if let TimeForm::Holiday(name, _) = &primary.form {
+            match resolve_holiday(name, *y) {
+                Some(date) => return (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
+                None => return (midnight(ref_time), "day"),
+            }
+        }
         let (base, base_grain) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
         match &primary.form {
             TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. } => {
@@ -1628,6 +1817,18 @@ fn target_grain(form: &TimeForm) -> Grain {
         TimeForm::Month(_) => Grain::Month,
         TimeForm::Year(_) => Grain::Year,
         TimeForm::DayOfWeek(_) => Grain::Day,
+        TimeForm::Quarter(_) | TimeForm::QuarterYear(_, _) => Grain::Quarter,
+        TimeForm::Composed(a, b) => {
+            // For composed forms, use the coarser grain (the containing period)
+            // Month+Year → Month, DOW+Month → Month, etc.
+            let ga = target_grain(&a.form);
+            let gb = target_grain(&b.form);
+            // The coarser grain is the one with higher enum value (Year > Month > Day etc)
+            // But we want the containing period, which is the finer of the two
+            // Actually: Composed(Month(10), Year(2015)) → "October 2015" → grain=Month
+            // The grain should be the finer of the two base grains
+            if ga < gb { ga } else { gb }
+        }
         _ => Grain::Day,
     }
 }
@@ -1867,19 +2068,54 @@ fn is_leap_year(year: i32) -> bool {
 // Holiday resolution
 // ============================================================
 
-fn holiday_default_year(name: &str, ref_time: DateTime<Utc>) -> i32 {
-    // For holidays, determine whether to use this year or next
-    if let Some(date) = resolve_holiday(name, ref_time.year()) {
-        let dt = date.and_hms_opt(0, 0, 0).unwrap().and_utc();
-        if dt < ref_time {
-            // Holiday has passed this year, check if next year's is better
-            ref_time.year() + 1
-        } else {
-            ref_time.year()
+fn resolve_holiday_with_direction(name: &str, ref_time: DateTime<Utc>, direction: Option<Direction>) -> (DateTime<Utc>, &'static str) {
+    let ref_midnight = midnight(ref_time);
+    let this_year = ref_time.year();
+
+    // Resolve for this year
+    let this_year_date = resolve_holiday(name, this_year)
+        .map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc());
+    let next_year_date = resolve_holiday(name, this_year + 1)
+        .map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc());
+    let prev_year_date = resolve_holiday(name, this_year - 1)
+        .map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc());
+
+    let result = match direction {
+        Some(Direction::Past) => {
+            // Pick the most recent occurrence that is strictly before ref_time's date
+            if let Some(dt) = this_year_date {
+                if dt < ref_midnight {
+                    dt
+                } else if let Some(prev) = prev_year_date {
+                    prev
+                } else {
+                    dt
+                }
+            } else if let Some(prev) = prev_year_date {
+                prev
+            } else {
+                ref_midnight
+            }
         }
-    } else {
-        ref_time.year()
-    }
+        _ => {
+            // Default: future-first, but if holiday is today, use today
+            if let Some(dt) = this_year_date {
+                if dt >= ref_midnight {
+                    dt
+                } else if let Some(next) = next_year_date {
+                    next
+                } else {
+                    dt
+                }
+            } else if let Some(next) = next_year_date {
+                next
+            } else {
+                ref_midnight
+            }
+        }
+    };
+
+    (result, "day")
 }
 
 /// Resolve a holiday that is an interval of days. Returns (start_date, end_date_exclusive).
@@ -1996,13 +2232,18 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     let name_lower = name.to_lowercase();
     let name = name_lower.as_str();
 
+    // Chinese New Year (must be checked before "new year's day")
+    if name.contains("chinese") && name.contains("new year") {
+        return chinese_new_year(year);
+    }
+
     // Fixed-date holidays
     match name {
         s if s.starts_with("christmas") || s.starts_with("xmas") =>
             return NaiveDate::from_ymd_opt(year, 12, 25),
         s if s.contains("new year") && s.contains("eve") =>
             return NaiveDate::from_ymd_opt(year, 12, 31),
-        s if s.contains("new year") && s.contains("day") =>
+        s if s.contains("new year") && s.contains("day") && !s.contains("chinese") && !s.contains("lunar") =>
             return NaiveDate::from_ymd_opt(year, 1, 1),
         s if s.contains("valentine") =>
             return NaiveDate::from_ymd_opt(year, 2, 14),
@@ -2085,11 +2326,10 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
         if name.contains("good friday") || name.contains("great friday") {
             return Some(orthodox - Duration::days(2));
         }
-        if name.contains("shrove monday") {
-            return Some(orthodox - Duration::days(48));
-        }
     }
-    if name == "clean monday" {
+    // Clean Monday and its aliases (Haskell: (orthodox\s+)?(ash|clean|green|pure|shrove)\s+monday)
+    if name.contains("monday") && (name.contains("clean") || name.contains("ash") || name.contains("green")
+       || name.contains("pure") || name.contains("shrove") || name.contains("lent")) {
         return Some(orthodox - Duration::days(48));
     }
     if name == "lazarus saturday" {
@@ -2098,11 +2338,6 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     if name == "great fast" {
         // Interval: Clean Monday to Lazarus Saturday
         return Some(orthodox - Duration::days(48));
-    }
-
-    // Chinese New Year (lookup table)
-    if name.contains("chinese") && name.contains("new year") {
-        return chinese_new_year(year);
     }
 
     // Jewish holidays (lookup tables)
@@ -2166,6 +2401,10 @@ fn easter_date(year: i32) -> NaiveDate {
 }
 
 fn orthodox_easter_date(year: i32) -> NaiveDate {
+    if let Some(d) = orthodox_easter_lookup(year) {
+        return d;
+    }
+    // Fallback: algorithmic computation for years outside table
     let a = year % 4;
     let b = year % 7;
     let c = year % 19;
@@ -2173,10 +2412,41 @@ fn orthodox_easter_date(year: i32) -> NaiveDate {
     let e = (2 * a + 4 * b - d + 34) % 7;
     let month = (d + e + 114) / 31;
     let day = (d + e + 114) % 31 + 1;
-    // Julian calendar date — add offset to convert to Gregorian
-    // For years 1900-2099, the offset is 13 days
     let julian = NaiveDate::from_ymd_opt(year, month as u32, day as u32).unwrap();
     julian + Duration::days(13)
+}
+
+fn orthodox_easter_lookup(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        1950 => (4, 9),  1951 => (4, 29), 1952 => (4, 20), 1953 => (4, 5),
+        1954 => (4, 25), 1955 => (4, 17), 1956 => (5, 6),  1957 => (4, 21),
+        1958 => (4, 13), 1959 => (5, 3),  1960 => (4, 17), 1961 => (4, 9),
+        1962 => (4, 29), 1963 => (4, 14), 1964 => (5, 3),  1965 => (4, 25),
+        1966 => (4, 10), 1967 => (4, 30), 1968 => (4, 21), 1969 => (4, 13),
+        1970 => (4, 26), 1971 => (4, 18), 1972 => (4, 9),  1973 => (4, 29),
+        1974 => (4, 14), 1975 => (5, 4),  1976 => (4, 25), 1977 => (4, 10),
+        1978 => (4, 30), 1979 => (4, 22), 1980 => (4, 6),  1981 => (4, 26),
+        1982 => (4, 18), 1983 => (5, 8),  1984 => (4, 22), 1985 => (4, 14),
+        1986 => (5, 4),  1987 => (4, 19), 1988 => (4, 10), 1989 => (4, 30),
+        1990 => (4, 15), 1991 => (4, 7),  1992 => (4, 26), 1993 => (4, 18),
+        1994 => (5, 1),  1995 => (4, 23), 1996 => (4, 14), 1997 => (4, 27),
+        1998 => (4, 19), 1999 => (4, 11), 2000 => (4, 30), 2001 => (4, 15),
+        2002 => (5, 5),  2003 => (4, 27), 2004 => (4, 11), 2005 => (5, 1),
+        2006 => (4, 23), 2007 => (4, 8),  2008 => (4, 27), 2009 => (4, 19),
+        2010 => (4, 4),  2011 => (4, 24), 2012 => (4, 15), 2013 => (5, 5),
+        2014 => (4, 20), 2015 => (4, 12), 2016 => (5, 1),  2017 => (4, 16),
+        2018 => (4, 8),  2019 => (4, 28), 2020 => (4, 19), 2021 => (5, 2),
+        2022 => (4, 24), 2023 => (4, 16), 2024 => (5, 5),  2025 => (4, 20),
+        2026 => (4, 12), 2027 => (5, 2),  2028 => (4, 16), 2029 => (4, 8),
+        2030 => (4, 28), 2031 => (4, 13), 2032 => (5, 2),  2033 => (4, 24),
+        2034 => (4, 9),  2035 => (4, 29), 2036 => (4, 20), 2037 => (4, 5),
+        2038 => (4, 25), 2039 => (4, 17), 2040 => (5, 6),  2041 => (4, 21),
+        2042 => (4, 13), 2043 => (5, 3),  2044 => (4, 24), 2045 => (4, 9),
+        2046 => (4, 29), 2047 => (4, 21), 2048 => (4, 5),  2049 => (4, 25),
+        2050 => (4, 17),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
 }
 
 // ============================================================
@@ -2285,10 +2555,32 @@ fn closest_weekday(date: NaiveDate) -> NaiveDate {
 
 fn chinese_new_year(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2010 => (2, 14), 2011 => (2, 3), 2012 => (1, 23), 2013 => (2, 10),
-        2014 => (1, 31), 2015 => (2, 19), 2016 => (2, 8), 2017 => (1, 28),
-        2018 => (2, 16), 2019 => (2, 5), 2020 => (1, 25), 2021 => (2, 12),
-        2022 => (2, 1), 2023 => (1, 22), 2024 => (2, 10), 2025 => (1, 29),
+        1950 => (2, 17), 1951 => (2, 6),  1952 => (1, 27), 1953 => (2, 14),
+        1954 => (2, 3),  1955 => (1, 24), 1956 => (2, 12), 1957 => (1, 31),
+        1958 => (2, 18), 1959 => (2, 8),  1960 => (1, 28), 1961 => (2, 15),
+        1962 => (2, 5),  1963 => (1, 25), 1964 => (2, 13), 1965 => (2, 2),
+        1966 => (1, 21), 1967 => (2, 9),  1968 => (1, 30), 1969 => (2, 17),
+        1970 => (2, 6),  1971 => (1, 27), 1972 => (2, 15), 1973 => (2, 3),
+        1974 => (1, 23), 1975 => (2, 11), 1976 => (1, 31), 1977 => (2, 18),
+        1978 => (2, 7),  1979 => (1, 28), 1980 => (2, 16), 1981 => (2, 5),
+        1982 => (1, 25), 1983 => (2, 13), 1984 => (2, 2),  1985 => (2, 20),
+        1986 => (2, 9),  1987 => (1, 29), 1988 => (2, 17), 1989 => (2, 6),
+        1990 => (1, 27), 1991 => (2, 15), 1992 => (2, 4),  1993 => (1, 23),
+        1994 => (2, 10), 1995 => (1, 31), 1996 => (2, 19), 1997 => (2, 7),
+        1998 => (1, 28), 1999 => (2, 16), 2000 => (2, 5),  2001 => (1, 24),
+        2002 => (2, 12), 2003 => (2, 1),  2004 => (1, 22), 2005 => (2, 9),
+        2006 => (1, 29), 2007 => (2, 18), 2008 => (2, 7),  2009 => (1, 26),
+        2010 => (2, 14), 2011 => (2, 3),  2012 => (1, 23), 2013 => (2, 10),
+        2014 => (1, 31), 2015 => (2, 19), 2016 => (2, 8),  2017 => (1, 28),
+        2018 => (2, 16), 2019 => (2, 5),  2020 => (1, 25), 2021 => (2, 12),
+        2022 => (2, 1),  2023 => (1, 22), 2024 => (2, 10), 2025 => (1, 29),
+        2026 => (2, 17), 2027 => (2, 6),  2028 => (1, 26), 2029 => (2, 13),
+        2030 => (2, 3),  2031 => (1, 23), 2032 => (2, 11), 2033 => (1, 31),
+        2034 => (2, 19), 2035 => (2, 8),  2036 => (1, 28), 2037 => (2, 15),
+        2038 => (2, 4),  2039 => (1, 24), 2040 => (2, 12), 2041 => (2, 1),
+        2042 => (1, 22), 2043 => (2, 10), 2044 => (1, 30), 2045 => (2, 17),
+        2046 => (2, 6),  2047 => (1, 26), 2048 => (2, 14), 2049 => (2, 2),
+        2050 => (1, 23),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2445,19 +2737,65 @@ fn chanukah(year: i32) -> Option<NaiveDate> {
 
 fn tisha_bav(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (7, 16), 2014 => (8, 5), 2015 => (7, 26), 2016 => (8, 14),
-        2017 => (8, 1), 2018 => (7, 22), 2019 => (8, 11), 2020 => (7, 30),
-        2021 => (7, 18), 2022 => (8, 7), 2023 => (7, 27),
+        1950 => (7, 22), 1951 => (8, 11), 1952 => (7, 30), 1953 => (7, 20),
+        1954 => (8, 7),  1955 => (7, 27), 1956 => (7, 16), 1957 => (8, 5),
+        1958 => (7, 26), 1959 => (8, 12), 1960 => (8, 1),  1961 => (7, 22),
+        1962 => (8, 8),  1963 => (7, 29), 1964 => (7, 18), 1965 => (8, 7),
+        1966 => (7, 25), 1967 => (8, 14), 1968 => (8, 3),  1969 => (7, 23),
+        1970 => (8, 10), 1971 => (7, 31), 1972 => (7, 19), 1973 => (8, 6),
+        1974 => (7, 27), 1975 => (7, 16), 1976 => (8, 4),  1977 => (7, 23),
+        1978 => (8, 12), 1979 => (8, 1),  1980 => (7, 21), 1981 => (8, 8),
+        1982 => (7, 28), 1983 => (7, 18), 1984 => (8, 6),  1985 => (7, 27),
+        1986 => (8, 13), 1987 => (8, 3),  1988 => (7, 23), 1989 => (8, 9),
+        1990 => (7, 30), 1991 => (7, 20), 1992 => (8, 8),  1993 => (7, 26),
+        1994 => (7, 16), 1995 => (8, 5),  1996 => (7, 24), 1997 => (8, 11),
+        1998 => (8, 1),  1999 => (7, 21), 2000 => (8, 9),  2001 => (7, 28),
+        2002 => (7, 17), 2003 => (8, 6),  2004 => (7, 26), 2005 => (8, 13),
+        2006 => (8, 2),  2007 => (7, 23), 2008 => (8, 9),  2009 => (7, 29),
+        2010 => (7, 19), 2011 => (8, 8),  2012 => (7, 28), 2013 => (7, 15),
+        2014 => (8, 4),  2015 => (7, 25), 2016 => (8, 13), 2017 => (7, 31),
+        2018 => (7, 21), 2019 => (8, 10), 2020 => (7, 29), 2021 => (7, 17),
+        2022 => (8, 6),  2023 => (7, 26), 2024 => (8, 12), 2025 => (8, 2),
+        2026 => (7, 22), 2027 => (8, 11), 2028 => (7, 31), 2029 => (7, 21),
+        2030 => (8, 7),  2031 => (7, 28), 2032 => (7, 17), 2033 => (8, 3),
+        2034 => (7, 24), 2035 => (8, 13), 2036 => (8, 2),  2037 => (7, 20),
+        2038 => (8, 9),  2039 => (7, 30), 2040 => (7, 18), 2041 => (8, 5),
+        2042 => (7, 26), 2043 => (8, 15), 2044 => (8, 1),  2045 => (7, 22),
+        2046 => (8, 11), 2047 => (7, 31), 2048 => (7, 18), 2049 => (8, 7),
+        2050 => (7, 27),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
 }
 
 fn yom_haatzmaut(year: i32) -> Option<NaiveDate> {
-    // Israel Independence Day - varies
     let (m, d) = match year {
-        2013 => (4, 16), 2014 => (5, 6), 2015 => (4, 23), 2016 => (5, 12),
-        2017 => (5, 2), 2018 => (4, 19), 2019 => (5, 9), 2020 => (4, 29),
+        1950 => (4, 19), 1951 => (5, 9),  1952 => (4, 29), 1953 => (4, 19),
+        1954 => (5, 5),  1955 => (4, 26), 1956 => (4, 15), 1957 => (5, 5),
+        1958 => (4, 23), 1959 => (5, 12), 1960 => (5, 1),  1961 => (4, 19),
+        1962 => (5, 8),  1963 => (4, 28), 1964 => (4, 15), 1965 => (5, 5),
+        1966 => (4, 24), 1967 => (5, 14), 1968 => (5, 1),  1969 => (4, 22),
+        1970 => (5, 10), 1971 => (4, 28), 1972 => (4, 18), 1973 => (5, 6),
+        1974 => (4, 24), 1975 => (4, 15), 1976 => (5, 4),  1977 => (4, 20),
+        1978 => (5, 10), 1979 => (5, 1),  1980 => (4, 20), 1981 => (5, 6),
+        1982 => (4, 27), 1983 => (4, 17), 1984 => (5, 6),  1985 => (4, 24),
+        1986 => (5, 13), 1987 => (5, 3),  1988 => (4, 20), 1989 => (5, 9),
+        1990 => (4, 29), 1991 => (4, 17), 1992 => (5, 6),  1993 => (4, 25),
+        1994 => (4, 13), 1995 => (5, 3),  1996 => (4, 23), 1997 => (5, 11),
+        1998 => (4, 29), 1999 => (4, 20), 2000 => (5, 9),  2001 => (4, 25),
+        2002 => (4, 16), 2003 => (5, 6),  2004 => (4, 26), 2005 => (5, 11),
+        2006 => (5, 2),  2007 => (4, 23), 2008 => (5, 7),  2009 => (4, 28),
+        2010 => (4, 19), 2011 => (5, 9),  2012 => (4, 25), 2013 => (4, 15),
+        2014 => (5, 5),  2015 => (4, 22), 2016 => (5, 11), 2017 => (5, 1),
+        2018 => (4, 18), 2019 => (5, 8),  2020 => (4, 28), 2021 => (4, 14),
+        2022 => (5, 4),  2023 => (4, 25), 2024 => (5, 13), 2025 => (4, 30),
+        2026 => (4, 21), 2027 => (5, 11), 2028 => (5, 1),  2029 => (4, 18),
+        2030 => (5, 7),  2031 => (4, 28), 2032 => (4, 14), 2033 => (5, 3),
+        2034 => (4, 24), 2035 => (5, 14), 2036 => (4, 30), 2037 => (4, 20),
+        2038 => (5, 10), 2039 => (4, 27), 2040 => (4, 17), 2041 => (5, 6),
+        2042 => (4, 23), 2043 => (5, 13), 2044 => (5, 2),  2045 => (4, 19),
+        2046 => (5, 9),  2047 => (4, 30), 2048 => (4, 15), 2049 => (5, 5),
+        2050 => (4, 26),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2497,19 +2835,39 @@ fn lag_bomer(year: i32) -> Option<NaiveDate> {
     NaiveDate::from_ymd_opt(year, m, d)
 }
 
+// Yom HaShoah = Passover + 12 (matching Haskell)
 fn yom_hashoah(year: i32) -> Option<NaiveDate> {
-    let (m, d) = match year {
-        2013 => (4, 8), 2014 => (4, 28), 2015 => (4, 16), 2016 => (5, 5),
-        2017 => (4, 24), 2018 => (4, 12), 2019 => (5, 2), 2020 => (4, 21),
-        _ => return None,
-    };
-    NaiveDate::from_ymd_opt(year, m, d)
+    passover(year).map(|d| d + Duration::days(12))
 }
 
 fn tu_bishvat(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (1, 26), 2014 => (1, 16), 2015 => (2, 4), 2016 => (1, 25),
-        2017 => (2, 11), 2018 => (1, 31), 2019 => (1, 21), 2020 => (2, 10),
+        1950 => (2, 1),  1951 => (1, 21), 1952 => (2, 10), 1953 => (1, 30),
+        1954 => (1, 18), 1955 => (2, 6),  1956 => (1, 27), 1957 => (1, 16),
+        1958 => (2, 4),  1959 => (1, 23), 1960 => (2, 12), 1961 => (1, 31),
+        1962 => (1, 19), 1963 => (2, 8),  1964 => (1, 28), 1965 => (1, 17),
+        1966 => (2, 4),  1967 => (1, 25), 1968 => (2, 13), 1969 => (2, 2),
+        1970 => (1, 21), 1971 => (2, 9),  1972 => (1, 30), 1973 => (1, 17),
+        1974 => (2, 6),  1975 => (1, 26), 1976 => (1, 16), 1977 => (2, 2),
+        1978 => (1, 22), 1979 => (2, 11), 1980 => (2, 1),  1981 => (1, 19),
+        1982 => (2, 7),  1983 => (1, 28), 1984 => (1, 18), 1985 => (2, 5),
+        1986 => (1, 24), 1987 => (2, 13), 1988 => (2, 2),  1989 => (1, 20),
+        1990 => (2, 9),  1991 => (1, 29), 1992 => (1, 19), 1993 => (2, 5),
+        1994 => (1, 26), 1995 => (1, 15), 1996 => (2, 4),  1997 => (1, 22),
+        1998 => (2, 10), 1999 => (1, 31), 2000 => (1, 21), 2001 => (2, 7),
+        2002 => (1, 27), 2003 => (1, 17), 2004 => (2, 6),  2005 => (1, 24),
+        2006 => (2, 12), 2007 => (2, 2),  2008 => (1, 21), 2009 => (2, 8),
+        2010 => (1, 29), 2011 => (1, 19), 2012 => (2, 7),  2013 => (1, 25),
+        2014 => (1, 15), 2015 => (2, 3),  2016 => (1, 24), 2017 => (2, 10),
+        2018 => (1, 30), 2019 => (1, 20), 2020 => (2, 9),  2021 => (1, 27),
+        2022 => (1, 16), 2023 => (2, 5),  2024 => (1, 24), 2025 => (2, 12),
+        2026 => (2, 1),  2027 => (1, 22), 2028 => (2, 11), 2029 => (1, 30),
+        2030 => (1, 18), 2031 => (2, 7),  2032 => (1, 27), 2033 => (1, 14),
+        2034 => (2, 3),  2035 => (1, 24), 2036 => (2, 12), 2037 => (1, 30),
+        2038 => (1, 20), 2039 => (2, 8),  2040 => (1, 29), 2041 => (1, 16),
+        2042 => (2, 4),  2043 => (1, 25), 2044 => (2, 12), 2045 => (2, 1),
+        2046 => (1, 21), 2047 => (2, 10), 2048 => (1, 29), 2049 => (1, 17),
+        2050 => (2, 6),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2779,7 +3137,7 @@ fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
         return navaratri(year).map(|d| d + Duration::days(9));
     }
     if name == "dhanteras" || name == "dhanatrayodashi" {
-        return diwali(year).map(|d| d - Duration::days(2));
+        return dhanteras(year);
     }
     if name.starts_with("bhai dooj") {
         return diwali(year).map(|d| d + Duration::days(2));
@@ -2802,13 +3160,15 @@ fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     if name.starts_with("pongal") || name.starts_with("makar") || name.starts_with("makara") || name.starts_with("maghi") {
         return thai_pongal(year);
     }
-    if name.starts_with("vaisakhi") || name.starts_with("baisakhi") || name.starts_with("mesadi") {
+    if name.starts_with("vaisakhi") || name.starts_with("baisakhi") || name.starts_with("mesadi")
+       || name.starts_with("vasakhi") || name.starts_with("vaishakhi") || name.starts_with("vaisakhadi") {
         return vaisakhi(year);
     }
-    if name.starts_with("onam") || name.starts_with("thiru onam") {
+    if name.starts_with("onam") || name.contains("onam") || name.starts_with("thiru") {
         return onam(year);
     }
-    if name.starts_with("ugadi") || name.starts_with("yugadi") {
+    if name.starts_with("ugadi") || name.starts_with("yugadi") || name.starts_with("samvatsaradi")
+       || name.starts_with("chaitra suk") {
         return ugadi(year);
     }
     if name.starts_with("karva chauth") {
@@ -2817,8 +3177,9 @@ fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     if name.starts_with("ratha") {
         return rath_yatra(year);
     }
-    if name.starts_with("chhath") || name.starts_with("dala puja") {
-        return diwali(year).map(|d| d + Duration::days(6));
+    if name.starts_with("chhath") || name.starts_with("dala puja") || name.starts_with("dala chhath")
+       || name.starts_with("surya shashthi") {
+        return chhath(year);
     }
     if name.starts_with("vasant panchami") || name.starts_with("basant panchami") {
         return vasant_panchami(year);
@@ -2826,8 +3187,10 @@ fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     if name.starts_with("saraswati jayanti") {
         return saraswati_jayanti(year);
     }
-    if name.starts_with("naraka chaturdashi") || name.starts_with("kali chaudas") || name.starts_with("choti diwali") {
-        return diwali(year).map(|d| d - Duration::days(1));
+    if name.starts_with("naraka") || name.starts_with("kali chaudas") || name.starts_with("roop chaudas")
+       || name.starts_with("choti diwali") {
+        // Kali Chaudas = Dhanteras + 1 (matching Haskell)
+        return dhanteras(year).map(|d| d + Duration::days(1));
     }
     if name.starts_with("maha saptami") {
         return navaratri(year).map(|d| d + Duration::days(6));
@@ -2864,15 +3227,9 @@ fn resolve_hindu_holiday(name: &str, year: i32) -> Option<NaiveDate> {
 }
 
 // Hindu holiday lookup tables
+// Diwali = Dhanteras + 2 (matching Haskell: cycleNthAfter False TG.Day 2 dhanteras)
 fn diwali(year: i32) -> Option<NaiveDate> {
-    let (m, d) = match year {
-        2010 => (11, 5), 2011 => (10, 26), 2012 => (11, 13), 2013 => (11, 3),
-        2014 => (10, 23), 2015 => (11, 11), 2016 => (10, 30), 2017 => (10, 19),
-        2018 => (11, 7), 2019 => (10, 27), 2020 => (11, 14), 2021 => (11, 4),
-        2022 => (10, 24), 2023 => (11, 12), 2024 => (11, 1), 2025 => (10, 20),
-        _ => return None,
-    };
-    NaiveDate::from_ymd_opt(year, m, d)
+    dhanteras(year).map(|d| d + Duration::days(2))
 }
 
 fn holi(year: i32) -> Option<NaiveDate> {
@@ -2902,9 +3259,14 @@ fn navaratri(year: i32) -> Option<NaiveDate> {
 
 fn maha_shivaratri(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (3, 10), 2014 => (2, 27), 2015 => (2, 17), 2016 => (3, 7),
-        2017 => (2, 24), 2018 => (2, 13), 2019 => (3, 4), 2020 => (2, 21),
-        2021 => (3, 11), 2022 => (3, 1), 2023 => (2, 18),
+        2000 => (3, 4),  2001 => (2, 21), 2002 => (3, 12), 2003 => (3, 1),
+        2004 => (2, 18), 2005 => (3, 8),  2006 => (2, 26), 2007 => (2, 16),
+        2008 => (3, 6),  2009 => (2, 23), 2010 => (2, 12), 2011 => (3, 2),
+        2012 => (2, 20), 2013 => (3, 10), 2014 => (2, 27), 2015 => (2, 17),
+        2016 => (3, 7),  2017 => (2, 24), 2018 => (2, 13), 2019 => (3, 4),
+        2020 => (2, 21), 2021 => (3, 11), 2022 => (3, 1),  2023 => (2, 18),
+        2024 => (3, 8),  2025 => (2, 26), 2026 => (2, 15), 2027 => (3, 6),
+        2028 => (2, 23), 2029 => (2, 11), 2030 => (3, 2),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2912,9 +3274,14 @@ fn maha_shivaratri(year: i32) -> Option<NaiveDate> {
 
 fn ganesh_chaturthi(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (9, 9), 2014 => (8, 29), 2015 => (9, 17), 2016 => (9, 5),
-        2017 => (8, 25), 2018 => (9, 13), 2019 => (9, 2), 2020 => (8, 22),
-        2021 => (9, 10), 2022 => (8, 31), 2023 => (9, 19),
+        2000 => (9, 1),  2001 => (8, 22), 2002 => (9, 10), 2003 => (8, 31),
+        2004 => (9, 18), 2005 => (9, 7),  2006 => (8, 27), 2007 => (9, 15),
+        2008 => (9, 3),  2009 => (8, 23), 2010 => (9, 11), 2011 => (9, 1),
+        2012 => (9, 19), 2013 => (9, 9),  2014 => (8, 29), 2015 => (9, 17),
+        2016 => (9, 5),  2017 => (8, 25), 2018 => (9, 13), 2019 => (9, 2),
+        2020 => (8, 22), 2021 => (9, 9),  2022 => (8, 30), 2023 => (9, 18),
+        2024 => (9, 6),  2025 => (8, 26), 2026 => (9, 14), 2027 => (9, 3),
+        2028 => (8, 23), 2029 => (9, 11), 2030 => (9, 1),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2937,9 +3304,14 @@ fn janmashtami(year: i32) -> Option<NaiveDate> {
 
 fn rama_navami(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (4, 19), 2014 => (4, 8), 2015 => (3, 28), 2016 => (4, 15),
-        2017 => (4, 4), 2018 => (3, 25), 2019 => (4, 14), 2020 => (4, 2),
-        2021 => (4, 21), 2022 => (4, 10), 2023 => (3, 30),
+        2000 => (4, 12), 2001 => (4, 2),  2002 => (4, 21), 2003 => (4, 11),
+        2004 => (3, 30), 2005 => (4, 18), 2006 => (4, 6),  2007 => (3, 27),
+        2008 => (4, 14), 2009 => (4, 3),  2010 => (3, 24), 2011 => (4, 12),
+        2012 => (4, 1),  2013 => (4, 19), 2014 => (4, 8),  2015 => (3, 28),
+        2016 => (4, 15), 2017 => (4, 5),  2018 => (3, 25), 2019 => (4, 14),
+        2020 => (4, 2),  2021 => (4, 21), 2022 => (4, 10), 2023 => (3, 30),
+        2024 => (4, 17), 2025 => (4, 6),  2026 => (3, 27), 2027 => (4, 15),
+        2028 => (4, 4),  2029 => (4, 23), 2030 => (4, 12),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2947,9 +3319,14 @@ fn rama_navami(year: i32) -> Option<NaiveDate> {
 
 fn raksha_bandhan(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (8, 20), 2014 => (8, 10), 2015 => (8, 29), 2016 => (8, 18),
-        2017 => (8, 7), 2018 => (8, 26), 2019 => (8, 15), 2020 => (8, 3),
-        2021 => (8, 22), 2022 => (8, 11), 2023 => (8, 30),
+        2000 => (8, 15), 2001 => (8, 4),  2002 => (8, 22), 2003 => (8, 12),
+        2004 => (8, 29), 2005 => (8, 19), 2006 => (8, 9),  2007 => (8, 28),
+        2008 => (8, 16), 2009 => (8, 5),  2010 => (8, 24), 2011 => (8, 13),
+        2012 => (8, 2),  2013 => (8, 20), 2014 => (8, 10), 2015 => (8, 29),
+        2016 => (8, 18), 2017 => (8, 7),  2018 => (8, 26), 2019 => (8, 15),
+        2020 => (8, 3),  2021 => (8, 22), 2022 => (8, 11), 2023 => (8, 30),
+        2024 => (8, 19), 2025 => (8, 9),  2026 => (8, 28), 2027 => (8, 17),
+        2028 => (8, 5),  2029 => (8, 23), 2030 => (8, 13),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2981,8 +3358,14 @@ fn ugadi(year: i32) -> Option<NaiveDate> {
 
 fn karva_chauth(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (10, 22), 2014 => (10, 11), 2015 => (10, 30), 2016 => (10, 19),
-        2017 => (10, 8), 2018 => (10, 27), 2019 => (10, 17), 2020 => (11, 4),
+        2000 => (10, 16), 2001 => (10, 4),  2002 => (10, 24), 2003 => (10, 13),
+        2004 => (10, 31), 2005 => (10, 20), 2006 => (10, 9),  2007 => (10, 28),
+        2008 => (10, 17), 2009 => (10, 7),  2010 => (10, 26), 2011 => (10, 15),
+        2012 => (10, 2),  2013 => (10, 22), 2014 => (10, 11), 2015 => (10, 30),
+        2016 => (10, 18), 2017 => (10, 8),  2018 => (10, 27), 2019 => (10, 17),
+        2020 => (10, 3),  2021 => (10, 23), 2022 => (10, 12), 2023 => (10, 31),
+        2024 => (10, 20), 2025 => (10, 9),  2026 => (10, 28), 2027 => (10, 18),
+        2028 => (10, 6),  2029 => (10, 25), 2030 => (10, 14),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -2990,8 +3373,14 @@ fn karva_chauth(year: i32) -> Option<NaiveDate> {
 
 fn rath_yatra(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (7, 10), 2014 => (6, 29), 2015 => (7, 18), 2016 => (7, 6),
-        2017 => (6, 25), 2018 => (7, 14), 2019 => (7, 4), 2020 => (6, 23),
+        2000 => (7, 2),  2001 => (6, 22), 2002 => (7, 11), 2003 => (7, 1),
+        2004 => (6, 19), 2005 => (7, 8),  2006 => (6, 27), 2007 => (7, 16),
+        2008 => (7, 4),  2009 => (6, 24), 2010 => (7, 13), 2011 => (7, 3),
+        2012 => (6, 21), 2013 => (7, 10), 2014 => (6, 29), 2015 => (7, 18),
+        2016 => (7, 6),  2017 => (6, 25), 2018 => (7, 14), 2019 => (7, 4),
+        2020 => (6, 23), 2021 => (7, 11), 2022 => (6, 30), 2023 => (6, 19),
+        2024 => (7, 7),  2025 => (6, 26), 2026 => (7, 15), 2027 => (7, 5),
+        2028 => (6, 24), 2029 => (7, 13), 2030 => (7, 2),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -3060,8 +3449,14 @@ fn guru_gobind_singh(year: i32) -> Option<NaiveDate> {
 
 fn guru_ravidas(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (2, 25), 2014 => (2, 14), 2015 => (2, 3), 2016 => (2, 22),
-        2017 => (2, 11), 2018 => (1, 31), 2019 => (2, 19), 2020 => (2, 9),
+        2000 => (2, 19), 2001 => (2, 8),  2002 => (2, 27), 2003 => (2, 16),
+        2004 => (2, 6),  2005 => (2, 24), 2006 => (2, 13), 2007 => (2, 2),
+        2008 => (2, 21), 2009 => (2, 9),  2010 => (1, 30), 2011 => (2, 18),
+        2012 => (2, 7),  2013 => (2, 25), 2014 => (2, 14), 2015 => (2, 3),
+        2016 => (2, 22), 2017 => (2, 10), 2018 => (1, 31), 2019 => (2, 19),
+        2020 => (2, 9),  2021 => (2, 27), 2022 => (2, 16), 2023 => (2, 5),
+        2024 => (2, 24), 2025 => (2, 12), 2026 => (2, 1),  2027 => (2, 20),
+        2028 => (2, 10), 2029 => (1, 30), 2030 => (2, 18),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -3069,8 +3464,14 @@ fn guru_ravidas(year: i32) -> Option<NaiveDate> {
 
 fn valmiki_jayanti(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (10, 18), 2014 => (10, 8), 2015 => (10, 27), 2016 => (10, 16),
-        2017 => (10, 5), 2018 => (10, 24), 2019 => (10, 13), 2020 => (10, 31),
+        2000 => (10, 12), 2001 => (10, 31), 2002 => (10, 20), 2003 => (10, 9),
+        2004 => (10, 27), 2005 => (10, 16), 2006 => (10, 6),  2007 => (10, 25),
+        2008 => (10, 14), 2009 => (10, 3),  2010 => (10, 22), 2011 => (10, 11),
+        2012 => (10, 29), 2013 => (10, 18), 2014 => (10, 7),  2015 => (10, 26),
+        2016 => (10, 15), 2017 => (10, 5),  2018 => (10, 24), 2019 => (10, 13),
+        2020 => (10, 30), 2021 => (10, 19), 2022 => (10, 9),  2023 => (10, 28),
+        2024 => (10, 16), 2025 => (10, 6),  2026 => (10, 25), 2027 => (10, 14),
+        2028 => (10, 2),  2029 => (10, 21), 2030 => (10, 10),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)
@@ -3158,8 +3559,34 @@ fn gysd_date(year: i32) -> Option<NaiveDate> {
 
 fn resolve_vesak(year: i32) -> Option<NaiveDate> {
     let (m, d) = match year {
-        2013 => (5, 24), 2014 => (5, 13), 2015 => (6, 1), 2016 => (5, 21),
-        2017 => (5, 10), 2018 => (5, 29), 2019 => (5, 19), 2020 => (5, 7),
+        2000 => (5, 18), 2001 => (5, 7),  2002 => (5, 26), 2003 => (5, 15),
+        2004 => (5, 4),  2005 => (5, 23), 2006 => (5, 12), 2007 => (5, 31),
+        2008 => (5, 19), 2009 => (5, 8),  2010 => (5, 27), 2011 => (5, 17),
+        2012 => (5, 5),  2013 => (5, 24), 2014 => (5, 14), 2015 => (5, 3),
+        2016 => (5, 21), 2017 => (5, 10), 2018 => (5, 29), 2019 => (5, 18),
+        2020 => (5, 7),  2021 => (5, 26), 2022 => (5, 15), 2023 => (5, 5),
+        2024 => (5, 23), 2025 => (5, 12), 2026 => (5, 31), 2027 => (5, 20),
+        2028 => (5, 8),  2029 => (5, 27), 2030 => (5, 17),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+// Chhath = Dhanteras + 8 (matching Haskell: cycleNthAfter False TG.Day 8 dhanteras)
+fn chhath(year: i32) -> Option<NaiveDate> {
+    dhanteras(year).map(|d| d + Duration::days(8))
+}
+
+fn dhanteras(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (10, 24), 2001 => (11, 12), 2002 => (11, 2),  2003 => (10, 23),
+        2004 => (11, 10), 2005 => (10, 30), 2006 => (10, 19), 2007 => (11, 7),
+        2008 => (10, 26), 2009 => (10, 15), 2010 => (11, 3),  2011 => (10, 24),
+        2012 => (11, 11), 2013 => (11, 1),  2014 => (10, 21), 2015 => (11, 9),
+        2016 => (10, 28), 2017 => (10, 17), 2018 => (11, 5),  2019 => (10, 25),
+        2020 => (11, 13), 2021 => (11, 2),  2022 => (10, 22), 2023 => (11, 10),
+        2024 => (10, 29), 2025 => (10, 18), 2026 => (11, 6),  2027 => (10, 27),
+        2028 => (10, 15), 2029 => (11, 4),  2030 => (10, 24),
         _ => return None,
     };
     NaiveDate::from_ymd_opt(year, m, d)

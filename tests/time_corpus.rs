@@ -9,6 +9,7 @@ fn make_context() -> Context {
     Context {
         reference_time: chrono::Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
         locale: Locale::new(Lang::EN, None),
+        timezone_offset_minutes: -120, // UTC-2, matching Haskell test context
     }
 }
 
