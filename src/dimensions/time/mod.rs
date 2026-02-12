@@ -171,10 +171,6 @@ impl TimeData {
         }
     }
 
-    pub fn with_direction(mut self, direction: Direction) -> Self {
-        self.direction = Some(direction);
-        self
-    }
 }
 
 // ============================================================
@@ -531,7 +527,7 @@ fn try_resolve_as_interval(
             Some(make_interval(from, to, "day"))
         }
         // early/mid/late + Month → interval (e.g., "early March", "late October")
-        TimeForm::Month(m) if data.early_late.is_some() => {
+        TimeForm::Month(_m) if data.early_late.is_some() => {
             let (month_start, _) = resolve_simple_datetime(&data.form, ref_time, data.direction);
             let y = month_start.year();
             let m = month_start.month();
