@@ -5,6 +5,7 @@ fn check_url(text: &str, expected_url: &str, expected_domain: &str) {
     let entities = parse_en(text, &[DimensionKind::Url]);
     let found = entities.iter().any(|e| {
         e.dim == "url"
+            && e.value.value.get("value").and_then(|v| v.as_str()) == Some(expected_url)
             && e.value.value.get("domain").and_then(|v| v.as_str()) == Some(expected_domain)
     });
     assert!(

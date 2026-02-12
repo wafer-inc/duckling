@@ -1,27 +1,17 @@
 // Ported from Duckling/CreditCardNumber/Corpus.hs
 use duckling::{parse_en, DimensionKind};
 
-fn check_cc(text: &str, expected_issuer: &str) {
+fn check_cc(text: &str, expected_number: &str, expected_issuer: &str) {
     let entities = parse_en(text, &[DimensionKind::CreditCardNumber]);
     let found = entities.iter().any(|e| {
         e.dim == "credit-card-number"
+            && e.value.value.get("value").and_then(|v| v.as_str()) == Some(expected_number)
             && e.value.value.get("issuer").and_then(|v| v.as_str()) == Some(expected_issuer)
     });
     assert!(
         found,
-        "Expected credit card issuer '{}' for '{}', got: {:?}",
-        expected_issuer, text,
-        entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
-    );
-}
-
-fn check_cc_any(text: &str) {
-    let entities = parse_en(text, &[DimensionKind::CreditCardNumber]);
-    let found = entities.iter().any(|e| e.dim == "credit-card-number");
-    assert!(
-        found,
-        "Expected credit card for '{}', got: {:?}",
-        text,
+        "Expected credit card number '{}' issuer '{}' for '{}', got: {:?}",
+        expected_number, expected_issuer, text,
         entities.iter().map(|e| format!("{}={:?}", e.dim, e.value)).collect::<Vec<_>>()
     );
 }
@@ -40,42 +30,42 @@ fn check_no_cc(text: &str) {
 // Visa
 #[test]
 fn test_cc_visa() {
-    check_cc("4111111111111111", "visa");
-    check_cc("4111-1111-1111-1111", "visa");
+    check_cc("4111111111111111", "4111111111111111", "visa");
+    check_cc("4111-1111-1111-1111", "4111111111111111", "visa");
 }
 
 // Amex
 #[test]
 fn test_cc_amex() {
-    check_cc("371449635398431", "amex");
-    check_cc("3714-496353-98431", "amex");
+    check_cc("371449635398431", "371449635398431", "amex");
+    check_cc("3714-496353-98431", "371449635398431", "amex");
 }
 
 // Discover
 #[test]
 fn test_cc_discover() {
-    check_cc("6011111111111117", "discover");
-    check_cc("6011-1111-1111-1117", "discover");
+    check_cc("6011111111111117", "6011111111111117", "discover");
+    check_cc("6011-1111-1111-1117", "6011111111111117", "discover");
 }
 
 // Mastercard
 #[test]
 fn test_cc_mastercard() {
-    check_cc("5555555555554444", "mastercard");
-    check_cc("5555-5555-5555-4444", "mastercard");
+    check_cc("5555555555554444", "5555555555554444", "mastercard");
+    check_cc("5555-5555-5555-4444", "5555555555554444", "mastercard");
 }
 
 // DinerClub
 #[test]
 fn test_cc_diners_club() {
-    check_cc_any("30569309025904");
-    check_cc_any("3056-930902-5904");
+    check_cc("30569309025904", "30569309025904", "dinerclub");
+    check_cc("3056-930902-5904", "30569309025904", "dinerclub");
 }
 
 // Other (JCB)
 #[test]
 fn test_cc_other() {
-    check_cc_any("3530111333300000");
+    check_cc("3530111333300000", "3530111333300000", "other");
 }
 
 // Negative examples - invalid Luhn
