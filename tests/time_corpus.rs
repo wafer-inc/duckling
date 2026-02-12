@@ -2,8 +2,8 @@
 // Reference time for tests: 2013-02-12 04:30:00 UTC
 // All expected values from Haskell corpus at /tmp/duckling-haskell/Duckling/Time/EN/Corpus.hs
 
-use chrono::{DateTime, Utc, TimeZone, NaiveDate};
-use duckling::{parse, Locale, Lang, Context, Options, DimensionKind, DimensionValue, TimeValue, Entity, Grain};
+use chrono::{DateTime, NaiveDateTime, Utc, TimeZone, NaiveDate};
+use duckling::{parse, Locale, Lang, Context, Options, DimensionKind, DimensionValue, TimeValue, TimePoint, Entity, Grain};
 
 fn make_context() -> Context {
     Context {
@@ -20,40 +20,68 @@ fn parse_time(text: &str) -> Vec<Entity> {
     parse(text, &locale, &[DimensionKind::Time], &context, &options)
 }
 
-/// Build a DateTime<Utc> from components
-fn dt(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32) -> DateTime<Utc> {
+/// Build a NaiveDateTime from components (for naive/wall-clock time tests)
+fn dt(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32) -> NaiveDateTime {
     NaiveDate::from_ymd_opt(y, m, d)
         .unwrap()
         .and_hms_opt(h, mi, s)
         .unwrap()
-        .and_utc()
+}
+
+/// Build a DateTime<Utc> from components (for instant/absolute time tests)
+fn dt_utc(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32) -> DateTime<Utc> {
+    dt(y, m, d, h, mi, s).and_utc()
 }
 
 fn grain(s: &str) -> Grain {
     Grain::from_str(s)
 }
 
-fn check_time_value(text: &str, expected_value: DateTime<Utc>, expected_grain: &str) {
+fn check_time_naive(text: &str, expected_value: NaiveDateTime, expected_grain: &str) {
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Time(TimeValue::Instant { value, grain }) if *value == expected_value && *grain == eg)
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, grain })) if *value == expected_value && *grain == eg)
     });
     assert!(
         found,
-        "Expected time value '{:?}' grain '{}' for '{}', got: {:?}",
+        "Expected naive time value '{:?}' grain '{}' for '{}', got: {:?}",
         expected_value, expected_grain, text,
         entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
     );
 }
 
-fn check_time_interval(text: &str, expected_from: DateTime<Utc>, expected_to: DateTime<Utc>, expected_grain: &str) {
+fn check_time_instant(text: &str, expected_value: NaiveDateTime, expected_grain: &str) {
+    let entities = parse_time(text);
+    let eg = grain(expected_grain);
+    let found = entities.iter().any(|e| {
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Instant { value, grain })) if value.naive_utc() == expected_value && *grain == eg)
+    });
+    assert!(
+        found,
+        "Expected instant time value '{:?}' grain '{}' for '{}', got: {:?}",
+        expected_value, expected_grain, text,
+        entities.iter().map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value)).collect::<Vec<_>>()
+    );
+}
+
+/// Extract NaiveDateTime and Grain from a TimePoint (works for both Instant and Naive)
+fn tp_value_grain(tp: &TimePoint) -> (NaiveDateTime, Grain) {
+    match tp {
+        TimePoint::Instant { value, grain } => (value.naive_utc(), *grain),
+        TimePoint::Naive { value, grain } => (*value, *grain),
+    }
+}
+
+fn check_time_interval(text: &str, expected_from: NaiveDateTime, expected_to: NaiveDateTime, expected_grain: &str) {
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
         match &e.value {
             DimensionValue::Time(TimeValue::Interval { from: Some(f), to: Some(t) }) => {
-                f.value == expected_from && t.value == expected_to && (f.grain == eg || t.grain == eg)
+                let (fv, fg) = tp_value_grain(f);
+                let (tv, tg) = tp_value_grain(t);
+                fv == expected_from && tv == expected_to && (fg == eg || tg == eg)
             }
             _ => false,
         }
@@ -66,13 +94,14 @@ fn check_time_interval(text: &str, expected_from: DateTime<Utc>, expected_to: Da
     );
 }
 
-fn check_time_open_interval_after(text: &str, expected_value: DateTime<Utc>, expected_grain: &str) {
+fn check_time_open_interval_after(text: &str, expected_value: NaiveDateTime, expected_grain: &str) {
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
         match &e.value {
             DimensionValue::Time(TimeValue::Interval { from: Some(f), to: None }) => {
-                f.value == expected_value && f.grain == eg
+                let (fv, fg) = tp_value_grain(f);
+                fv == expected_value && fg == eg
             }
             _ => false,
         }
@@ -85,13 +114,14 @@ fn check_time_open_interval_after(text: &str, expected_value: DateTime<Utc>, exp
     );
 }
 
-fn check_time_open_interval_before(text: &str, expected_value: DateTime<Utc>, expected_grain: &str) {
+fn check_time_open_interval_before(text: &str, expected_value: NaiveDateTime, expected_grain: &str) {
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
         match &e.value {
             DimensionValue::Time(TimeValue::Interval { from: None, to: Some(t) }) => {
-                t.value == expected_value && t.grain == eg
+                let (tv, tg) = tp_value_grain(t);
+                tv == expected_value && tg == eg
             }
             _ => false,
         }
@@ -121,11 +151,11 @@ fn check_no_time(text: &str) {
 // ============================================================
 #[test]
 fn test_time_now() {
-    check_time_value("now", dt(2013, 2, 12, 4, 30, 0), "second");
-    check_time_value("right now", dt(2013, 2, 12, 4, 30, 0), "second");
-    check_time_value("just now", dt(2013, 2, 12, 4, 30, 0), "second");
-    check_time_value("at the moment", dt(2013, 2, 12, 4, 30, 0), "second");
-    check_time_value("ATM", dt(2013, 2, 12, 4, 30, 0), "second");
+    check_time_instant("now", dt(2013, 2, 12, 4, 30, 0), "second");
+    check_time_instant("right now", dt(2013, 2, 12, 4, 30, 0), "second");
+    check_time_instant("just now", dt(2013, 2, 12, 4, 30, 0), "second");
+    check_time_instant("at the moment", dt(2013, 2, 12, 4, 30, 0), "second");
+    check_time_instant("ATM", dt(2013, 2, 12, 4, 30, 0), "second");
 }
 
 // ============================================================
@@ -133,8 +163,8 @@ fn test_time_now() {
 // ============================================================
 #[test]
 fn test_time_today() {
-    check_time_value("today", dt(2013, 2, 12, 0, 0, 0), "day");
-    check_time_value("at this time", dt(2013, 2, 12, 0, 0, 0), "day");
+    check_time_naive("today", dt(2013, 2, 12, 0, 0, 0), "day");
+    check_time_naive("at this time", dt(2013, 2, 12, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -142,7 +172,7 @@ fn test_time_today() {
 // ============================================================
 #[test]
 fn test_time_month_year_slash() {
-    check_time_value("2/2013", dt(2013, 2, 1, 0, 0, 0), "month");
+    check_time_naive("2/2013", dt(2013, 2, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -150,7 +180,7 @@ fn test_time_month_year_slash() {
 // ============================================================
 #[test]
 fn test_time_in_2014() {
-    check_time_value("in 2014", dt(2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 2014", dt(2014, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -158,7 +188,7 @@ fn test_time_in_2014() {
 // ============================================================
 #[test]
 fn test_time_yesterday() {
-    check_time_value("yesterday", dt(2013, 2, 11, 0, 0, 0), "day");
+    check_time_naive("yesterday", dt(2013, 2, 11, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -166,8 +196,8 @@ fn test_time_yesterday() {
 // ============================================================
 #[test]
 fn test_time_tomorrow() {
-    check_time_value("tomorrow", dt(2013, 2, 13, 0, 0, 0), "day");
-    check_time_value("tomorrows", dt(2013, 2, 13, 0, 0, 0), "day");
+    check_time_naive("tomorrow", dt(2013, 2, 13, 0, 0, 0), "day");
+    check_time_naive("tomorrows", dt(2013, 2, 13, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -175,11 +205,11 @@ fn test_time_tomorrow() {
 // ============================================================
 #[test]
 fn test_time_monday() {
-    check_time_value("monday", dt(2013, 2, 18, 0, 0, 0), "day");
-    check_time_value("mon.", dt(2013, 2, 18, 0, 0, 0), "day");
-    check_time_value("this monday", dt(2013, 2, 18, 0, 0, 0), "day");
-    check_time_value("Monday, Feb 18", dt(2013, 2, 18, 0, 0, 0), "day");
-    check_time_value("Mon, February 18", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("monday", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("mon.", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("this monday", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("Monday, Feb 18", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("Mon, February 18", dt(2013, 2, 18, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -187,9 +217,9 @@ fn test_time_monday() {
 // ============================================================
 #[test]
 fn test_time_tuesday() {
-    check_time_value("tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("Tuesday the 19th", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("Tuesday 19th", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_naive("tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_naive("Tuesday the 19th", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_naive("Tuesday 19th", dt(2013, 2, 19, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -197,7 +227,7 @@ fn test_time_tuesday() {
 // ============================================================
 #[test]
 fn test_time_thu_15th() {
-    check_time_value("Thu 15th", dt(2013, 8, 15, 0, 0, 0), "day");
+    check_time_naive("Thu 15th", dt(2013, 8, 15, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -205,9 +235,9 @@ fn test_time_thu_15th() {
 // ============================================================
 #[test]
 fn test_time_thursday() {
-    check_time_value("thursday", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("thu", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("thu.", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("thursday", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("thu", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("thu.", dt(2013, 2, 14, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -215,9 +245,9 @@ fn test_time_thursday() {
 // ============================================================
 #[test]
 fn test_time_friday() {
-    check_time_value("friday", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("fri", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("fri.", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("friday", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("fri", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("fri.", dt(2013, 2, 15, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -225,9 +255,9 @@ fn test_time_friday() {
 // ============================================================
 #[test]
 fn test_time_saturday() {
-    check_time_value("saturday", dt(2013, 2, 16, 0, 0, 0), "day");
-    check_time_value("sat", dt(2013, 2, 16, 0, 0, 0), "day");
-    check_time_value("sat.", dt(2013, 2, 16, 0, 0, 0), "day");
+    check_time_naive("saturday", dt(2013, 2, 16, 0, 0, 0), "day");
+    check_time_naive("sat", dt(2013, 2, 16, 0, 0, 0), "day");
+    check_time_naive("sat.", dt(2013, 2, 16, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -235,9 +265,9 @@ fn test_time_saturday() {
 // ============================================================
 #[test]
 fn test_time_sunday() {
-    check_time_value("sunday", dt(2013, 2, 17, 0, 0, 0), "day");
-    check_time_value("sun", dt(2013, 2, 17, 0, 0, 0), "day");
-    check_time_value("sun.", dt(2013, 2, 17, 0, 0, 0), "day");
+    check_time_naive("sunday", dt(2013, 2, 17, 0, 0, 0), "day");
+    check_time_naive("sun", dt(2013, 2, 17, 0, 0, 0), "day");
+    check_time_naive("sun.", dt(2013, 2, 17, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -245,10 +275,10 @@ fn test_time_sunday() {
 // ============================================================
 #[test]
 fn test_time_first_of_march() {
-    check_time_value("the 1st of march", dt(2013, 3, 1, 0, 0, 0), "day");
-    check_time_value("first of march", dt(2013, 3, 1, 0, 0, 0), "day");
-    check_time_value("the first of march", dt(2013, 3, 1, 0, 0, 0), "day");
-    check_time_value("march first", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("the 1st of march", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("first of march", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("the first of march", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("march first", dt(2013, 3, 1, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -256,9 +286,9 @@ fn test_time_first_of_march() {
 // ============================================================
 #[test]
 fn test_time_second_of_march() {
-    check_time_value("the 2nd of march", dt(2013, 3, 2, 0, 0, 0), "day");
-    check_time_value("second of march", dt(2013, 3, 2, 0, 0, 0), "day");
-    check_time_value("the second of march", dt(2013, 3, 2, 0, 0, 0), "day");
+    check_time_naive("the 2nd of march", dt(2013, 3, 2, 0, 0, 0), "day");
+    check_time_naive("second of march", dt(2013, 3, 2, 0, 0, 0), "day");
+    check_time_naive("the second of march", dt(2013, 3, 2, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -266,8 +296,8 @@ fn test_time_second_of_march() {
 // ============================================================
 #[test]
 fn test_time_march_3() {
-    check_time_value("march 3", dt(2013, 3, 3, 0, 0, 0), "day");
-    check_time_value("the third of march", dt(2013, 3, 3, 0, 0, 0), "day");
+    check_time_naive("march 3", dt(2013, 3, 3, 0, 0, 0), "day");
+    check_time_naive("the third of march", dt(2013, 3, 3, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -275,7 +305,7 @@ fn test_time_march_3() {
 // ============================================================
 #[test]
 fn test_time_ides_of_march() {
-    check_time_value("the ides of march", dt(2013, 3, 15, 0, 0, 0), "day");
+    check_time_naive("the ides of march", dt(2013, 3, 15, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -283,13 +313,13 @@ fn test_time_ides_of_march() {
 // ============================================================
 #[test]
 fn test_time_march_3_2015() {
-    check_time_value("march 3 2015", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("march 3rd 2015", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("march third 2015", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("3/3/2015", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("3/3/15", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("2015-3-3", dt(2015, 3, 3, 0, 0, 0), "day");
-    check_time_value("2015-03-03", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("march 3 2015", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("march 3rd 2015", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("march third 2015", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("3/3/2015", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("3/3/15", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("2015-3-3", dt(2015, 3, 3, 0, 0, 0), "day");
+    check_time_naive("2015-03-03", dt(2015, 3, 3, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -297,13 +327,13 @@ fn test_time_march_3_2015() {
 // ============================================================
 #[test]
 fn test_time_february_15() {
-    check_time_value("on the 15th", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("the 15th of february", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("15 of february", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("february the 15th", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("february 15", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("15th february", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("February 15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("on the 15th", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("the 15th of february", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("15 of february", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("february the 15th", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("february 15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("15th february", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("February 15", dt(2013, 2, 15, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -311,7 +341,7 @@ fn test_time_february_15() {
 // ============================================================
 #[test]
 fn test_time_aug_8() {
-    check_time_value("Aug 8", dt(2013, 8, 8, 0, 0, 0), "day");
+    check_time_naive("Aug 8", dt(2013, 8, 8, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -319,8 +349,8 @@ fn test_time_aug_8() {
 // ============================================================
 #[test]
 fn test_time_march_in_a_year() {
-    check_time_value("March in 1 year", dt(2014, 3, 1, 0, 0, 0), "month");
-    check_time_value("March in a year", dt(2014, 3, 1, 0, 0, 0), "month");
+    check_time_naive("March in 1 year", dt(2014, 3, 1, 0, 0, 0), "month");
+    check_time_naive("March in a year", dt(2014, 3, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -328,8 +358,8 @@ fn test_time_march_in_a_year() {
 // ============================================================
 #[test]
 fn test_time_fri_jul_18() {
-    check_time_value("Fri, Jul 18", dt(2014, 7, 18, 0, 0, 0), "day");
-    check_time_value("Jul 18, Fri", dt(2014, 7, 18, 0, 0, 0), "day");
+    check_time_naive("Fri, Jul 18", dt(2014, 7, 18, 0, 0, 0), "day");
+    check_time_naive("Jul 18, Fri", dt(2014, 7, 18, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -337,9 +367,9 @@ fn test_time_fri_jul_18() {
 // ============================================================
 #[test]
 fn test_time_october_2014() {
-    check_time_value("October 2014", dt(2014, 10, 1, 0, 0, 0), "month");
-    check_time_value("2014-10", dt(2014, 10, 1, 0, 0, 0), "month");
-    check_time_value("2014/10", dt(2014, 10, 1, 0, 0, 0), "month");
+    check_time_naive("October 2014", dt(2014, 10, 1, 0, 0, 0), "month");
+    check_time_naive("2014-10", dt(2014, 10, 1, 0, 0, 0), "month");
+    check_time_naive("2014/10", dt(2014, 10, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -347,9 +377,9 @@ fn test_time_october_2014() {
 // ============================================================
 #[test]
 fn test_time_april_14_2015() {
-    check_time_value("14april 2015", dt(2015, 4, 14, 0, 0, 0), "day");
-    check_time_value("April 14, 2015", dt(2015, 4, 14, 0, 0, 0), "day");
-    check_time_value("14th April 15", dt(2015, 4, 14, 0, 0, 0), "day");
+    check_time_naive("14april 2015", dt(2015, 4, 14, 0, 0, 0), "day");
+    check_time_naive("April 14, 2015", dt(2015, 4, 14, 0, 0, 0), "day");
+    check_time_naive("14th April 15", dt(2015, 4, 14, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -357,8 +387,8 @@ fn test_time_april_14_2015() {
 // ============================================================
 #[test]
 fn test_time_next_tuesday() {
-    check_time_value("next tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("around next tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_naive("next tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_naive("around next tuesday", dt(2013, 2, 19, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -366,7 +396,7 @@ fn test_time_next_tuesday() {
 // ============================================================
 #[test]
 fn test_time_friday_after_next() {
-    check_time_value("friday after next", dt(2013, 2, 22, 0, 0, 0), "day");
+    check_time_naive("friday after next", dt(2013, 2, 22, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -374,7 +404,7 @@ fn test_time_friday_after_next() {
 // ============================================================
 #[test]
 fn test_time_next_march() {
-    check_time_value("next March", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("next March", dt(2013, 3, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -382,7 +412,7 @@ fn test_time_next_march() {
 // ============================================================
 #[test]
 fn test_time_march_after_next() {
-    check_time_value("March after next", dt(2014, 3, 1, 0, 0, 0), "month");
+    check_time_naive("March after next", dt(2014, 3, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -390,7 +420,7 @@ fn test_time_march_after_next() {
 // ============================================================
 #[test]
 fn test_time_sunday_feb_10() {
-    check_time_value("Sunday, Feb 10", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("Sunday, Feb 10", dt(2013, 2, 10, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -398,7 +428,7 @@ fn test_time_sunday_feb_10() {
 // ============================================================
 #[test]
 fn test_time_wed_feb13() {
-    check_time_value("Wed, Feb13", dt(2013, 2, 13, 0, 0, 0), "day");
+    check_time_naive("Wed, Feb13", dt(2013, 2, 13, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -406,8 +436,8 @@ fn test_time_wed_feb13() {
 // ============================================================
 #[test]
 fn test_time_this_week() {
-    check_time_value("this week", dt(2013, 2, 11, 0, 0, 0), "week");
-    check_time_value("current week", dt(2013, 2, 11, 0, 0, 0), "week");
+    check_time_naive("this week", dt(2013, 2, 11, 0, 0, 0), "week");
+    check_time_naive("current week", dt(2013, 2, 11, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -415,9 +445,9 @@ fn test_time_this_week() {
 // ============================================================
 #[test]
 fn test_time_last_week() {
-    check_time_value("last week", dt(2013, 2, 4, 0, 0, 0), "week");
-    check_time_value("past week", dt(2013, 2, 4, 0, 0, 0), "week");
-    check_time_value("previous week", dt(2013, 2, 4, 0, 0, 0), "week");
+    check_time_naive("last week", dt(2013, 2, 4, 0, 0, 0), "week");
+    check_time_naive("past week", dt(2013, 2, 4, 0, 0, 0), "week");
+    check_time_naive("previous week", dt(2013, 2, 4, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -425,11 +455,11 @@ fn test_time_last_week() {
 // ============================================================
 #[test]
 fn test_time_next_week() {
-    check_time_value("next week", dt(2013, 2, 18, 0, 0, 0), "week");
-    check_time_value("the following week", dt(2013, 2, 18, 0, 0, 0), "week");
-    check_time_value("around next week", dt(2013, 2, 18, 0, 0, 0), "week");
-    check_time_value("upcoming week", dt(2013, 2, 18, 0, 0, 0), "week");
-    check_time_value("coming week", dt(2013, 2, 18, 0, 0, 0), "week");
+    check_time_naive("next week", dt(2013, 2, 18, 0, 0, 0), "week");
+    check_time_naive("the following week", dt(2013, 2, 18, 0, 0, 0), "week");
+    check_time_naive("around next week", dt(2013, 2, 18, 0, 0, 0), "week");
+    check_time_naive("upcoming week", dt(2013, 2, 18, 0, 0, 0), "week");
+    check_time_naive("coming week", dt(2013, 2, 18, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -437,7 +467,7 @@ fn test_time_next_week() {
 // ============================================================
 #[test]
 fn test_time_last_month() {
-    check_time_value("last month", dt(2013, 1, 1, 0, 0, 0), "month");
+    check_time_naive("last month", dt(2013, 1, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -445,7 +475,7 @@ fn test_time_last_month() {
 // ============================================================
 #[test]
 fn test_time_next_month() {
-    check_time_value("next month", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("next month", dt(2013, 3, 1, 0, 0, 0), "month");
 }
 
 // ============================================================
@@ -453,9 +483,9 @@ fn test_time_next_month() {
 // ============================================================
 #[test]
 fn test_time_20_of_next_month() {
-    check_time_value("20 of next month", dt(2013, 3, 20, 0, 0, 0), "day");
-    check_time_value("20th of the next month", dt(2013, 3, 20, 0, 0, 0), "day");
-    check_time_value("20th day of next month", dt(2013, 3, 20, 0, 0, 0), "day");
+    check_time_naive("20 of next month", dt(2013, 3, 20, 0, 0, 0), "day");
+    check_time_naive("20th of the next month", dt(2013, 3, 20, 0, 0, 0), "day");
+    check_time_naive("20th day of next month", dt(2013, 3, 20, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -463,8 +493,8 @@ fn test_time_20_of_next_month() {
 // ============================================================
 #[test]
 fn test_time_20_of_current_month() {
-    check_time_value("20th of the current month", dt(2013, 2, 20, 0, 0, 0), "day");
-    check_time_value("20 of this month", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("20th of the current month", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("20 of this month", dt(2013, 2, 20, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -472,7 +502,7 @@ fn test_time_20_of_current_month() {
 // ============================================================
 #[test]
 fn test_time_20_of_previous_month() {
-    check_time_value("20th of the previous month", dt(2013, 1, 20, 0, 0, 0), "day");
+    check_time_naive("20th of the previous month", dt(2013, 1, 20, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -480,8 +510,8 @@ fn test_time_20_of_previous_month() {
 // ============================================================
 #[test]
 fn test_time_this_quarter() {
-    check_time_value("this quarter", dt(2013, 1, 1, 0, 0, 0), "quarter");
-    check_time_value("this qtr", dt(2013, 1, 1, 0, 0, 0), "quarter");
+    check_time_naive("this quarter", dt(2013, 1, 1, 0, 0, 0), "quarter");
+    check_time_naive("this qtr", dt(2013, 1, 1, 0, 0, 0), "quarter");
 }
 
 // ============================================================
@@ -489,8 +519,8 @@ fn test_time_this_quarter() {
 // ============================================================
 #[test]
 fn test_time_next_quarter() {
-    check_time_value("next quarter", dt(2013, 4, 1, 0, 0, 0), "quarter");
-    check_time_value("next qtr", dt(2013, 4, 1, 0, 0, 0), "quarter");
+    check_time_naive("next quarter", dt(2013, 4, 1, 0, 0, 0), "quarter");
+    check_time_naive("next qtr", dt(2013, 4, 1, 0, 0, 0), "quarter");
 }
 
 // ============================================================
@@ -498,11 +528,11 @@ fn test_time_next_quarter() {
 // ============================================================
 #[test]
 fn test_time_third_quarter() {
-    check_time_value("third quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("3rd quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("third qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("3rd qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("the 3rd qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("third quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("3rd quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("third qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("3rd qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("the 3rd qtr", dt(2013, 7, 1, 0, 0, 0), "quarter");
 }
 
 // ============================================================
@@ -510,11 +540,11 @@ fn test_time_third_quarter() {
 // ============================================================
 #[test]
 fn test_time_4th_quarter_2018() {
-    check_time_value("4th quarter 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
-    check_time_value("4th qtr 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
-    check_time_value("the 4th qtr of 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
-    check_time_value("18q4", dt(2018, 10, 1, 0, 0, 0), "quarter");
-    check_time_value("2018Q4", dt(2018, 10, 1, 0, 0, 0), "quarter");
+    check_time_naive("4th quarter 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
+    check_time_naive("4th qtr 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
+    check_time_naive("the 4th qtr of 2018", dt(2018, 10, 1, 0, 0, 0), "quarter");
+    check_time_naive("18q4", dt(2018, 10, 1, 0, 0, 0), "quarter");
+    check_time_naive("2018Q4", dt(2018, 10, 1, 0, 0, 0), "quarter");
 }
 
 // ============================================================
@@ -522,8 +552,8 @@ fn test_time_4th_quarter_2018() {
 // ============================================================
 #[test]
 fn test_time_last_year() {
-    check_time_value("last year", dt(2012, 1, 1, 0, 0, 0), "year");
-    check_time_value("last yr", dt(2012, 1, 1, 0, 0, 0), "year");
+    check_time_naive("last year", dt(2012, 1, 1, 0, 0, 0), "year");
+    check_time_naive("last yr", dt(2012, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -531,9 +561,9 @@ fn test_time_last_year() {
 // ============================================================
 #[test]
 fn test_time_this_year() {
-    check_time_value("this year", dt(2013, 1, 1, 0, 0, 0), "year");
-    check_time_value("current year", dt(2013, 1, 1, 0, 0, 0), "year");
-    check_time_value("this yr", dt(2013, 1, 1, 0, 0, 0), "year");
+    check_time_naive("this year", dt(2013, 1, 1, 0, 0, 0), "year");
+    check_time_naive("current year", dt(2013, 1, 1, 0, 0, 0), "year");
+    check_time_naive("this yr", dt(2013, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -541,8 +571,8 @@ fn test_time_this_year() {
 // ============================================================
 #[test]
 fn test_time_next_year() {
-    check_time_value("next year", dt(2014, 1, 1, 0, 0, 0), "year");
-    check_time_value("next yr", dt(2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("next year", dt(2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("next yr", dt(2014, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -550,8 +580,8 @@ fn test_time_next_year() {
 // ============================================================
 #[test]
 fn test_time_in_2014_ad() {
-    check_time_value("in 2014 A.D.", dt(2014, 1, 1, 0, 0, 0), "year");
-    check_time_value("in 2014 AD", dt(2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 2014 A.D.", dt(2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 2014 AD", dt(2014, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -559,8 +589,8 @@ fn test_time_in_2014_ad() {
 // ============================================================
 #[test]
 fn test_time_in_2014_bc() {
-    check_time_value("in 2014 B.C.", dt(-2014, 1, 1, 0, 0, 0), "year");
-    check_time_value("in 2014 BC", dt(-2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 2014 B.C.", dt(-2014, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 2014 BC", dt(-2014, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -568,7 +598,7 @@ fn test_time_in_2014_bc() {
 // ============================================================
 #[test]
 fn test_time_in_14_ad() {
-    check_time_value("in 14 a.d.", dt(14, 1, 1, 0, 0, 0), "year");
+    check_time_naive("in 14 a.d.", dt(14, 1, 1, 0, 0, 0), "year");
 }
 
 // ============================================================
@@ -576,9 +606,9 @@ fn test_time_in_14_ad() {
 // ============================================================
 #[test]
 fn test_time_last_sunday() {
-    check_time_value("last sunday", dt(2013, 2, 10, 0, 0, 0), "day");
-    check_time_value("sunday from last week", dt(2013, 2, 10, 0, 0, 0), "day");
-    check_time_value("last week's sunday", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("last sunday", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("sunday from last week", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("last week's sunday", dt(2013, 2, 10, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -586,7 +616,7 @@ fn test_time_last_sunday() {
 // ============================================================
 #[test]
 fn test_time_last_tuesday() {
-    check_time_value("last tuesday", dt(2013, 2, 5, 0, 0, 0), "day");
+    check_time_naive("last tuesday", dt(2013, 2, 5, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -594,7 +624,7 @@ fn test_time_last_tuesday() {
 // ============================================================
 #[test]
 fn test_time_next_wednesday() {
-    check_time_value("next wednesday", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("next wednesday", dt(2013, 2, 20, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -602,9 +632,9 @@ fn test_time_next_wednesday() {
 // ============================================================
 #[test]
 fn test_time_wednesday_of_next_week() {
-    check_time_value("wednesday of next week", dt(2013, 2, 20, 0, 0, 0), "day");
-    check_time_value("wednesday next week", dt(2013, 2, 20, 0, 0, 0), "day");
-    check_time_value("wednesday after next", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("wednesday of next week", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("wednesday next week", dt(2013, 2, 20, 0, 0, 0), "day");
+    check_time_naive("wednesday after next", dt(2013, 2, 20, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -612,7 +642,7 @@ fn test_time_wednesday_of_next_week() {
 // ============================================================
 #[test]
 fn test_time_monday_of_this_week() {
-    check_time_value("monday of this week", dt(2013, 2, 11, 0, 0, 0), "day");
+    check_time_naive("monday of this week", dt(2013, 2, 11, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -620,7 +650,7 @@ fn test_time_monday_of_this_week() {
 // ============================================================
 #[test]
 fn test_time_tuesday_of_this_week() {
-    check_time_value("tuesday of this week", dt(2013, 2, 12, 0, 0, 0), "day");
+    check_time_naive("tuesday of this week", dt(2013, 2, 12, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -628,7 +658,7 @@ fn test_time_tuesday_of_this_week() {
 // ============================================================
 #[test]
 fn test_time_wednesday_of_this_week() {
-    check_time_value("wednesday of this week", dt(2013, 2, 13, 0, 0, 0), "day");
+    check_time_naive("wednesday of this week", dt(2013, 2, 13, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -636,7 +666,7 @@ fn test_time_wednesday_of_this_week() {
 // ============================================================
 #[test]
 fn test_time_day_after_tomorrow() {
-    check_time_value("the day after tomorrow", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("the day after tomorrow", dt(2013, 2, 14, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -644,7 +674,7 @@ fn test_time_day_after_tomorrow() {
 // ============================================================
 #[test]
 fn test_time_day_after_tomorrow_5pm() {
-    check_time_value("day after tomorrow 5pm", dt(2013, 2, 14, 17, 0, 0), "hour");
+    check_time_naive("day after tomorrow 5pm", dt(2013, 2, 14, 17, 0, 0), "hour");
 }
 
 // ============================================================
@@ -652,7 +682,7 @@ fn test_time_day_after_tomorrow_5pm() {
 // ============================================================
 #[test]
 fn test_time_day_before_yesterday() {
-    check_time_value("the day before yesterday", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("the day before yesterday", dt(2013, 2, 10, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -660,7 +690,7 @@ fn test_time_day_before_yesterday() {
 // ============================================================
 #[test]
 fn test_time_day_before_yesterday_8am() {
-    check_time_value("day before yesterday 8am", dt(2013, 2, 10, 8, 0, 0), "hour");
+    check_time_naive("day before yesterday 8am", dt(2013, 2, 10, 8, 0, 0), "hour");
 }
 
 // ============================================================
@@ -668,7 +698,7 @@ fn test_time_day_before_yesterday_8am() {
 // ============================================================
 #[test]
 fn test_time_last_monday_of_march() {
-    check_time_value("last Monday of March", dt(2013, 3, 25, 0, 0, 0), "day");
+    check_time_naive("last Monday of March", dt(2013, 3, 25, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -676,7 +706,7 @@ fn test_time_last_monday_of_march() {
 // ============================================================
 #[test]
 fn test_time_last_sunday_of_march_2014() {
-    check_time_value("last Sunday of March 2014", dt(2014, 3, 30, 0, 0, 0), "day");
+    check_time_naive("last Sunday of March 2014", dt(2014, 3, 30, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -684,7 +714,7 @@ fn test_time_last_sunday_of_march_2014() {
 // ============================================================
 #[test]
 fn test_time_third_day_of_october() {
-    check_time_value("third day of october", dt(2013, 10, 3, 0, 0, 0), "day");
+    check_time_naive("third day of october", dt(2013, 10, 3, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -692,7 +722,7 @@ fn test_time_third_day_of_october() {
 // ============================================================
 #[test]
 fn test_time_first_week_of_october_2014() {
-    check_time_value("first week of october 2014", dt(2014, 10, 6, 0, 0, 0), "week");
+    check_time_naive("first week of october 2014", dt(2014, 10, 6, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -700,9 +730,9 @@ fn test_time_first_week_of_october_2014() {
 // ============================================================
 #[test]
 fn test_time_third_last_week_of_2018() {
-    check_time_value("third last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
-    check_time_value("the third last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
-    check_time_value("the 3rd last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
+    check_time_naive("third last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
+    check_time_naive("the third last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
+    check_time_naive("the 3rd last week of 2018", dt(2018, 12, 10, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -710,8 +740,8 @@ fn test_time_third_last_week_of_2018() {
 // ============================================================
 #[test]
 fn test_time_2nd_last_week_of_october_2018() {
-    check_time_value("2nd last week of October 2018", dt(2018, 10, 15, 0, 0, 0), "week");
-    check_time_value("the second last week of October 2018", dt(2018, 10, 15, 0, 0, 0), "week");
+    check_time_naive("2nd last week of October 2018", dt(2018, 10, 15, 0, 0, 0), "week");
+    check_time_naive("the second last week of October 2018", dt(2018, 10, 15, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -719,8 +749,8 @@ fn test_time_2nd_last_week_of_october_2018() {
 // ============================================================
 #[test]
 fn test_time_fifth_last_day_of_may() {
-    check_time_value("fifth last day of May", dt(2013, 5, 27, 0, 0, 0), "day");
-    check_time_value("the 5th last day of May", dt(2013, 5, 27, 0, 0, 0), "day");
+    check_time_naive("fifth last day of May", dt(2013, 5, 27, 0, 0, 0), "day");
+    check_time_naive("the 5th last day of May", dt(2013, 5, 27, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -728,8 +758,8 @@ fn test_time_fifth_last_day_of_may() {
 // ============================================================
 #[test]
 fn test_time_week_of_october() {
-    check_time_value("the week of october 6th", dt(2013, 10, 7, 0, 0, 0), "week");
-    check_time_value("the week of october 7th", dt(2013, 10, 7, 0, 0, 0), "week");
+    check_time_naive("the week of october 6th", dt(2013, 10, 7, 0, 0, 0), "week");
+    check_time_naive("the week of october 7th", dt(2013, 10, 7, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -737,8 +767,8 @@ fn test_time_week_of_october() {
 // ============================================================
 #[test]
 fn test_time_last_day_of_october_2015() {
-    check_time_value("last day of october 2015", dt(2015, 10, 31, 0, 0, 0), "day");
-    check_time_value("last day in october 2015", dt(2015, 10, 31, 0, 0, 0), "day");
+    check_time_naive("last day of october 2015", dt(2015, 10, 31, 0, 0, 0), "day");
+    check_time_naive("last day in october 2015", dt(2015, 10, 31, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -746,7 +776,7 @@ fn test_time_last_day_of_october_2015() {
 // ============================================================
 #[test]
 fn test_time_last_week_of_september_2014() {
-    check_time_value("last week of september 2014", dt(2014, 9, 22, 0, 0, 0), "week");
+    check_time_naive("last week of september 2014", dt(2014, 9, 22, 0, 0, 0), "week");
 }
 
 // ============================================================
@@ -754,8 +784,8 @@ fn test_time_last_week_of_september_2014() {
 // ============================================================
 #[test]
 fn test_time_first_tuesday_of_october() {
-    check_time_value("first tuesday of october", dt(2013, 10, 1, 0, 0, 0), "day");
-    check_time_value("first tuesday in october", dt(2013, 10, 1, 0, 0, 0), "day");
+    check_time_naive("first tuesday of october", dt(2013, 10, 1, 0, 0, 0), "day");
+    check_time_naive("first tuesday in october", dt(2013, 10, 1, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -763,7 +793,7 @@ fn test_time_first_tuesday_of_october() {
 // ============================================================
 #[test]
 fn test_time_third_tuesday_of_september_2014() {
-    check_time_value("third tuesday of september 2014", dt(2014, 9, 16, 0, 0, 0), "day");
+    check_time_naive("third tuesday of september 2014", dt(2014, 9, 16, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -771,7 +801,7 @@ fn test_time_third_tuesday_of_september_2014() {
 // ============================================================
 #[test]
 fn test_time_first_wednesday_of_october_2014() {
-    check_time_value("first wednesday of october 2014", dt(2014, 10, 1, 0, 0, 0), "day");
+    check_time_naive("first wednesday of october 2014", dt(2014, 10, 1, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -779,7 +809,7 @@ fn test_time_first_wednesday_of_october_2014() {
 // ============================================================
 #[test]
 fn test_time_second_wednesday_of_october_2014() {
-    check_time_value("second wednesday of october 2014", dt(2014, 10, 8, 0, 0, 0), "day");
+    check_time_naive("second wednesday of october 2014", dt(2014, 10, 8, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -787,7 +817,7 @@ fn test_time_second_wednesday_of_october_2014() {
 // ============================================================
 #[test]
 fn test_time_third_tuesday_after_christmas_2014() {
-    check_time_value("third tuesday after christmas 2014", dt(2015, 1, 13, 0, 0, 0), "day");
+    check_time_naive("third tuesday after christmas 2014", dt(2015, 1, 13, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -795,423 +825,423 @@ fn test_time_third_tuesday_after_christmas_2014() {
 // ============================================================
 #[test]
 fn test_time_at_3am() {
-    check_time_value("at 3am", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("3 in the AM", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("at 3 AM", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("3 oclock am", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("at three am", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("this morning at 3", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("3 in the morning", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("at 3 in the morning", dt(2013, 2, 13, 3, 0, 0), "hour");
-    check_time_value("early morning @ 3", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("at 3am", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("3 in the AM", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("at 3 AM", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("3 oclock am", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("at three am", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("this morning at 3", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("3 in the morning", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("at 3 in the morning", dt(2013, 2, 13, 3, 0, 0), "hour");
+    check_time_naive("early morning @ 3", dt(2013, 2, 13, 3, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_this_morning_at_10() {
-    check_time_value("this morning @ 10", dt(2013, 2, 12, 10, 0, 0), "hour");
-    check_time_value("this morning at 10am", dt(2013, 2, 12, 10, 0, 0), "hour");
+    check_time_naive("this morning @ 10", dt(2013, 2, 12, 10, 0, 0), "hour");
+    check_time_naive("this morning at 10am", dt(2013, 2, 12, 10, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_3_18am() {
-    check_time_value("3:18am", dt(2013, 2, 13, 3, 18, 0), "minute");
-    check_time_value("3:18a", dt(2013, 2, 13, 3, 18, 0), "minute");
-    check_time_value("3h18", dt(2013, 2, 13, 3, 18, 0), "minute");
+    check_time_naive("3:18am", dt(2013, 2, 13, 3, 18, 0), "minute");
+    check_time_naive("3:18a", dt(2013, 2, 13, 3, 18, 0), "minute");
+    check_time_naive("3h18", dt(2013, 2, 13, 3, 18, 0), "minute");
 }
 
 #[test]
 fn test_time_at_7_in_3_years() {
-    check_time_value("at 7 in 3 years", dt(2016, 2, 1, 7, 0, 0), "hour");
+    check_time_naive("at 7 in 3 years", dt(2016, 2, 1, 7, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_at_3pm() {
-    check_time_value("at 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("@ 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3PM", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3 oclock pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3 o'clock in the afternoon", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3ish pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("3pm approximately", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("at about 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("at 3p", dt(2013, 2, 12, 15, 0, 0), "hour");
-    check_time_value("at 3p.", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("at 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("@ 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3PM", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3 oclock pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3 o'clock in the afternoon", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3ish pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("3pm approximately", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("at about 3pm", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("at 3p", dt(2013, 2, 12, 15, 0, 0), "hour");
+    check_time_naive("at 3p.", dt(2013, 2, 12, 15, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_15h00() {
-    check_time_value("15h00", dt(2013, 2, 12, 15, 0, 0), "minute");
-    check_time_value("at 15h00", dt(2013, 2, 12, 15, 0, 0), "minute");
-    check_time_value("15h", dt(2013, 2, 12, 15, 0, 0), "minute");
-    check_time_value("at 15h", dt(2013, 2, 12, 15, 0, 0), "minute");
+    check_time_naive("15h00", dt(2013, 2, 12, 15, 0, 0), "minute");
+    check_time_naive("at 15h00", dt(2013, 2, 12, 15, 0, 0), "minute");
+    check_time_naive("15h", dt(2013, 2, 12, 15, 0, 0), "minute");
+    check_time_naive("at 15h", dt(2013, 2, 12, 15, 0, 0), "minute");
 }
 
 #[test]
 fn test_time_quarter_past_3pm() {
-    check_time_value("at 15 past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("a quarter past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("for a quarter past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("3:15 in the afternoon", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("15:15", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("15h15", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("3:15pm", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("3:15PM", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("3:15p", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("at 3 15", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("15 minutes past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
-    check_time_value("15 minutes past 15h", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("at 15 past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("a quarter past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("for a quarter past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("3:15 in the afternoon", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("15:15", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("15h15", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("3:15pm", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("3:15PM", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("3:15p", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("at 3 15", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("15 minutes past 3pm", dt(2013, 2, 12, 15, 15, 0), "minute");
+    check_time_naive("15 minutes past 15h", dt(2013, 2, 12, 15, 15, 0), "minute");
 }
 
 #[test]
 fn test_time_20_past_3pm() {
-    check_time_value("at 20 past 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("3:20 in the afternoon", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("3:20 in afternoon", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("twenty after 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("3:20p", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("15h20", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("at three twenty", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("20 minutes past 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("this afternoon at 3:20", dt(2013, 2, 12, 15, 20, 0), "minute");
-    check_time_value("tonight @ 3:20", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("at 20 past 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("3:20 in the afternoon", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("3:20 in afternoon", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("twenty after 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("3:20p", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("15h20", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("at three twenty", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("20 minutes past 3pm", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("this afternoon at 3:20", dt(2013, 2, 12, 15, 20, 0), "minute");
+    check_time_naive("tonight @ 3:20", dt(2013, 2, 12, 15, 20, 0), "minute");
 }
 
 #[test]
 fn test_time_half_past_3pm() {
-    check_time_value("at half past three pm", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("half past 3 pm", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("15:30", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("15h30", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("3:30pm", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("3:30PM", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("330 p.m.", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("3:30 p m", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("3:30", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("half three", dt(2013, 2, 12, 15, 30, 0), "minute");
-    check_time_value("30 minutes past 3 pm", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("at half past three pm", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("half past 3 pm", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("15:30", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("15h30", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("3:30pm", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("3:30PM", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("330 p.m.", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("3:30 p m", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("3:30", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("half three", dt(2013, 2, 12, 15, 30, 0), "minute");
+    check_time_naive("30 minutes past 3 pm", dt(2013, 2, 12, 15, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_quarter_past_noon() {
-    check_time_value("at 15 past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("a quarter past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("for a quarter past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12:15 in the afternoon", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12:15", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12h15", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12:15pm", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12:15PM", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("12:15p", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("at 12 15", dt(2013, 2, 12, 12, 15, 0), "minute");
-    check_time_value("15 minutes past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("at 15 past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("a quarter past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("for a quarter past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12:15 in the afternoon", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12:15", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12h15", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12:15pm", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12:15PM", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("12:15p", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("at 12 15", dt(2013, 2, 12, 12, 15, 0), "minute");
+    check_time_naive("15 minutes past noon", dt(2013, 2, 12, 12, 15, 0), "minute");
 }
 
 #[test]
 fn test_time_nine_fifty_nine_am() {
-    check_time_value("nine fifty nine a m", dt(2013, 2, 12, 9, 59, 0), "minute");
+    check_time_naive("nine fifty nine a m", dt(2013, 2, 12, 9, 59, 0), "minute");
 }
 
 #[test]
 fn test_time_15_23_24() {
-    check_time_value("15:23:24", dt(2013, 2, 12, 15, 23, 24), "second");
+    check_time_naive("15:23:24", dt(2013, 2, 12, 15, 23, 24), "second");
 }
 
 #[test]
 fn test_time_9_01_10_am() {
-    check_time_value("9:01:10 AM", dt(2013, 2, 12, 9, 1, 10), "second");
+    check_time_naive("9:01:10 AM", dt(2013, 2, 12, 9, 1, 10), "second");
 }
 
 #[test]
 fn test_time_quarter_to_noon() {
-    check_time_value("a quarter to noon", dt(2013, 2, 12, 11, 45, 0), "minute");
-    check_time_value("11:45am", dt(2013, 2, 12, 11, 45, 0), "minute");
-    check_time_value("11h45", dt(2013, 2, 12, 11, 45, 0), "minute");
-    check_time_value("15 to noon", dt(2013, 2, 12, 11, 45, 0), "minute");
+    check_time_naive("a quarter to noon", dt(2013, 2, 12, 11, 45, 0), "minute");
+    check_time_naive("11:45am", dt(2013, 2, 12, 11, 45, 0), "minute");
+    check_time_naive("11h45", dt(2013, 2, 12, 11, 45, 0), "minute");
+    check_time_naive("15 to noon", dt(2013, 2, 12, 11, 45, 0), "minute");
 }
 
 #[test]
 fn test_time_quarter_past_1pm() {
-    check_time_value("a quarter past 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
-    check_time_value("for a quarter past 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
-    check_time_value("1:15pm", dt(2013, 2, 12, 13, 15, 0), "minute");
-    check_time_value("13h15", dt(2013, 2, 12, 13, 15, 0), "minute");
-    check_time_value("15 minutes from 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
+    check_time_naive("a quarter past 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
+    check_time_naive("for a quarter past 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
+    check_time_naive("1:15pm", dt(2013, 2, 12, 13, 15, 0), "minute");
+    check_time_naive("13h15", dt(2013, 2, 12, 13, 15, 0), "minute");
+    check_time_naive("15 minutes from 1pm", dt(2013, 2, 12, 13, 15, 0), "minute");
 }
 
 #[test]
 fn test_time_quarter_past_2pm() {
-    check_time_value("a quarter past 2pm", dt(2013, 2, 12, 14, 15, 0), "minute");
-    check_time_value("for a quarter past 2pm", dt(2013, 2, 12, 14, 15, 0), "minute");
+    check_time_naive("a quarter past 2pm", dt(2013, 2, 12, 14, 15, 0), "minute");
+    check_time_naive("for a quarter past 2pm", dt(2013, 2, 12, 14, 15, 0), "minute");
 }
 
 #[test]
 fn test_time_quarter_past_8pm() {
-    check_time_value("a quarter past 8pm", dt(2013, 2, 12, 20, 15, 0), "minute");
-    check_time_value("for a quarter past 8pm", dt(2013, 2, 12, 20, 15, 0), "minute");
+    check_time_naive("a quarter past 8pm", dt(2013, 2, 12, 20, 15, 0), "minute");
+    check_time_naive("for a quarter past 8pm", dt(2013, 2, 12, 20, 15, 0), "minute");
 }
 
 #[test]
 fn test_time_8_tonight() {
-    check_time_value("8 tonight", dt(2013, 2, 12, 20, 0, 0), "hour");
-    check_time_value("tonight at 8 o'clock", dt(2013, 2, 12, 20, 0, 0), "hour");
-    check_time_value("eight tonight", dt(2013, 2, 12, 20, 0, 0), "hour");
-    check_time_value("8 this evening", dt(2013, 2, 12, 20, 0, 0), "hour");
-    check_time_value("at 8 in the evening", dt(2013, 2, 12, 20, 0, 0), "hour");
-    check_time_value("in the evening at eight", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("8 tonight", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("tonight at 8 o'clock", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("eight tonight", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("8 this evening", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("at 8 in the evening", dt(2013, 2, 12, 20, 0, 0), "hour");
+    check_time_naive("in the evening at eight", dt(2013, 2, 12, 20, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_7_30pm_fri_sep_20() {
-    check_time_value("at 7:30 PM on Fri, Sep 20", dt(2013, 9, 20, 19, 30, 0), "minute");
-    check_time_value("at 19h30 on Fri, Sep 20", dt(2013, 9, 20, 19, 30, 0), "minute");
+    check_time_naive("at 7:30 PM on Fri, Sep 20", dt(2013, 9, 20, 19, 30, 0), "minute");
+    check_time_naive("at 19h30 on Fri, Sep 20", dt(2013, 9, 20, 19, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_saturday_at_9am() {
-    check_time_value("at 9am on Saturday", dt(2013, 2, 16, 9, 0, 0), "hour");
-    check_time_value("Saturday morning at 9", dt(2013, 2, 16, 9, 0, 0), "hour");
-    check_time_value("on Saturday for 9am", dt(2013, 2, 16, 9, 0, 0), "hour");
+    check_time_naive("at 9am on Saturday", dt(2013, 2, 16, 9, 0, 0), "hour");
+    check_time_naive("Saturday morning at 9", dt(2013, 2, 16, 9, 0, 0), "hour");
+    check_time_naive("on Saturday for 9am", dt(2013, 2, 16, 9, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_fri_jul_18_2014_7pm() {
-    check_time_value("Fri, Jul 18, 2014 07:00 PM", dt(2014, 7, 18, 19, 0, 0), "minute");
-    check_time_value("Fri, Jul 18, 2014 19h00", dt(2014, 7, 18, 19, 0, 0), "minute");
-    check_time_value("Fri, Jul 18, 2014 19h", dt(2014, 7, 18, 19, 0, 0), "minute");
+    check_time_naive("Fri, Jul 18, 2014 07:00 PM", dt(2014, 7, 18, 19, 0, 0), "minute");
+    check_time_naive("Fri, Jul 18, 2014 19h00", dt(2014, 7, 18, 19, 0, 0), "minute");
+    check_time_naive("Fri, Jul 18, 2014 19h", dt(2014, 7, 18, 19, 0, 0), "minute");
 }
 
 #[test]
 fn test_time_in_a_sec() {
-    check_time_value("in a sec", dt(2013, 2, 12, 4, 30, 1), "second");
-    check_time_value("one second from now", dt(2013, 2, 12, 4, 30, 1), "second");
-    check_time_value("in 1\"", dt(2013, 2, 12, 4, 30, 1), "second");
+    check_time_instant("in a sec", dt(2013, 2, 12, 4, 30, 1), "second");
+    check_time_instant("one second from now", dt(2013, 2, 12, 4, 30, 1), "second");
+    check_time_instant("in 1\"", dt(2013, 2, 12, 4, 30, 1), "second");
 }
 
 #[test]
 fn test_time_in_a_minute() {
-    check_time_value("in a minute", dt(2013, 2, 12, 4, 31, 0), "second");
-    check_time_value("in one minute", dt(2013, 2, 12, 4, 31, 0), "second");
-    check_time_value("in 1'", dt(2013, 2, 12, 4, 31, 0), "second");
+    check_time_instant("in a minute", dt(2013, 2, 12, 4, 31, 0), "second");
+    check_time_instant("in one minute", dt(2013, 2, 12, 4, 31, 0), "second");
+    check_time_instant("in 1'", dt(2013, 2, 12, 4, 31, 0), "second");
 }
 
 #[test]
 fn test_time_in_2_minutes() {
-    check_time_value("in 2 minutes", dt(2013, 2, 12, 4, 32, 0), "second");
-    check_time_value("in 2 more minutes", dt(2013, 2, 12, 4, 32, 0), "second");
-    check_time_value("2 minutes from now", dt(2013, 2, 12, 4, 32, 0), "second");
-    check_time_value("in a couple of minutes", dt(2013, 2, 12, 4, 32, 0), "second");
-    check_time_value("in a pair of minutes", dt(2013, 2, 12, 4, 32, 0), "second");
+    check_time_instant("in 2 minutes", dt(2013, 2, 12, 4, 32, 0), "second");
+    check_time_instant("in 2 more minutes", dt(2013, 2, 12, 4, 32, 0), "second");
+    check_time_instant("2 minutes from now", dt(2013, 2, 12, 4, 32, 0), "second");
+    check_time_instant("in a couple of minutes", dt(2013, 2, 12, 4, 32, 0), "second");
+    check_time_instant("in a pair of minutes", dt(2013, 2, 12, 4, 32, 0), "second");
 }
 
 #[test]
 fn test_time_in_three_minutes() {
-    check_time_value("in three minutes", dt(2013, 2, 12, 4, 33, 0), "second");
-    check_time_value("in a few minutes", dt(2013, 2, 12, 4, 33, 0), "second");
+    check_time_instant("in three minutes", dt(2013, 2, 12, 4, 33, 0), "second");
+    check_time_instant("in a few minutes", dt(2013, 2, 12, 4, 33, 0), "second");
 }
 
 #[test]
 fn test_time_in_60_minutes() {
-    check_time_value("in 60 minutes", dt(2013, 2, 12, 5, 30, 0), "second");
+    check_time_instant("in 60 minutes", dt(2013, 2, 12, 5, 30, 0), "second");
 }
 
 #[test]
 fn test_time_in_quarter_of_an_hour() {
-    check_time_value("in a quarter of an hour", dt(2013, 2, 12, 4, 45, 0), "second");
-    check_time_value("in 1/4h", dt(2013, 2, 12, 4, 45, 0), "second");
-    check_time_value("in 1/4 h", dt(2013, 2, 12, 4, 45, 0), "second");
-    check_time_value("in 1/4 hour", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in a quarter of an hour", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 1/4h", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 1/4 h", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 1/4 hour", dt(2013, 2, 12, 4, 45, 0), "second");
 }
 
 #[test]
 fn test_time_in_half_an_hour() {
-    check_time_value("in half an hour", dt(2013, 2, 12, 5, 0, 0), "second");
-    check_time_value("in 1/2h", dt(2013, 2, 12, 5, 0, 0), "second");
-    check_time_value("in 1/2 h", dt(2013, 2, 12, 5, 0, 0), "second");
-    check_time_value("in 1/2 hour", dt(2013, 2, 12, 5, 0, 0), "second");
+    check_time_instant("in half an hour", dt(2013, 2, 12, 5, 0, 0), "second");
+    check_time_instant("in 1/2h", dt(2013, 2, 12, 5, 0, 0), "second");
+    check_time_instant("in 1/2 h", dt(2013, 2, 12, 5, 0, 0), "second");
+    check_time_instant("in 1/2 hour", dt(2013, 2, 12, 5, 0, 0), "second");
 }
 
 #[test]
 fn test_time_in_three_quarters_of_an_hour() {
-    check_time_value("in three-quarters of an hour", dt(2013, 2, 12, 5, 15, 0), "second");
-    check_time_value("in 3/4h", dt(2013, 2, 12, 5, 15, 0), "second");
-    check_time_value("in 3/4 h", dt(2013, 2, 12, 5, 15, 0), "second");
-    check_time_value("in 3/4 hour", dt(2013, 2, 12, 5, 15, 0), "second");
+    check_time_instant("in three-quarters of an hour", dt(2013, 2, 12, 5, 15, 0), "second");
+    check_time_instant("in 3/4h", dt(2013, 2, 12, 5, 15, 0), "second");
+    check_time_instant("in 3/4 h", dt(2013, 2, 12, 5, 15, 0), "second");
+    check_time_instant("in 3/4 hour", dt(2013, 2, 12, 5, 15, 0), "second");
 }
 
 #[test]
 fn test_time_in_2_5_hours() {
-    check_time_value("in 2.5 hours", dt(2013, 2, 12, 7, 0, 0), "second");
-    check_time_value("in 2 and an half hours", dt(2013, 2, 12, 7, 0, 0), "second");
+    check_time_instant("in 2.5 hours", dt(2013, 2, 12, 7, 0, 0), "second");
+    check_time_instant("in 2 and an half hours", dt(2013, 2, 12, 7, 0, 0), "second");
 }
 
 #[test]
 fn test_time_in_one_hour() {
-    check_time_value("in one hour", dt(2013, 2, 12, 5, 30, 0), "minute");
-    check_time_value("in 1h", dt(2013, 2, 12, 5, 30, 0), "minute");
+    check_time_instant("in one hour", dt(2013, 2, 12, 5, 30, 0), "minute");
+    check_time_instant("in 1h", dt(2013, 2, 12, 5, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_in_a_couple_hours() {
-    check_time_value("in a couple hours", dt(2013, 2, 12, 6, 30, 0), "minute");
-    check_time_value("in a couple of hours", dt(2013, 2, 12, 6, 30, 0), "minute");
+    check_time_instant("in a couple hours", dt(2013, 2, 12, 6, 30, 0), "minute");
+    check_time_instant("in a couple of hours", dt(2013, 2, 12, 6, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_in_a_few_hours() {
-    check_time_value("in a few hours", dt(2013, 2, 12, 7, 30, 0), "minute");
-    check_time_value("in few hours", dt(2013, 2, 12, 7, 30, 0), "minute");
+    check_time_instant("in a few hours", dt(2013, 2, 12, 7, 30, 0), "minute");
+    check_time_instant("in few hours", dt(2013, 2, 12, 7, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_in_24_hours() {
-    check_time_value("in 24 hours", dt(2013, 2, 13, 4, 30, 0), "minute");
+    check_time_instant("in 24 hours", dt(2013, 2, 13, 4, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_in_a_day() {
-    check_time_value("in a day", dt(2013, 2, 13, 4, 0, 0), "hour");
-    check_time_value("a day from now", dt(2013, 2, 13, 4, 0, 0), "hour");
+    check_time_instant("in a day", dt(2013, 2, 13, 4, 0, 0), "hour");
+    check_time_instant("a day from now", dt(2013, 2, 13, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_a_day_from_right_now() {
-    check_time_value("a day from right now", dt(2013, 2, 13, 4, 30, 0), "second");
+    check_time_instant("a day from right now", dt(2013, 2, 13, 4, 30, 0), "second");
 }
 
 #[test]
 fn test_time_3_years_from_today() {
-    check_time_value("3 years from today", dt(2016, 2, 12, 0, 0, 0), "day");
+    check_time_naive("3 years from today", dt(2016, 2, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_3_fridays_from_now() {
-    check_time_value("3 fridays from now", dt(2013, 3, 1, 0, 0, 0), "day");
-    check_time_value("three fridays from now", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("3 fridays from now", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("three fridays from now", dt(2013, 3, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_2_sundays_from_now() {
-    check_time_value("2 sundays from now", dt(2013, 2, 24, 0, 0, 0), "day");
-    check_time_value("two sundays from now", dt(2013, 2, 24, 0, 0, 0), "day");
+    check_time_naive("2 sundays from now", dt(2013, 2, 24, 0, 0, 0), "day");
+    check_time_naive("two sundays from now", dt(2013, 2, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_4_tuesdays_from_now() {
-    check_time_value("4 tuesdays from now", dt(2013, 3, 12, 0, 0, 0), "day");
-    check_time_value("four tuesdays from now", dt(2013, 3, 12, 0, 0, 0), "day");
+    check_time_naive("4 tuesdays from now", dt(2013, 3, 12, 0, 0, 0), "day");
+    check_time_naive("four tuesdays from now", dt(2013, 3, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_in_7_days() {
-    check_time_value("in 7 days", dt(2013, 2, 19, 4, 0, 0), "hour");
+    check_time_instant("in 7 days", dt(2013, 2, 19, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_in_7_days_at_5pm() {
-    check_time_value("in 7 days at 5pm", dt(2013, 2, 19, 17, 0, 0), "hour");
+    check_time_instant("in 7 days at 5pm", dt(2013, 2, 19, 17, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_in_4_years_at_5pm() {
-    check_time_value("in 4 years at 5pm", dt(2017, 2, 1, 17, 0, 0), "hour");
+    check_time_instant("in 4 years at 5pm", dt(2017, 2, 1, 17, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_in_1_week() {
-    check_time_value("in 1 week", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("in a week", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_instant("in 1 week", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_instant("in a week", dt(2013, 2, 19, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_in_about_half_an_hour() {
-    check_time_value("in about half an hour", dt(2013, 2, 12, 5, 0, 0), "second");
+    check_time_instant("in about half an hour", dt(2013, 2, 12, 5, 0, 0), "second");
 }
 
 #[test]
 fn test_time_7_days_ago() {
-    check_time_value("7 days ago", dt(2013, 2, 5, 4, 0, 0), "hour");
+    check_time_instant("7 days ago", dt(2013, 2, 5, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_14_days_ago() {
-    check_time_value("14 days Ago", dt(2013, 1, 29, 4, 0, 0), "hour");
-    check_time_value("a fortnight ago", dt(2013, 1, 29, 4, 0, 0), "hour");
+    check_time_instant("14 days Ago", dt(2013, 1, 29, 4, 0, 0), "hour");
+    check_time_instant("a fortnight ago", dt(2013, 1, 29, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_a_week_ago() {
-    check_time_value("a week ago", dt(2013, 2, 5, 0, 0, 0), "day");
-    check_time_value("one week ago", dt(2013, 2, 5, 0, 0, 0), "day");
-    check_time_value("1 week ago", dt(2013, 2, 5, 0, 0, 0), "day");
+    check_time_instant("a week ago", dt(2013, 2, 5, 0, 0, 0), "day");
+    check_time_instant("one week ago", dt(2013, 2, 5, 0, 0, 0), "day");
+    check_time_instant("1 week ago", dt(2013, 2, 5, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_2_thursdays_ago() {
-    check_time_value("2 thursdays back", dt(2013, 1, 31, 0, 0, 0), "day");
-    check_time_value("2 thursdays ago", dt(2013, 1, 31, 0, 0, 0), "day");
+    check_time_naive("2 thursdays back", dt(2013, 1, 31, 0, 0, 0), "day");
+    check_time_naive("2 thursdays ago", dt(2013, 1, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_three_weeks_ago() {
-    check_time_value("three weeks ago", dt(2013, 1, 22, 0, 0, 0), "day");
+    check_time_instant("three weeks ago", dt(2013, 1, 22, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_three_months_ago() {
-    check_time_value("three months ago", dt(2012, 11, 12, 0, 0, 0), "day");
+    check_time_instant("three months ago", dt(2012, 11, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_first_monday_of_this_month() {
-    check_time_value("the first Monday of this month", dt(2013, 2, 4, 0, 0, 0), "day");
-    check_time_value("the first Monday of the month", dt(2013, 2, 4, 0, 0, 0), "day");
-    check_time_value("the first Monday in this month", dt(2013, 2, 4, 0, 0, 0), "day");
-    check_time_value("first Monday in the month", dt(2013, 2, 4, 0, 0, 0), "day");
+    check_time_naive("the first Monday of this month", dt(2013, 2, 4, 0, 0, 0), "day");
+    check_time_naive("the first Monday of the month", dt(2013, 2, 4, 0, 0, 0), "day");
+    check_time_naive("the first Monday in this month", dt(2013, 2, 4, 0, 0, 0), "day");
+    check_time_naive("first Monday in the month", dt(2013, 2, 4, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_two_years_ago() {
-    check_time_value("two years ago", dt(2011, 2, 1, 0, 0, 0), "month");
+    check_time_instant("two years ago", dt(2011, 2, 1, 0, 0, 0), "month");
 }
 
 #[test]
 fn test_time_7_days_hence() {
-    check_time_value("7 days hence", dt(2013, 2, 19, 4, 0, 0), "hour");
+    check_time_instant("7 days hence", dt(2013, 2, 19, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_14_days_hence() {
-    check_time_value("14 days hence", dt(2013, 2, 26, 4, 0, 0), "hour");
-    check_time_value("a fortnight hence", dt(2013, 2, 26, 4, 0, 0), "hour");
+    check_time_instant("14 days hence", dt(2013, 2, 26, 4, 0, 0), "hour");
+    check_time_instant("a fortnight hence", dt(2013, 2, 26, 4, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_a_week_hence() {
-    check_time_value("a week hence", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("one week hence", dt(2013, 2, 19, 0, 0, 0), "day");
-    check_time_value("1 week hence", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_instant("a week hence", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_instant("one week hence", dt(2013, 2, 19, 0, 0, 0), "day");
+    check_time_instant("1 week hence", dt(2013, 2, 19, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_three_weeks_hence() {
-    check_time_value("three weeks hence", dt(2013, 3, 5, 0, 0, 0), "day");
+    check_time_instant("three weeks hence", dt(2013, 3, 5, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_three_months_hence() {
-    check_time_value("three months hence", dt(2013, 5, 12, 0, 0, 0), "day");
+    check_time_instant("three months hence", dt(2013, 5, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_two_years_hence() {
-    check_time_value("two years hence", dt(2015, 2, 1, 0, 0, 0), "month");
+    check_time_instant("two years hence", dt(2015, 2, 1, 0, 0, 0), "month");
 }
 
 #[test]
 fn test_time_one_year_after_christmas() {
-    check_time_value("one year After christmas", dt(2013, 12, 25, 0, 0, 0), "day");
-    check_time_value("a year from Christmas", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("one year After christmas", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("a year from Christmas", dt(2013, 12, 25, 0, 0, 0), "day");
 }
 
 #[test]
@@ -1276,14 +1306,14 @@ fn test_time_late_last_night() {
 
 #[test]
 fn test_time_christmas() {
-    check_time_value("xmas", dt(2013, 12, 25, 0, 0, 0), "day");
-    check_time_value("christmas", dt(2013, 12, 25, 0, 0, 0), "day");
-    check_time_value("christmas day", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("xmas", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("christmas", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("christmas day", dt(2013, 12, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_xmas_at_6pm() {
-    check_time_value("xmas at 6 pm", dt(2013, 12, 25, 18, 0, 0), "hour");
+    check_time_naive("xmas at 6 pm", dt(2013, 12, 25, 18, 0, 0), "hour");
 }
 
 #[test]
@@ -1310,161 +1340,161 @@ fn test_time_morning_of_xmas() {
 
 #[test]
 fn test_time_new_years_eve() {
-    check_time_value("new year's eve", dt(2013, 12, 31, 0, 0, 0), "day");
-    check_time_value("new years eve", dt(2013, 12, 31, 0, 0, 0), "day");
+    check_time_naive("new year's eve", dt(2013, 12, 31, 0, 0, 0), "day");
+    check_time_naive("new years eve", dt(2013, 12, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_new_years_day() {
-    check_time_value("new year's day", dt(2014, 1, 1, 0, 0, 0), "day");
-    check_time_value("new years day", dt(2014, 1, 1, 0, 0, 0), "day");
+    check_time_naive("new year's day", dt(2014, 1, 1, 0, 0, 0), "day");
+    check_time_naive("new years day", dt(2014, 1, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_valentines_day() {
-    check_time_value("valentine's day", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("valentine day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("valentine's day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("valentine day", dt(2013, 2, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_4th_of_july() {
-    check_time_value("4th of July", dt(2013, 7, 4, 0, 0, 0), "day");
-    check_time_value("4 of july", dt(2013, 7, 4, 0, 0, 0), "day");
+    check_time_naive("4th of July", dt(2013, 7, 4, 0, 0, 0), "day");
+    check_time_naive("4 of july", dt(2013, 7, 4, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_halloween() {
-    check_time_value("halloween", dt(2013, 10, 31, 0, 0, 0), "day");
-    check_time_value("next halloween", dt(2013, 10, 31, 0, 0, 0), "day");
-    check_time_value("Halloween 2013", dt(2013, 10, 31, 0, 0, 0), "day");
+    check_time_naive("halloween", dt(2013, 10, 31, 0, 0, 0), "day");
+    check_time_naive("next halloween", dt(2013, 10, 31, 0, 0, 0), "day");
+    check_time_naive("Halloween 2013", dt(2013, 10, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_black_friday() {
-    check_time_value("black friday", dt(2013, 11, 29, 0, 0, 0), "day");
-    check_time_value("black friday of this year", dt(2013, 11, 29, 0, 0, 0), "day");
-    check_time_value("black friday 2013", dt(2013, 11, 29, 0, 0, 0), "day");
+    check_time_naive("black friday", dt(2013, 11, 29, 0, 0, 0), "day");
+    check_time_naive("black friday of this year", dt(2013, 11, 29, 0, 0, 0), "day");
+    check_time_naive("black friday 2013", dt(2013, 11, 29, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_black_friday_2017() {
-    check_time_value("black friday 2017", dt(2017, 11, 24, 0, 0, 0), "day");
+    check_time_naive("black friday 2017", dt(2017, 11, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_boss_day() {
-    check_time_value("boss's day", dt(2013, 10, 16, 0, 0, 0), "day");
-    check_time_value("boss's", dt(2013, 10, 16, 0, 0, 0), "day");
-    check_time_value("boss day", dt(2013, 10, 16, 0, 0, 0), "day");
-    check_time_value("next boss's day", dt(2013, 10, 16, 0, 0, 0), "day");
+    check_time_naive("boss's day", dt(2013, 10, 16, 0, 0, 0), "day");
+    check_time_naive("boss's", dt(2013, 10, 16, 0, 0, 0), "day");
+    check_time_naive("boss day", dt(2013, 10, 16, 0, 0, 0), "day");
+    check_time_naive("next boss's day", dt(2013, 10, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_boss_day_2016() {
-    check_time_value("boss's day 2016", dt(2016, 10, 17, 0, 0, 0), "day");
+    check_time_naive("boss's day 2016", dt(2016, 10, 17, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_boss_day_2021() {
-    check_time_value("boss's day 2021", dt(2021, 10, 15, 0, 0, 0), "day");
+    check_time_naive("boss's day 2021", dt(2021, 10, 15, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_mlk_day() {
-    check_time_value("MLK day", dt(2014, 1, 20, 0, 0, 0), "day");
-    check_time_value("next Martin Luther King day", dt(2014, 1, 20, 0, 0, 0), "day");
-    check_time_value("next Martin Luther King's day", dt(2014, 1, 20, 0, 0, 0), "day");
-    check_time_value("next Martin Luther Kings day", dt(2014, 1, 20, 0, 0, 0), "day");
-    check_time_value("this MLK day", dt(2014, 1, 20, 0, 0, 0), "day");
+    check_time_naive("MLK day", dt(2014, 1, 20, 0, 0, 0), "day");
+    check_time_naive("next Martin Luther King day", dt(2014, 1, 20, 0, 0, 0), "day");
+    check_time_naive("next Martin Luther King's day", dt(2014, 1, 20, 0, 0, 0), "day");
+    check_time_naive("next Martin Luther Kings day", dt(2014, 1, 20, 0, 0, 0), "day");
+    check_time_naive("this MLK day", dt(2014, 1, 20, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_last_mlk_day() {
-    check_time_value("last MLK Jr. day", dt(2013, 1, 21, 0, 0, 0), "day");
-    check_time_value("MLK day 2013", dt(2013, 1, 21, 0, 0, 0), "day");
+    check_time_naive("last MLK Jr. day", dt(2013, 1, 21, 0, 0, 0), "day");
+    check_time_naive("MLK day 2013", dt(2013, 1, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_mlk_day_last_year() {
-    check_time_value("MLK day of last year", dt(2012, 1, 16, 0, 0, 0), "day");
-    check_time_value("MLK day 2012", dt(2012, 1, 16, 0, 0, 0), "day");
-    check_time_value("Civil Rights Day of last year", dt(2012, 1, 16, 0, 0, 0), "day");
+    check_time_naive("MLK day of last year", dt(2012, 1, 16, 0, 0, 0), "day");
+    check_time_naive("MLK day 2012", dt(2012, 1, 16, 0, 0, 0), "day");
+    check_time_naive("Civil Rights Day of last year", dt(2012, 1, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_world_vegan_day() {
-    check_time_value("world vegan day", dt(2013, 11, 1, 0, 0, 0), "day");
+    check_time_naive("world vegan day", dt(2013, 11, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_easter() {
-    check_time_value("easter", dt(2013, 3, 31, 0, 0, 0), "day");
-    check_time_value("easter 2013", dt(2013, 3, 31, 0, 0, 0), "day");
+    check_time_naive("easter", dt(2013, 3, 31, 0, 0, 0), "day");
+    check_time_naive("easter 2013", dt(2013, 3, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_last_easter() {
-    check_time_value("last easter", dt(2012, 4, 8, 0, 0, 0), "day");
+    check_time_naive("last easter", dt(2012, 4, 8, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_easter_monday() {
-    check_time_value("easter mon", dt(2013, 4, 1, 0, 0, 0), "day");
+    check_time_naive("easter mon", dt(2013, 4, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_easter_2010() {
-    check_time_value("easter 2010", dt(2010, 4, 4, 0, 0, 0), "day");
-    check_time_value("Easter Sunday two thousand ten", dt(2010, 4, 4, 0, 0, 0), "day");
+    check_time_naive("easter 2010", dt(2010, 4, 4, 0, 0, 0), "day");
+    check_time_naive("Easter Sunday two thousand ten", dt(2010, 4, 4, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_three_days_after_easter() {
-    check_time_value("three days after Easter", dt(2013, 4, 3, 0, 0, 0), "day");
+    check_time_naive("three days after Easter", dt(2013, 4, 3, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_maundy_thursday() {
-    check_time_value("Maundy Thursday", dt(2013, 3, 28, 0, 0, 0), "day");
-    check_time_value("Covenant thu", dt(2013, 3, 28, 0, 0, 0), "day");
-    check_time_value("Thu of Mysteries", dt(2013, 3, 28, 0, 0, 0), "day");
+    check_time_naive("Maundy Thursday", dt(2013, 3, 28, 0, 0, 0), "day");
+    check_time_naive("Covenant thu", dt(2013, 3, 28, 0, 0, 0), "day");
+    check_time_naive("Thu of Mysteries", dt(2013, 3, 28, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_pentecost() {
-    check_time_value("Pentecost", dt(2013, 5, 19, 0, 0, 0), "day");
-    check_time_value("white sunday 2013", dt(2013, 5, 19, 0, 0, 0), "day");
+    check_time_naive("Pentecost", dt(2013, 5, 19, 0, 0, 0), "day");
+    check_time_naive("white sunday 2013", dt(2013, 5, 19, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_whit_monday() {
-    check_time_value("whit monday", dt(2013, 5, 20, 0, 0, 0), "day");
-    check_time_value("Monday of the Holy Spirit", dt(2013, 5, 20, 0, 0, 0), "day");
+    check_time_naive("whit monday", dt(2013, 5, 20, 0, 0, 0), "day");
+    check_time_naive("Monday of the Holy Spirit", dt(2013, 5, 20, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_palm_sunday() {
-    check_time_value("palm sunday", dt(2013, 3, 24, 0, 0, 0), "day");
-    check_time_value("branch sunday 2013", dt(2013, 3, 24, 0, 0, 0), "day");
+    check_time_naive("palm sunday", dt(2013, 3, 24, 0, 0, 0), "day");
+    check_time_naive("branch sunday 2013", dt(2013, 3, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_trinity_sunday() {
-    check_time_value("trinity sunday", dt(2013, 5, 26, 0, 0, 0), "day");
+    check_time_naive("trinity sunday", dt(2013, 5, 26, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_pancake_day() {
-    check_time_value("pancake day 2013", dt(2013, 2, 12, 0, 0, 0), "day");
-    check_time_value("mardi gras", dt(2013, 2, 12, 0, 0, 0), "day");
+    check_time_naive("pancake day 2013", dt(2013, 2, 12, 0, 0, 0), "day");
+    check_time_naive("mardi gras", dt(2013, 2, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_st_patricks_day() {
-    check_time_value("st patrick's day 2013", dt(2013, 3, 17, 0, 0, 0), "day");
-    check_time_value("st paddy's day", dt(2013, 3, 17, 0, 0, 0), "day");
-    check_time_value("saint paddy's day", dt(2013, 3, 17, 0, 0, 0), "day");
-    check_time_value("saint patricks day", dt(2013, 3, 17, 0, 0, 0), "day");
+    check_time_naive("st patrick's day 2013", dt(2013, 3, 17, 0, 0, 0), "day");
+    check_time_naive("st paddy's day", dt(2013, 3, 17, 0, 0, 0), "day");
+    check_time_naive("saint paddy's day", dt(2013, 3, 17, 0, 0, 0), "day");
+    check_time_naive("saint patricks day", dt(2013, 3, 17, 0, 0, 0), "day");
 }
 
 #[test]
@@ -1479,19 +1509,19 @@ fn test_time_lent_2018() {
 
 #[test]
 fn test_time_orthodox_easter_2018() {
-    check_time_value("orthodox easter 2018", dt(2018, 4, 8, 0, 0, 0), "day");
+    check_time_naive("orthodox easter 2018", dt(2018, 4, 8, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_orthodox_good_friday_2020() {
-    check_time_value("orthodox good friday 2020", dt(2020, 4, 17, 0, 0, 0), "day");
-    check_time_value("orthodox great friday 2020", dt(2020, 4, 17, 0, 0, 0), "day");
+    check_time_naive("orthodox good friday 2020", dt(2020, 4, 17, 0, 0, 0), "day");
+    check_time_naive("orthodox great friday 2020", dt(2020, 4, 17, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_clean_monday_2018() {
-    check_time_value("clean monday 2018", dt(2018, 2, 19, 0, 0, 0), "day");
-    check_time_value(
+    check_time_naive("clean monday 2018", dt(2018, 2, 19, 0, 0, 0), "day");
+    check_time_naive(
         "orthodox shrove monday two thousand eighteen",
         dt(2018, 2, 19, 0, 0, 0),
         "day",
@@ -1500,7 +1530,7 @@ fn test_time_clean_monday_2018() {
 
 #[test]
 fn test_time_lazarus_saturday_2018() {
-    check_time_value("lazarus saturday 2018", dt(2018, 3, 31, 0, 0, 0), "day");
+    check_time_naive("lazarus saturday 2018", dt(2018, 3, 31, 0, 0, 0), "day");
 }
 
 #[test]
@@ -2345,7 +2375,7 @@ fn test_time_1130_to_130() {
 
 #[test]
 fn test_time_130pm_sat_sep_21() {
-    check_time_value(
+    check_time_naive(
         "1:30 PM on Sat, Sep 21",
         dt(2013, 9, 21, 13, 30, 0),
         "minute",
@@ -2502,53 +2532,53 @@ fn test_time_by_end_of_next_month() {
 
 #[test]
 fn test_time_4pm_cet() {
-    check_time_value("4pm CET", dt(2013, 2, 12, 13, 0, 0), "minute");
+    check_time_instant("4pm CET", dt(2013, 2, 12, 13, 0, 0), "minute");
 }
 
 #[test]
 fn test_time_thursday_8_gmt() {
-    check_time_value("Thursday 8:00 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 8:00 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 8h00 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 8h00 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 8h GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 8h gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thu at 8 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thu at 8 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 9 am BST", dt(2013, 2, 14, 6, 0, 0), "minute");
-    check_time_value("Thursday 9 am (BST)", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8:00 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8:00 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8h00 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8h00 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8h GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 8h gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thu at 8 GMT", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thu at 8 gmt", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 9 am BST", dt(2013, 2, 14, 6, 0, 0), "minute");
+    check_time_instant("Thursday 9 am (BST)", dt(2013, 2, 14, 6, 0, 0), "minute");
 }
 
 #[test]
 fn test_time_thursday_8_pst() {
-    check_time_value("Thursday 8:00 PST", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday 8:00 pst", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday 8h00 PST", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday 8h00 pst", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday 8h PST", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday 8h pst", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thu at 8 am PST", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thu at 8 am pst", dt(2013, 2, 14, 14, 0, 0), "minute");
-    check_time_value("Thursday at 9:30pm ist", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8:00 PST", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8:00 pst", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8h00 PST", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8h00 pst", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8h PST", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday 8h pst", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thu at 8 am PST", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thu at 8 am pst", dt(2013, 2, 14, 14, 0, 0), "minute");
+    check_time_instant("Thursday at 9:30pm ist", dt(2013, 2, 14, 14, 0, 0), "minute");
 }
 
 #[test]
 fn test_time_today_at_2pm() {
-    check_time_value("today at 2pm", dt(2013, 2, 12, 14, 0, 0), "hour");
-    check_time_value("at 2pm", dt(2013, 2, 12, 14, 0, 0), "hour");
-    check_time_value("this afternoon at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
-    check_time_value("this evening at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
-    check_time_value("tonight at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
+    check_time_naive("today at 2pm", dt(2013, 2, 12, 14, 0, 0), "hour");
+    check_time_naive("at 2pm", dt(2013, 2, 12, 14, 0, 0), "hour");
+    check_time_naive("this afternoon at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
+    check_time_naive("this evening at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
+    check_time_naive("tonight at 2", dt(2013, 2, 12, 14, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_3pm_tomorrow() {
-    check_time_value("3pm tomorrow", dt(2013, 2, 13, 15, 0, 0), "hour");
+    check_time_naive("3pm tomorrow", dt(2013, 2, 13, 15, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_today_in_one_hour() {
-    check_time_value("today in one hour", dt(2013, 2, 12, 5, 30, 0), "minute");
+    check_time_naive("today in one hour", dt(2013, 2, 12, 5, 30, 0), "minute");
 }
 
 #[test]
@@ -2614,17 +2644,17 @@ fn test_time_8am_until_6() {
 
 #[test]
 fn test_time_at_130pm() {
-    check_time_value("at 1:30pm", dt(2013, 2, 12, 13, 30, 0), "minute");
-    check_time_value("1:30pm", dt(2013, 2, 12, 13, 30, 0), "minute");
-    check_time_value("at 13h30", dt(2013, 2, 12, 13, 30, 0), "minute");
-    check_time_value("13h30", dt(2013, 2, 12, 13, 30, 0), "minute");
+    check_time_naive("at 1:30pm", dt(2013, 2, 12, 13, 30, 0), "minute");
+    check_time_naive("1:30pm", dt(2013, 2, 12, 13, 30, 0), "minute");
+    check_time_naive("at 13h30", dt(2013, 2, 12, 13, 30, 0), "minute");
+    check_time_naive("13h30", dt(2013, 2, 12, 13, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_in_15_minutes() {
-    check_time_value("in 15 minutes", dt(2013, 2, 12, 4, 45, 0), "second");
-    check_time_value("in 15'", dt(2013, 2, 12, 4, 45, 0), "second");
-    check_time_value("in 15", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 15 minutes", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 15'", dt(2013, 2, 12, 4, 45, 0), "second");
+    check_time_instant("in 15", dt(2013, 2, 12, 4, 45, 0), "second");
 }
 
 #[test]
@@ -2649,8 +2679,8 @@ fn test_time_after_school() {
 
 #[test]
 fn test_time_1030() {
-    check_time_value("10:30", dt(2013, 2, 12, 10, 30, 0), "minute");
-    check_time_value("approximately 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("10:30", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("approximately 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
 }
 
 #[test]
@@ -2665,60 +2695,60 @@ fn test_time_this_morning() {
 
 #[test]
 fn test_time_next_monday() {
-    check_time_value("next monday", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("next monday", dt(2013, 2, 18, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_at_noon() {
-    check_time_value("at 12pm", dt(2013, 2, 12, 12, 0, 0), "hour");
-    check_time_value("at noon", dt(2013, 2, 12, 12, 0, 0), "hour");
-    check_time_value("midday", dt(2013, 2, 12, 12, 0, 0), "hour");
-    check_time_value("the midday", dt(2013, 2, 12, 12, 0, 0), "hour");
-    check_time_value("mid day", dt(2013, 2, 12, 12, 0, 0), "hour");
+    check_time_naive("at 12pm", dt(2013, 2, 12, 12, 0, 0), "hour");
+    check_time_naive("at noon", dt(2013, 2, 12, 12, 0, 0), "hour");
+    check_time_naive("midday", dt(2013, 2, 12, 12, 0, 0), "hour");
+    check_time_naive("the midday", dt(2013, 2, 12, 12, 0, 0), "hour");
+    check_time_naive("mid day", dt(2013, 2, 12, 12, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_at_midnight() {
-    check_time_value("at 12am", dt(2013, 2, 13, 0, 0, 0), "hour");
-    check_time_value("at midnight", dt(2013, 2, 13, 0, 0, 0), "hour");
-    check_time_value("this morning at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
-    check_time_value("this evening at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
-    check_time_value("this afternoon at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
+    check_time_naive("at 12am", dt(2013, 2, 13, 0, 0, 0), "hour");
+    check_time_naive("at midnight", dt(2013, 2, 13, 0, 0, 0), "hour");
+    check_time_naive("this morning at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
+    check_time_naive("this evening at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
+    check_time_naive("this afternoon at 12", dt(2013, 2, 13, 0, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_9_tomorrow_morning() {
-    check_time_value("9 tomorrow morning", dt(2013, 2, 13, 9, 0, 0), "hour");
-    check_time_value("9 tomorrow", dt(2013, 2, 13, 9, 0, 0), "hour");
+    check_time_naive("9 tomorrow morning", dt(2013, 2, 13, 9, 0, 0), "hour");
+    check_time_naive("9 tomorrow", dt(2013, 2, 13, 9, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_9_tomorrow_evening() {
-    check_time_value("9 tomorrow evening", dt(2013, 2, 13, 21, 0, 0), "hour");
+    check_time_naive("9 tomorrow evening", dt(2013, 2, 13, 21, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_march() {
-    check_time_value("March", dt(2013, 3, 1, 0, 0, 0), "month");
-    check_time_value("in March", dt(2013, 3, 1, 0, 0, 0), "month");
-    check_time_value("during March", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("March", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("in March", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("during March", dt(2013, 3, 1, 0, 0, 0), "month");
 }
 
 #[test]
 fn test_time_tomorrow_afternoon_at_5() {
-    check_time_value(
+    check_time_naive(
         "tomorrow afternoon at 5",
         dt(2013, 2, 13, 17, 0, 0),
         "hour",
     );
-    check_time_value(
+    check_time_naive(
         "at 5 tomorrow afternoon",
         dt(2013, 2, 13, 17, 0, 0),
         "hour",
     );
-    check_time_value("at 5pm tomorrow", dt(2013, 2, 13, 17, 0, 0), "hour");
-    check_time_value("tomorrow at 5pm", dt(2013, 2, 13, 17, 0, 0), "hour");
-    check_time_value(
+    check_time_naive("at 5pm tomorrow", dt(2013, 2, 13, 17, 0, 0), "hour");
+    check_time_naive("tomorrow at 5pm", dt(2013, 2, 13, 17, 0, 0), "hour");
+    check_time_naive(
         "tomorrow evening at 5",
         dt(2013, 2, 13, 17, 0, 0),
         "hour",
@@ -2753,50 +2783,50 @@ fn test_time_1pm_to_2pm_tomorrow() {
 
 #[test]
 fn test_time_on_the_first() {
-    check_time_value("on the first", dt(2013, 3, 1, 0, 0, 0), "day");
-    check_time_value("the 1st", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("on the first", dt(2013, 3, 1, 0, 0, 0), "day");
+    check_time_naive("the 1st", dt(2013, 3, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_time_at_1030_am() {
-    check_time_value("at 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
-    check_time_value("around 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
-    check_time_value("ten thirty am", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("at 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("around 1030", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("ten thirty am", dt(2013, 2, 12, 10, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_730_in_the_evening() {
-    check_time_value(
+    check_time_naive(
         "at 730 in the evening",
         dt(2013, 2, 12, 19, 30, 0),
         "minute",
     );
-    check_time_value("seven thirty p.m.", dt(2013, 2, 12, 19, 30, 0), "minute");
+    check_time_naive("seven thirty p.m.", dt(2013, 2, 12, 19, 30, 0), "minute");
 }
 
 #[test]
 fn test_time_tomorrow_at_150ish() {
-    check_time_value("tomorrow at 150ish", dt(2013, 2, 13, 1, 50, 0), "minute");
+    check_time_naive("tomorrow at 150ish", dt(2013, 2, 13, 1, 50, 0), "minute");
 }
 
 #[test]
 fn test_time_tonight_at_11() {
-    check_time_value("tonight at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
-    check_time_value("this evening at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
-    check_time_value("this afternoon at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
-    check_time_value("tonight at 11pm", dt(2013, 2, 12, 23, 0, 0), "hour");
+    check_time_naive("tonight at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
+    check_time_naive("this evening at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
+    check_time_naive("this afternoon at 11", dt(2013, 2, 12, 23, 0, 0), "hour");
+    check_time_naive("tonight at 11pm", dt(2013, 2, 12, 23, 0, 0), "hour");
 }
 
 #[test]
 fn test_time_at_423() {
-    check_time_value("at 4:23", dt(2013, 2, 12, 4, 23, 0), "minute");
-    check_time_value("4:23am", dt(2013, 2, 12, 4, 23, 0), "minute");
-    check_time_value("four twenty-three a m", dt(2013, 2, 12, 4, 23, 0), "minute");
+    check_time_naive("at 4:23", dt(2013, 2, 12, 4, 23, 0), "minute");
+    check_time_naive("4:23am", dt(2013, 2, 12, 4, 23, 0), "minute");
+    check_time_naive("four twenty-three a m", dt(2013, 2, 12, 4, 23, 0), "minute");
 }
 
 #[test]
 fn test_time_closest_monday_to_oct_5th() {
-    check_time_value(
+    check_time_naive(
         "the closest Monday to Oct 5th",
         dt(2013, 10, 7, 0, 0, 0),
         "day",
@@ -2805,7 +2835,7 @@ fn test_time_closest_monday_to_oct_5th() {
 
 #[test]
 fn test_time_second_closest_monday_to_oct_5th() {
-    check_time_value(
+    check_time_naive(
         "the second closest Mon to October fifth",
         dt(2013, 9, 30, 0, 0, 0),
         "day",
@@ -3374,56 +3404,56 @@ fn test_time_end_of_next_week() {
 
 #[test]
 fn test_chinese_new_year() {
-    check_time_value("chinese new year", dt(2014, 1, 31, 0, 0, 0), "day");
-    check_time_value("chinese lunar new year's day", dt(2014, 1, 31, 0, 0, 0), "day");
+    check_time_naive("chinese new year", dt(2014, 1, 31, 0, 0, 0), "day");
+    check_time_naive("chinese lunar new year's day", dt(2014, 1, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_last_chinese_new_year() {
-    check_time_value("last chinese new year", dt(2013, 2, 10, 0, 0, 0), "day");
-    check_time_value("last chinese lunar new year's day", dt(2013, 2, 10, 0, 0, 0), "day");
-    check_time_value("last chinese new years", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("last chinese new year", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("last chinese lunar new year's day", dt(2013, 2, 10, 0, 0, 0), "day");
+    check_time_naive("last chinese new years", dt(2013, 2, 10, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_chinese_new_year_2018() {
-    check_time_value("chinese new year's day 2018", dt(2018, 2, 16, 0, 0, 0), "day");
+    check_time_naive("chinese new year's day 2018", dt(2018, 2, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_yom_kippur_2018() {
-    check_time_value("yom kippur 2018", dt(2018, 9, 18, 0, 0, 0), "day");
+    check_time_naive("yom kippur 2018", dt(2018, 9, 18, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_shemini_atzeret_2018() {
-    check_time_value("shemini atzeret 2018", dt(2018, 9, 30, 0, 0, 0), "day");
+    check_time_naive("shemini atzeret 2018", dt(2018, 9, 30, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_simchat_torah_2018() {
-    check_time_value("simchat torah 2018", dt(2018, 10, 1, 0, 0, 0), "day");
+    check_time_naive("simchat torah 2018", dt(2018, 10, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_tisha_bav_2018() {
-    check_time_value("tisha b'av 2018", dt(2018, 7, 21, 0, 0, 0), "day");
+    check_time_naive("tisha b'av 2018", dt(2018, 7, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_yom_haatzmaut_2018() {
-    check_time_value("yom haatzmaut 2018", dt(2018, 4, 18, 0, 0, 0), "day");
+    check_time_naive("yom haatzmaut 2018", dt(2018, 4, 18, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_lag_bomer_2017() {
-    check_time_value("lag b'omer 2017", dt(2017, 5, 13, 0, 0, 0), "day");
+    check_time_naive("lag b'omer 2017", dt(2017, 5, 13, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_yom_hashoah_2018() {
-    check_time_value("Yom Hashoah 2018", dt(2018, 4, 11, 0, 0, 0), "day");
-    check_time_value("Holocaust Day 2018", dt(2018, 4, 11, 0, 0, 0), "day");
+    check_time_naive("Yom Hashoah 2018", dt(2018, 4, 11, 0, 0, 0), "day");
+    check_time_naive("Holocaust Day 2018", dt(2018, 4, 11, 0, 0, 0), "day");
 }
 
 #[test]
@@ -3458,126 +3488,126 @@ fn test_shavuot_2018() {
 
 #[test]
 fn test_mawlid_2017() {
-    check_time_value("mawlid al-nabawi 2017", dt(2017, 11, 30, 0, 0, 0), "day");
+    check_time_naive("mawlid al-nabawi 2017", dt(2017, 11, 30, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_1950() {
-    check_time_value("Eid al-Fitr 1950", dt(1950, 7, 16, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 1950", dt(1950, 7, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_1975() {
-    check_time_value("Eid al-Fitr 1975", dt(1975, 10, 6, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 1975", dt(1975, 10, 6, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_1988() {
-    check_time_value("Eid al-Fitr 1988", dt(1988, 5, 16, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 1988", dt(1988, 5, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_2018() {
-    check_time_value("Eid al-Fitr 2018", dt(2018, 6, 15, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 2018", dt(2018, 6, 15, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_2034() {
-    check_time_value("Eid al-Fitr 2034", dt(2034, 12, 12, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 2034", dt(2034, 12, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_2046() {
-    check_time_value("Eid al-Fitr 2046", dt(2046, 8, 4, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 2046", dt(2046, 8, 4, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_fitr_2050() {
-    check_time_value("Eid al-Fitr 2050", dt(2050, 6, 21, 0, 0, 0), "day");
+    check_time_naive("Eid al-Fitr 2050", dt(2050, 6, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_adha_2018() {
-    check_time_value("Eid al-Adha 2018", dt(2018, 8, 21, 0, 0, 0), "day");
-    check_time_value("id ul-adha 2018", dt(2018, 8, 21, 0, 0, 0), "day");
-    check_time_value("sacrifice feast 2018", dt(2018, 8, 21, 0, 0, 0), "day");
-    check_time_value("Bakr Id 2018", dt(2018, 8, 21, 0, 0, 0), "day");
+    check_time_naive("Eid al-Adha 2018", dt(2018, 8, 21, 0, 0, 0), "day");
+    check_time_naive("id ul-adha 2018", dt(2018, 8, 21, 0, 0, 0), "day");
+    check_time_naive("sacrifice feast 2018", dt(2018, 8, 21, 0, 0, 0), "day");
+    check_time_naive("Bakr Id 2018", dt(2018, 8, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_adha_1980() {
-    check_time_value("Eid al-Adha 1980", dt(1980, 10, 19, 0, 0, 0), "day");
-    check_time_value("id ul-adha 1980", dt(1980, 10, 19, 0, 0, 0), "day");
-    check_time_value("sacrifice feast 1980", dt(1980, 10, 19, 0, 0, 0), "day");
-    check_time_value("Bakr Id 1980", dt(1980, 10, 19, 0, 0, 0), "day");
+    check_time_naive("Eid al-Adha 1980", dt(1980, 10, 19, 0, 0, 0), "day");
+    check_time_naive("id ul-adha 1980", dt(1980, 10, 19, 0, 0, 0), "day");
+    check_time_naive("sacrifice feast 1980", dt(1980, 10, 19, 0, 0, 0), "day");
+    check_time_naive("Bakr Id 1980", dt(1980, 10, 19, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_adha_1966() {
-    check_time_value("Eid al-Adha 1966", dt(1966, 4, 1, 0, 0, 0), "day");
-    check_time_value("id ul-adha 1966", dt(1966, 4, 1, 0, 0, 0), "day");
-    check_time_value("sacrifice feast 1966", dt(1966, 4, 1, 0, 0, 0), "day");
-    check_time_value("Bakr Id 1966", dt(1966, 4, 1, 0, 0, 0), "day");
+    check_time_naive("Eid al-Adha 1966", dt(1966, 4, 1, 0, 0, 0), "day");
+    check_time_naive("id ul-adha 1966", dt(1966, 4, 1, 0, 0, 0), "day");
+    check_time_naive("sacrifice feast 1966", dt(1966, 4, 1, 0, 0, 0), "day");
+    check_time_naive("Bakr Id 1966", dt(1966, 4, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_eid_al_adha_1974() {
-    check_time_value("Eid al-Adha 1974", dt(1974, 1, 3, 0, 0, 0), "day");
-    check_time_value("id ul-adha 1974", dt(1974, 1, 3, 0, 0, 0), "day");
-    check_time_value("sacrifice feast 1974", dt(1974, 1, 3, 0, 0, 0), "day");
-    check_time_value("Bakr Id 1974", dt(1974, 1, 3, 0, 0, 0), "day");
+    check_time_naive("Eid al-Adha 1974", dt(1974, 1, 3, 0, 0, 0), "day");
+    check_time_naive("id ul-adha 1974", dt(1974, 1, 3, 0, 0, 0), "day");
+    check_time_naive("sacrifice feast 1974", dt(1974, 1, 3, 0, 0, 0), "day");
+    check_time_naive("Bakr Id 1974", dt(1974, 1, 3, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_laylat_al_qadr_2017() {
-    check_time_value("laylat al kadr 2017", dt(2017, 6, 22, 0, 0, 0), "day");
-    check_time_value("night of measures 2017", dt(2017, 6, 22, 0, 0, 0), "day");
+    check_time_naive("laylat al kadr 2017", dt(2017, 6, 22, 0, 0, 0), "day");
+    check_time_naive("night of measures 2017", dt(2017, 6, 22, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_laylat_al_qadr_2018() {
-    check_time_value("laylat al-qadr 2018", dt(2018, 6, 11, 0, 0, 0), "day");
-    check_time_value("night of power 2018", dt(2018, 6, 11, 0, 0, 0), "day");
+    check_time_naive("laylat al-qadr 2018", dt(2018, 6, 11, 0, 0, 0), "day");
+    check_time_naive("night of power 2018", dt(2018, 6, 11, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_islamic_new_year_2018() {
-    check_time_value("Islamic New Year 2018", dt(2018, 9, 11, 0, 0, 0), "day");
-    check_time_value("Amun Jadid 2018", dt(2018, 9, 11, 0, 0, 0), "day");
+    check_time_naive("Islamic New Year 2018", dt(2018, 9, 11, 0, 0, 0), "day");
+    check_time_naive("Amun Jadid 2018", dt(2018, 9, 11, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_ashura_2017() {
-    check_time_value("day of Ashura 2017", dt(2017, 9, 30, 0, 0, 0), "day");
+    check_time_naive("day of Ashura 2017", dt(2017, 9, 30, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_tu_bishvat_2018() {
-    check_time_value("tu bishvat 2018", dt(2018, 1, 30, 0, 0, 0), "day");
+    check_time_naive("tu bishvat 2018", dt(2018, 1, 30, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_jamat_ul_vida_2017() {
-    check_time_value("Jamat Ul-Vida 2017", dt(2017, 6, 23, 0, 0, 0), "day");
-    check_time_value("Jumu'atul-Wida 2017", dt(2017, 6, 23, 0, 0, 0), "day");
+    check_time_naive("Jamat Ul-Vida 2017", dt(2017, 6, 23, 0, 0, 0), "day");
+    check_time_naive("Jumu'atul-Wida 2017", dt(2017, 6, 23, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_jamat_ul_vida_2018() {
-    check_time_value("Jamat Ul-Vida 2018", dt(2018, 6, 8, 0, 0, 0), "day");
-    check_time_value("Jumu'atul-Wida 2018", dt(2018, 6, 8, 0, 0, 0), "day");
+    check_time_naive("Jamat Ul-Vida 2018", dt(2018, 6, 8, 0, 0, 0), "day");
+    check_time_naive("Jumu'atul-Wida 2018", dt(2018, 6, 8, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_isra_and_miraj_2018() {
-    check_time_value("isra and mi'raj 2018", dt(2018, 4, 13, 0, 0, 0), "day");
-    check_time_value("the prophet's ascension 2018", dt(2018, 4, 13, 0, 0, 0), "day");
+    check_time_naive("isra and mi'raj 2018", dt(2018, 4, 13, 0, 0, 0), "day");
+    check_time_naive("the prophet's ascension 2018", dt(2018, 4, 13, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_night_journey_2019() {
-    check_time_value("the night journey 2019", dt(2019, 4, 3, 0, 0, 0), "day");
-    check_time_value("ascension to heaven 2019", dt(2019, 4, 3, 0, 0, 0), "day");
+    check_time_naive("the night journey 2019", dt(2019, 4, 3, 0, 0, 0), "day");
+    check_time_naive("ascension to heaven 2019", dt(2019, 4, 3, 0, 0, 0), "day");
 }
 
 #[test]
@@ -3612,48 +3642,48 @@ fn test_ramadan_2050() {
 
 #[test]
 fn test_dhanatrayodashi_2017() {
-    check_time_value("dhanatrayodashi in 2017", dt(2017, 10, 17, 0, 0, 0), "day");
+    check_time_naive("dhanatrayodashi in 2017", dt(2017, 10, 17, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_dhanteras_2019() {
-    check_time_value("dhanteras 2019", dt(2019, 10, 25, 0, 0, 0), "day");
+    check_time_naive("dhanteras 2019", dt(2019, 10, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_kali_chaudas_2019() {
-    check_time_value("kali chaudas 2019", dt(2019, 10, 26, 0, 0, 0), "day");
-    check_time_value("choti diwali two thousand nineteen", dt(2019, 10, 26, 0, 0, 0), "day");
+    check_time_naive("kali chaudas 2019", dt(2019, 10, 26, 0, 0, 0), "day");
+    check_time_naive("choti diwali two thousand nineteen", dt(2019, 10, 26, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_diwali_2019() {
-    check_time_value("diwali 2019", dt(2019, 10, 27, 0, 0, 0), "day");
-    check_time_value("Deepavali in 2019", dt(2019, 10, 27, 0, 0, 0), "day");
-    check_time_value("Lakshmi Puja six years hence", dt(2019, 10, 27, 0, 0, 0), "day");
+    check_time_naive("diwali 2019", dt(2019, 10, 27, 0, 0, 0), "day");
+    check_time_naive("Deepavali in 2019", dt(2019, 10, 27, 0, 0, 0), "day");
+    check_time_naive("Lakshmi Puja six years hence", dt(2019, 10, 27, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_bhai_dooj_2019() {
-    check_time_value("bhai dooj 2019", dt(2019, 10, 29, 0, 0, 0), "day");
+    check_time_naive("bhai dooj 2019", dt(2019, 10, 29, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_chhath_2019() {
-    check_time_value("chhath 2019", dt(2019, 11, 2, 0, 0, 0), "day");
-    check_time_value("dala puja 2019", dt(2019, 11, 2, 0, 0, 0), "day");
-    check_time_value("Surya Shashthi in 2019", dt(2019, 11, 2, 0, 0, 0), "day");
+    check_time_naive("chhath 2019", dt(2019, 11, 2, 0, 0, 0), "day");
+    check_time_naive("dala puja 2019", dt(2019, 11, 2, 0, 0, 0), "day");
+    check_time_naive("Surya Shashthi in 2019", dt(2019, 11, 2, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_maha_saptami_2021() {
-    check_time_value("Maha Saptami 2021", dt(2021, 10, 12, 0, 0, 0), "day");
+    check_time_naive("Maha Saptami 2021", dt(2021, 10, 12, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_dussehra_2018() {
-    check_time_value("Dussehra 2018", dt(2018, 10, 18, 0, 0, 0), "day");
-    check_time_value("vijayadashami in five years", dt(2018, 10, 18, 0, 0, 0), "day");
+    check_time_naive("Dussehra 2018", dt(2018, 10, 18, 0, 0, 0), "day");
+    check_time_naive("vijayadashami in five years", dt(2018, 10, 18, 0, 0, 0), "day");
 }
 
 #[test]
@@ -3664,115 +3694,115 @@ fn test_navaratri_2018() {
 
 #[test]
 fn test_karva_chauth_2018() {
-    check_time_value("karva chauth 2018", dt(2018, 10, 27, 0, 0, 0), "day");
-    check_time_value("karva chauth in 2018", dt(2018, 10, 27, 0, 0, 0), "day");
+    check_time_naive("karva chauth 2018", dt(2018, 10, 27, 0, 0, 0), "day");
+    check_time_naive("karva chauth in 2018", dt(2018, 10, 27, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_ratha_yatra_2018() {
-    check_time_value("ratha-yatra 2018", dt(2018, 7, 14, 0, 0, 0), "day");
+    check_time_naive("ratha-yatra 2018", dt(2018, 7, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_rakhi_2018() {
-    check_time_value("rakhi 2018", dt(2018, 8, 26, 0, 0, 0), "day");
+    check_time_naive("rakhi 2018", dt(2018, 8, 26, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_mahavir_jayanti_2020() {
-    check_time_value("mahavir jayanti 2020", dt(2020, 4, 6, 0, 0, 0), "day");
-    check_time_value("mahaveer janma kalyanak 2020", dt(2020, 4, 6, 0, 0, 0), "day");
+    check_time_naive("mahavir jayanti 2020", dt(2020, 4, 6, 0, 0, 0), "day");
+    check_time_naive("mahaveer janma kalyanak 2020", dt(2020, 4, 6, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_maha_shivaratri_2020() {
-    check_time_value("maha shivaratri 2020", dt(2020, 2, 21, 0, 0, 0), "day");
+    check_time_naive("maha shivaratri 2020", dt(2020, 2, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_saraswati_jayanti_2018() {
-    check_time_value("saraswati jayanti 2018", dt(2018, 2, 10, 0, 0, 0), "day");
+    check_time_naive("saraswati jayanti 2018", dt(2018, 2, 10, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_pongal_2018() {
-    check_time_value("pongal 2018", dt(2018, 1, 14, 0, 0, 0), "day");
-    check_time_value("makara sankranthi 2018", dt(2018, 1, 14, 0, 0, 0), "day");
+    check_time_naive("pongal 2018", dt(2018, 1, 14, 0, 0, 0), "day");
+    check_time_naive("makara sankranthi 2018", dt(2018, 1, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_bogi_pandigai_2018() {
-    check_time_value("bogi pandigai 2018", dt(2018, 1, 13, 0, 0, 0), "day");
+    check_time_naive("bogi pandigai 2018", dt(2018, 1, 13, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_maattu_pongal_2018() {
-    check_time_value("maattu pongal 2018", dt(2018, 1, 15, 0, 0, 0), "day");
+    check_time_naive("maattu pongal 2018", dt(2018, 1, 15, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_kaanum_pongal_2018() {
-    check_time_value("kaanum pongal 2018", dt(2018, 1, 16, 0, 0, 0), "day");
-    check_time_value("kanni pongal 2018", dt(2018, 1, 16, 0, 0, 0), "day");
+    check_time_naive("kaanum pongal 2018", dt(2018, 1, 16, 0, 0, 0), "day");
+    check_time_naive("kanni pongal 2018", dt(2018, 1, 16, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_makar_sankranti_2019() {
-    check_time_value("makar sankranti 2019", dt(2019, 1, 15, 0, 0, 0), "day");
-    check_time_value("maghi in 2019", dt(2019, 1, 15, 0, 0, 0), "day");
+    check_time_naive("makar sankranti 2019", dt(2019, 1, 15, 0, 0, 0), "day");
+    check_time_naive("maghi in 2019", dt(2019, 1, 15, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_vaisakhi_2018() {
-    check_time_value("Vaisakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
-    check_time_value("baisakhi in 2018", dt(2018, 4, 14, 0, 0, 0), "day");
-    check_time_value("Vasakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
-    check_time_value("vaishakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
+    check_time_naive("Vaisakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
+    check_time_naive("baisakhi in 2018", dt(2018, 4, 14, 0, 0, 0), "day");
+    check_time_naive("Vasakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
+    check_time_naive("vaishakhi 2018", dt(2018, 4, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_onam_2018() {
-    check_time_value("onam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
-    check_time_value("Thiru Onam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
-    check_time_value("Thiruvonam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
+    check_time_naive("onam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
+    check_time_naive("Thiru Onam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
+    check_time_naive("Thiruvonam 2018", dt(2018, 8, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_vasant_panchami_2019() {
-    check_time_value("vasant panchami in 2019", dt(2019, 2, 10, 0, 0, 0), "day");
-    check_time_value("basant panchami 2019", dt(2019, 2, 10, 0, 0, 0), "day");
+    check_time_naive("vasant panchami in 2019", dt(2019, 2, 10, 0, 0, 0), "day");
+    check_time_naive("basant panchami 2019", dt(2019, 2, 10, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_chhoti_holi_2019() {
-    check_time_value("chhoti holi 2019", dt(2019, 3, 20, 0, 0, 0), "day");
-    check_time_value("holika dahan 2019", dt(2019, 3, 20, 0, 0, 0), "day");
-    check_time_value("kamudu pyre 2019", dt(2019, 3, 20, 0, 0, 0), "day");
+    check_time_naive("chhoti holi 2019", dt(2019, 3, 20, 0, 0, 0), "day");
+    check_time_naive("holika dahan 2019", dt(2019, 3, 20, 0, 0, 0), "day");
+    check_time_naive("kamudu pyre 2019", dt(2019, 3, 20, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_krishna_janmashtami_2019() {
-    check_time_value("krishna janmashtami 2019", dt(2019, 8, 23, 0, 0, 0), "day");
-    check_time_value("gokulashtami 2019", dt(2019, 8, 23, 0, 0, 0), "day");
+    check_time_naive("krishna janmashtami 2019", dt(2019, 8, 23, 0, 0, 0), "day");
+    check_time_naive("gokulashtami 2019", dt(2019, 8, 23, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_holi_2019() {
-    check_time_value("holi 2019", dt(2019, 3, 21, 0, 0, 0), "day");
-    check_time_value("dhulandi 2019", dt(2019, 3, 21, 0, 0, 0), "day");
-    check_time_value("phagwah 2019", dt(2019, 3, 21, 0, 0, 0), "day");
+    check_time_naive("holi 2019", dt(2019, 3, 21, 0, 0, 0), "day");
+    check_time_naive("dhulandi 2019", dt(2019, 3, 21, 0, 0, 0), "day");
+    check_time_naive("phagwah 2019", dt(2019, 3, 21, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_parsi_new_year_2018() {
-    check_time_value("Parsi New Year 2018", dt(2018, 8, 17, 0, 0, 0), "day");
-    check_time_value("Jamshedi Navroz 2018", dt(2018, 8, 17, 0, 0, 0), "day");
+    check_time_naive("Parsi New Year 2018", dt(2018, 8, 17, 0, 0, 0), "day");
+    check_time_naive("Jamshedi Navroz 2018", dt(2018, 8, 17, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_parsi_new_year_2022() {
-    check_time_value("jamshedi Navroz 2022", dt(2022, 8, 16, 0, 0, 0), "day");
-    check_time_value("parsi new year 2022", dt(2022, 8, 16, 0, 0, 0), "day");
+    check_time_naive("jamshedi Navroz 2022", dt(2022, 8, 16, 0, 0, 0), "day");
+    check_time_naive("parsi new year 2022", dt(2022, 8, 16, 0, 0, 0), "day");
 }
 
 #[test]
@@ -3783,10 +3813,10 @@ fn test_gysd_2013() {
 
 #[test]
 fn test_vesak() {
-    check_time_value("vesak", dt(2013, 5, 24, 0, 0, 0), "day");
-    check_time_value("vaisakha", dt(2013, 5, 24, 0, 0, 0), "day");
-    check_time_value("Buddha day", dt(2013, 5, 24, 0, 0, 0), "day");
-    check_time_value("Buddha Purnima", dt(2013, 5, 24, 0, 0, 0), "day");
+    check_time_naive("vesak", dt(2013, 5, 24, 0, 0, 0), "day");
+    check_time_naive("vaisakha", dt(2013, 5, 24, 0, 0, 0), "day");
+    check_time_naive("Buddha day", dt(2013, 5, 24, 0, 0, 0), "day");
+    check_time_naive("Buddha Purnima", dt(2013, 5, 24, 0, 0, 0), "day");
 }
 
 #[test]
@@ -3801,210 +3831,210 @@ fn test_earth_hour_2016() {
 
 #[test]
 fn test_purim() {
-    check_time_value("purim", dt(2013, 2, 23, 0, 0, 0), "day");
+    check_time_naive("purim", dt(2013, 2, 23, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_shushan_purim() {
-    check_time_value("Shushan Purim", dt(2013, 2, 24, 0, 0, 0), "day");
+    check_time_naive("Shushan Purim", dt(2013, 2, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_guru_gobind_singh_jayanti() {
-    check_time_value("guru gobind singh birthday", dt(2014, 1, 7, 0, 0, 0), "day");
-    check_time_value("guru gobind singh jayanti 2014", dt(2014, 1, 7, 0, 0, 0), "day");
-    check_time_value("guru gobind singh jayanti", dt(2014, 1, 7, 0, 0, 0), "day");
-    check_time_value("Guru Govind Singh Jayanti", dt(2014, 1, 7, 0, 0, 0), "day");
+    check_time_naive("guru gobind singh birthday", dt(2014, 1, 7, 0, 0, 0), "day");
+    check_time_naive("guru gobind singh jayanti 2014", dt(2014, 1, 7, 0, 0, 0), "day");
+    check_time_naive("guru gobind singh jayanti", dt(2014, 1, 7, 0, 0, 0), "day");
+    check_time_naive("Guru Govind Singh Jayanti", dt(2014, 1, 7, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_koningsdag_2018() {
-    check_time_value("Koningsdag 2018", dt(2018, 4, 27, 0, 0, 0), "day");
-    check_time_value("koningsdag 2018", dt(2018, 4, 27, 0, 0, 0), "day");
-    check_time_value("king's day 2018", dt(2018, 4, 27, 0, 0, 0), "day");
-    check_time_value("King's Day 2018", dt(2018, 4, 27, 0, 0, 0), "day");
+    check_time_naive("Koningsdag 2018", dt(2018, 4, 27, 0, 0, 0), "day");
+    check_time_naive("koningsdag 2018", dt(2018, 4, 27, 0, 0, 0), "day");
+    check_time_naive("king's day 2018", dt(2018, 4, 27, 0, 0, 0), "day");
+    check_time_naive("King's Day 2018", dt(2018, 4, 27, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_koningsdag_2014() {
-    check_time_value("Koningsdag 2014", dt(2014, 4, 26, 0, 0, 0), "day");
-    check_time_value("koningsdag 2014", dt(2014, 4, 26, 0, 0, 0), "day");
-    check_time_value("King's Day 2014", dt(2014, 4, 26, 0, 0, 0), "day");
-    check_time_value("king's day 2014", dt(2014, 4, 26, 0, 0, 0), "day");
+    check_time_naive("Koningsdag 2014", dt(2014, 4, 26, 0, 0, 0), "day");
+    check_time_naive("koningsdag 2014", dt(2014, 4, 26, 0, 0, 0), "day");
+    check_time_naive("King's Day 2014", dt(2014, 4, 26, 0, 0, 0), "day");
+    check_time_naive("king's day 2014", dt(2014, 4, 26, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_rabindra_jayanti_2018() {
-    check_time_value("rabindra jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
-    check_time_value("Rabindranath Jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
-    check_time_value("Rabindra Jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
+    check_time_naive("rabindra jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
+    check_time_naive("Rabindranath Jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
+    check_time_naive("Rabindra Jayanti 2018", dt(2018, 5, 9, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_rabindra_jayanti_2019() {
-    check_time_value("rabindra jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
-    check_time_value("Rabindranath Jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
-    check_time_value("Rabindra Jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
+    check_time_naive("rabindra jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
+    check_time_naive("Rabindranath Jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
+    check_time_naive("Rabindra Jayanti 2019", dt(2019, 5, 9, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_guru_ravidas_jayanti_2018() {
-    check_time_value("guru Ravidas jayanti 2018", dt(2018, 1, 31, 0, 0, 0), "day");
-    check_time_value("Guru Ravidass birthday 2018", dt(2018, 1, 31, 0, 0, 0), "day");
-    check_time_value("guru ravidass Jayanti 2018", dt(2018, 1, 31, 0, 0, 0), "day");
+    check_time_naive("guru Ravidas jayanti 2018", dt(2018, 1, 31, 0, 0, 0), "day");
+    check_time_naive("Guru Ravidass birthday 2018", dt(2018, 1, 31, 0, 0, 0), "day");
+    check_time_naive("guru ravidass Jayanti 2018", dt(2018, 1, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_guru_ravidas_jayanti_2019() {
-    check_time_value("Guru Ravidass Jayanti 2019", dt(2019, 2, 19, 0, 0, 0), "day");
-    check_time_value("Guru Ravidas Birthday 2019", dt(2019, 2, 19, 0, 0, 0), "day");
-    check_time_value("guru ravidas jayanti 2019", dt(2019, 2, 19, 0, 0, 0), "day");
+    check_time_naive("Guru Ravidass Jayanti 2019", dt(2019, 2, 19, 0, 0, 0), "day");
+    check_time_naive("Guru Ravidas Birthday 2019", dt(2019, 2, 19, 0, 0, 0), "day");
+    check_time_naive("guru ravidas jayanti 2019", dt(2019, 2, 19, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_valmiki_jayanti_2019() {
-    check_time_value("valmiki jayanti 2019", dt(2019, 10, 13, 0, 0, 0), "day");
-    check_time_value("Valmiki Jayanti 2019", dt(2019, 10, 13, 0, 0, 0), "day");
-    check_time_value("pargat diwas 2019", dt(2019, 10, 13, 0, 0, 0), "day");
+    check_time_naive("valmiki jayanti 2019", dt(2019, 10, 13, 0, 0, 0), "day");
+    check_time_naive("Valmiki Jayanti 2019", dt(2019, 10, 13, 0, 0, 0), "day");
+    check_time_naive("pargat diwas 2019", dt(2019, 10, 13, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_valmiki_jayanti_2018() {
-    check_time_value("maharishi valmiki jayanti 2018", dt(2018, 10, 24, 0, 0, 0), "day");
-    check_time_value("pargat diwas 2018", dt(2018, 10, 24, 0, 0, 0), "day");
-    check_time_value("Pargat Diwas 2018", dt(2018, 10, 24, 0, 0, 0), "day");
+    check_time_naive("maharishi valmiki jayanti 2018", dt(2018, 10, 24, 0, 0, 0), "day");
+    check_time_naive("pargat diwas 2018", dt(2018, 10, 24, 0, 0, 0), "day");
+    check_time_naive("Pargat Diwas 2018", dt(2018, 10, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_ganesh_chaturthi_2019() {
-    check_time_value("ganesh chaturthi 2019", dt(2019, 9, 2, 0, 0, 0), "day");
+    check_time_naive("ganesh chaturthi 2019", dt(2019, 9, 2, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_rama_navami_2020() {
-    check_time_value("rama navami 2020", dt(2020, 4, 2, 0, 0, 0), "day");
+    check_time_naive("rama navami 2020", dt(2020, 4, 2, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_ugadi_2018() {
-    check_time_value("Ugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("ugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("yugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("Yugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("samvatsaradi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("chaitra sukladi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
-    check_time_value("chaitra sukhladi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("Ugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("ugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("yugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("Yugadi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("samvatsaradi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("chaitra sukladi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
+    check_time_naive("chaitra sukhladi 2018", dt(2018, 3, 18, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_closest_xmas() {
-    check_time_value("the closest xmas to today", dt(2012, 12, 25, 0, 0, 0), "day");
+    check_time_naive("the closest xmas to today", dt(2012, 12, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_second_closest_xmas() {
-    check_time_value("the second closest xmas to today", dt(2013, 12, 25, 0, 0, 0), "day");
+    check_time_naive("the second closest xmas to today", dt(2013, 12, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_3rd_closest_xmas() {
-    check_time_value("the 3rd closest xmas to today", dt(2011, 12, 25, 0, 0, 0), "day");
+    check_time_naive("the 3rd closest xmas to today", dt(2011, 12, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_last_friday_of_october() {
-    check_time_value("last friday of october", dt(2013, 10, 25, 0, 0, 0), "day");
-    check_time_value("last friday in october", dt(2013, 10, 25, 0, 0, 0), "day");
+    check_time_naive("last friday of october", dt(2013, 10, 25, 0, 0, 0), "day");
+    check_time_naive("last friday in october", dt(2013, 10, 25, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_upcoming_two_weeks() {
-    check_time_value("upcoming two weeks", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("upcoming two week", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("upcoming 2 weeks", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("upcoming 2 week", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("two upcoming weeks", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("two upcoming week", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("2 upcoming weeks", dt(2013, 2, 25, 0, 0, 0), "week");
-    check_time_value("2 upcoming week", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("upcoming two weeks", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("upcoming two week", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("upcoming 2 weeks", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("upcoming 2 week", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("two upcoming weeks", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("two upcoming week", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("2 upcoming weeks", dt(2013, 2, 25, 0, 0, 0), "week");
+    check_time_naive("2 upcoming week", dt(2013, 2, 25, 0, 0, 0), "week");
 }
 
 #[test]
 fn test_upcoming_two_days() {
-    check_time_value("upcoming two days", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("upcoming two day", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("upcoming 2 days", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("upcoming 2 day", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("two upcoming days", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("two upcoming day", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("2 upcoming days", dt(2013, 2, 14, 0, 0, 0), "day");
-    check_time_value("2 upcoming day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("upcoming two days", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("upcoming two day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("upcoming 2 days", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("upcoming 2 day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("two upcoming days", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("two upcoming day", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("2 upcoming days", dt(2013, 2, 14, 0, 0, 0), "day");
+    check_time_naive("2 upcoming day", dt(2013, 2, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_upcoming_two_months() {
-    check_time_value("upcoming two months", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("upcoming two month", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("upcoming 2 months", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("upcoming 2 month", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("two upcoming months", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("two upcoming month", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("2 upcoming months", dt(2013, 4, 1, 0, 0, 0), "month");
-    check_time_value("2 upcoming month", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("upcoming two months", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("upcoming two month", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("upcoming 2 months", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("upcoming 2 month", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("two upcoming months", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("two upcoming month", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("2 upcoming months", dt(2013, 4, 1, 0, 0, 0), "month");
+    check_time_naive("2 upcoming month", dt(2013, 4, 1, 0, 0, 0), "month");
 }
 
 #[test]
 fn test_upcoming_two_quarters() {
-    check_time_value("upcoming two quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("upcoming two quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("upcoming 2 quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("upcoming 2 quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("two upcoming quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("two upcoming quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("2 upcoming quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
-    check_time_value("2 upcoming quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("upcoming two quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("upcoming two quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("upcoming 2 quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("upcoming 2 quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("two upcoming quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("two upcoming quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("2 upcoming quarters", dt(2013, 7, 1, 0, 0, 0), "quarter");
+    check_time_naive("2 upcoming quarter", dt(2013, 7, 1, 0, 0, 0), "quarter");
 }
 
 #[test]
 fn test_upcoming_two_years() {
-    check_time_value("upcoming two years", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("upcoming two year", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("upcoming 2 years", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("upcoming 2 year", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("two upcoming years", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("two upcoming year", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("2 upcoming years", dt(2015, 1, 1, 0, 0, 0), "year");
-    check_time_value("2 upcoming year", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("upcoming two years", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("upcoming two year", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("upcoming 2 years", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("upcoming 2 year", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("two upcoming years", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("two upcoming year", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("2 upcoming years", dt(2015, 1, 1, 0, 0, 0), "year");
+    check_time_naive("2 upcoming year", dt(2015, 1, 1, 0, 0, 0), "year");
 }
 
 #[test]
 fn test_20_minutes_to_2pm_tomorrow() {
-    check_time_value("20 minutes to 2pm tomorrow", dt(2013, 2, 13, 13, 40, 0), "minute");
+    check_time_naive("20 minutes to 2pm tomorrow", dt(2013, 2, 13, 13, 40, 0), "minute");
 }
 
 #[test]
 fn test_first_monday_of_last_month() {
-    check_time_value("first monday of last month", dt(2013, 1, 7, 0, 0, 0), "day");
+    check_time_naive("first monday of last month", dt(2013, 1, 7, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_first_tuesday_of_last_month() {
-    check_time_value("first tuesday of last month", dt(2013, 1, 1, 0, 0, 0), "day");
+    check_time_naive("first tuesday of last month", dt(2013, 1, 1, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_second_monday_of_last_month() {
-    check_time_value("second monday of last month", dt(2013, 1, 14, 0, 0, 0), "day");
+    check_time_naive("second monday of last month", dt(2013, 1, 14, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_next_saturday() {
-    check_time_value("next saturday", dt(2013, 2, 23, 0, 0, 0), "day");
+    check_time_naive("next saturday", dt(2013, 2, 23, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_next_monday() {
-    check_time_value("next monday", dt(2013, 2, 18, 0, 0, 0), "day");
+    check_time_naive("next monday", dt(2013, 2, 18, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -4013,66 +4043,66 @@ fn test_next_monday() {
 
 #[test]
 fn test_us_date_format_2_15() {
-    check_time_value("2/15", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("on 2/15", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("2 / 15", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("2-15", dt(2013, 2, 15, 0, 0, 0), "day");
-    check_time_value("2 - 15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("2/15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("on 2/15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("2 / 15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("2-15", dt(2013, 2, 15, 0, 0, 0), "day");
+    check_time_naive("2 - 15", dt(2013, 2, 15, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_us_date_format_10_31_1974() {
-    check_time_value("10/31/1974", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("10/31/74", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("10-31-74", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("10.31.1974", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("31/Oct/1974", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("31-Oct-74", dt(1974, 10, 31, 0, 0, 0), "day");
-    check_time_value("31st Oct 1974", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("10/31/1974", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("10/31/74", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("10-31-74", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("10.31.1974", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("31/Oct/1974", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("31-Oct-74", dt(1974, 10, 31, 0, 0, 0), "day");
+    check_time_naive("31st Oct 1974", dt(1974, 10, 31, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_date_with_time_4_25() {
-    check_time_value("4/25 at 4:00pm", dt(2013, 4, 25, 16, 0, 0), "minute");
-    check_time_value("4/25 at 16h00", dt(2013, 4, 25, 16, 0, 0), "minute");
-    check_time_value("4/25 at 16h", dt(2013, 4, 25, 16, 0, 0), "minute");
+    check_time_naive("4/25 at 4:00pm", dt(2013, 4, 25, 16, 0, 0), "minute");
+    check_time_naive("4/25 at 16h00", dt(2013, 4, 25, 16, 0, 0), "minute");
+    check_time_naive("4/25 at 16h", dt(2013, 4, 25, 16, 0, 0), "minute");
 }
 
 #[test]
 fn test_thanksgiving_2013() {
-    check_time_value("thanksgiving day", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("thanksgiving", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("thanksgiving 2013", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("this thanksgiving", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("next thanksgiving day", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("thanksgiving in 9 months", dt(2013, 11, 28, 0, 0, 0), "day");
-    check_time_value("thanksgiving 9 months from now", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("thanksgiving day", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("thanksgiving", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 2013", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("this thanksgiving", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("next thanksgiving day", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("thanksgiving in 9 months", dt(2013, 11, 28, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 9 months from now", dt(2013, 11, 28, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_thanksgiving_next_year() {
-    check_time_value("thanksgiving of next year", dt(2014, 11, 27, 0, 0, 0), "day");
-    check_time_value("thanksgiving in a year", dt(2014, 11, 27, 0, 0, 0), "day");
-    check_time_value("thanksgiving 2014", dt(2014, 11, 27, 0, 0, 0), "day");
+    check_time_naive("thanksgiving of next year", dt(2014, 11, 27, 0, 0, 0), "day");
+    check_time_naive("thanksgiving in a year", dt(2014, 11, 27, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 2014", dt(2014, 11, 27, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_last_thanksgiving() {
-    check_time_value("last thanksgiving", dt(2012, 11, 22, 0, 0, 0), "day");
-    check_time_value("thanksgiving day 2012", dt(2012, 11, 22, 0, 0, 0), "day");
-    check_time_value("thanksgiving 3 months ago", dt(2012, 11, 22, 0, 0, 0), "day");
-    check_time_value("thanksgiving 1 year ago", dt(2012, 11, 22, 0, 0, 0), "day");
+    check_time_naive("last thanksgiving", dt(2012, 11, 22, 0, 0, 0), "day");
+    check_time_naive("thanksgiving day 2012", dt(2012, 11, 22, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 3 months ago", dt(2012, 11, 22, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 1 year ago", dt(2012, 11, 22, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_thanksgiving_2016() {
-    check_time_value("thanksgiving 2016", dt(2016, 11, 24, 0, 0, 0), "day");
-    check_time_value("thanksgiving in 3 years", dt(2016, 11, 24, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 2016", dt(2016, 11, 24, 0, 0, 0), "day");
+    check_time_naive("thanksgiving in 3 years", dt(2016, 11, 24, 0, 0, 0), "day");
 }
 
 #[test]
 fn test_thanksgiving_2017() {
-    check_time_value("thanksgiving 2017", dt(2017, 11, 23, 0, 0, 0), "day");
+    check_time_naive("thanksgiving 2017", dt(2017, 11, 23, 0, 0, 0), "day");
 }
 
 // ============================================================
@@ -4224,25 +4254,25 @@ fn test_negative_two_three() {
 #[test]
 fn test_latent_examples() {
     // Latent: needs withLatent = true
-    // check_time_value("the 24", dt(2013, 2, 24, 0, 0, 0), "day");
-    // check_time_value("On 24th", dt(2013, 2, 24, 0, 0, 0), "day");
+    // check_time_naive("the 24", dt(2013, 2, 24, 0, 0, 0), "day");
+    // check_time_naive("On 24th", dt(2013, 2, 24, 0, 0, 0), "day");
 
     // Latent: needs withLatent = true
-    // check_time_value("7", dt(2013, 2, 12, 7, 0, 0), "hour");
-    // check_time_value("7a", dt(2013, 2, 12, 7, 0, 0), "hour");
+    // check_time_naive("7", dt(2013, 2, 12, 7, 0, 0), "hour");
+    // check_time_naive("7a", dt(2013, 2, 12, 7, 0, 0), "hour");
 
     // Latent: needs withLatent = true
-    // check_time_value("7p", dt(2013, 2, 12, 19, 0, 0), "hour");
+    // check_time_naive("7p", dt(2013, 2, 12, 19, 0, 0), "hour");
 
     // Latent: needs withLatent = true
-    // check_time_value("ten thirty", dt(2013, 2, 12, 10, 30, 0), "minute");
-    // check_time_value("ten-thirty", dt(2013, 2, 12, 10, 30, 0), "minute");
+    // check_time_naive("ten thirty", dt(2013, 2, 12, 10, 30, 0), "minute");
+    // check_time_naive("ten-thirty", dt(2013, 2, 12, 10, 30, 0), "minute");
 
     // Latent: needs withLatent = true
-    // check_time_value("1974", dt(1974, 1, 1, 0, 0, 0), "year");
+    // check_time_naive("1974", dt(1974, 1, 1, 0, 0, 0), "year");
 
     // Latent: needs withLatent = true
-    // check_time_value("May", dt(2013, 5, 1, 0, 0, 0), "month");
+    // check_time_naive("May", dt(2013, 5, 1, 0, 0, 0), "month");
 
     // Latent: needs withLatent = true
     // check_time_interval("morning", dt(2013, 2, 12, 0, 0, 0), dt(2013, 2, 12, 12, 0, 0), "hour");
@@ -4260,18 +4290,18 @@ fn test_latent_examples() {
     // check_time_interval("the week", dt(2013, 2, 12, 0, 0, 0), dt(2013, 2, 17, 0, 0, 0), "day");
 
     // Latent: needs withLatent = true
-    // check_time_value("twelve zero three", dt(2013, 2, 12, 12, 3, 0), "minute");
-    // check_time_value("twelve o three", dt(2013, 2, 12, 12, 3, 0), "minute");
-    // check_time_value("twelve ou three", dt(2013, 2, 12, 12, 3, 0), "minute");
-    // check_time_value("twelve oh three", dt(2013, 2, 12, 12, 3, 0), "minute");
-    // check_time_value("twelve-zero-three", dt(2013, 2, 12, 12, 3, 0), "minute");
-    // check_time_value("twelve-oh-three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve zero three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve o three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve ou three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve oh three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve-zero-three", dt(2013, 2, 12, 12, 3, 0), "minute");
+    // check_time_naive("twelve-oh-three", dt(2013, 2, 12, 12, 3, 0), "minute");
 
     // Latent: needs withLatent = true
     // check_time_interval("1960 - 1961", dt(1960, 1, 1, 0, 0, 0), dt(1962, 1, 1, 0, 0, 0), "year");
 
     // Latent: needs withLatent = true
-    // check_time_value("tonight 815", dt(2013, 2, 12, 20, 15, 0), "minute");
+    // check_time_naive("tonight 815", dt(2013, 2, 12, 20, 15, 0), "minute");
 }
 
 // ============================================================
@@ -4283,6 +4313,6 @@ fn test_latent_examples() {
 #[test]
 fn test_diff_corpus_examples() {
     // diffCorpus: requires reference time 2013-02-15 04:30:00 UTC-2
-    // check_time_value("3 fridays from now", dt(2013, 3, 8, 0, 0, 0), "day");
-    // check_time_value("three fridays from now", dt(2013, 3, 8, 0, 0, 0), "day");
+    // check_time_naive("3 fridays from now", dt(2013, 3, 8, 0, 0, 0), "day");
+    // check_time_naive("three fridays from now", dt(2013, 3, 8, 0, 0, 0), "day");
 }

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::dimensions::amount_of_money::AmountOfMoneyData;
 use crate::dimensions::credit_card_number::CreditCardNumberData;
 use crate::dimensions::distance::DistanceData;
@@ -70,15 +70,23 @@ pub struct MeasurementPoint {
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-pub enum TimeValue {
+pub enum TimePoint {
     Instant { value: DateTime<Utc>, grain: Grain },
-    Interval { from: Option<TimePoint>, to: Option<TimePoint> },
+    Naive { value: NaiveDateTime, grain: Grain },
+}
+
+impl TimePoint {
+    pub fn grain(&self) -> Grain {
+        match self {
+            TimePoint::Instant { grain, .. } | TimePoint::Naive { grain, .. } => *grain,
+        }
+    }
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct TimePoint {
-    pub value: DateTime<Utc>,
-    pub grain: Grain,
+pub enum TimeValue {
+    Single(TimePoint),
+    Interval { from: Option<TimePoint>, to: Option<TimePoint> },
 }
 
 #[derive(Debug, Clone, serde::Serialize)]

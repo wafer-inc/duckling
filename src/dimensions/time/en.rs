@@ -3650,7 +3650,7 @@ mod tests {
                 &[DimensionKind::Time],
             );
             let found = entities.iter().any(|e| {
-                matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Instant { grain, .. }) if *grain == crate::dimensions::time_grain::Grain::Day)
+                matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single(tp)) if tp.grain() == crate::dimensions::time_grain::Grain::Day)
             });
             assert!(found, "Expected time for '{}', got: {:?}", day, entities);
         }
@@ -3689,7 +3689,7 @@ mod tests {
             &[DimensionKind::Time],
         );
         let found = entities.iter().any(|e| {
-            matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Instant { grain, .. }) if *grain == crate::dimensions::time_grain::Grain::Minute)
+            matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single(tp)) if tp.grain() == crate::dimensions::time_grain::Grain::Minute)
         });
         assert!(found, "Expected time for '3:30', got: {:?}", entities);
     }

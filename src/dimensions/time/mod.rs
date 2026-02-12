@@ -127,6 +127,22 @@ impl TimeData {
 }
 
 // ============================================================
+// Instant vs Naive classification
+// ============================================================
+
+/// Returns true if the form represents an absolute time pinned to a UTC instant.
+/// Now and RelativeGrain are instant; DurationAfter and Composed inherit from their base/primary.
+fn is_instant_form(form: &TimeForm) -> bool {
+    match form {
+        TimeForm::Now => true,
+        TimeForm::RelativeGrain { .. } => true,
+        TimeForm::DurationAfter { base, .. } => is_instant_form(&base.form),
+        TimeForm::Composed(primary, _) => is_instant_form(&primary.form),
+        _ => false,
+    }
+}
+
+// ============================================================
 // Main resolve entry point
 // ============================================================
 
@@ -153,7 +169,11 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     if let Some(dir) = data.open_interval_direction {
         let (dt, grain_str) = resolve_simple_datetime(&data.form, ref_time, data.direction);
         let grain = if has_tz { Grain::Minute } else { Grain::from_str(grain_str) };
-        let point = TimePoint { value: apply_tz(dt), grain };
+        let point = if has_tz || is_instant_form(&data.form) {
+            TimePoint::Instant { value: apply_tz(dt), grain }
+        } else {
+            TimePoint::Naive { value: dt.naive_utc(), grain }
+        };
         return match dir {
             IntervalDirection::After => Some(DimensionValue::Time(TimeValue::Interval {
                 from: Some(point),
@@ -174,10 +194,13 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     // 3. Simple value
     let (dt, grain_str) = resolve_simple_datetime(&data.form, ref_time, data.direction);
     let grain = if has_tz { Grain::Minute } else { Grain::from_str(grain_str) };
-    Some(DimensionValue::Time(TimeValue::Instant {
-        value: apply_tz(dt),
-        grain,
-    }))
+    let is_instant = has_tz || is_instant_form(&data.form);
+    let point = if is_instant {
+        TimePoint::Instant { value: apply_tz(dt), grain }
+    } else {
+        TimePoint::Naive { value: dt.naive_utc(), grain }
+    };
+    Some(DimensionValue::Time(TimeValue::Single(point)))
 }
 
 /// Map timezone abbreviation to UTC offset in minutes
@@ -240,7 +263,15 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
                         dt
                     }
                 };
-                return Some(make_interval(from_dt, to_dt, "second"));
+                let g = Grain::Second;
+                return Some(TimeValue::Interval {
+                    from: Some(TimePoint::Instant { value: from_dt, grain: g }),
+                    to: Some(if is_instant_form(&to_data.form) {
+                        TimePoint::Instant { value: to_dt, grain: g }
+                    } else {
+                        TimePoint::Naive { value: to_dt.naive_utc(), grain: g }
+                    }),
+                });
             }
 
             let (mut from_dt, from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
@@ -327,7 +358,15 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
             let to_grain = form_grain(&to_data.form);
             let from_g = form_grain(&from_data.form);
             let interval_grain = if has_endpoint_tz { "minute" } else if from_g < to_grain { from_g.as_str() } else { to_grain.as_str() };
-            Some(make_interval(from_dt, to_dt, interval_grain))
+            if has_endpoint_tz {
+                let g = Grain::from_str(interval_grain);
+                Some(TimeValue::Interval {
+                    from: Some(TimePoint::Instant { value: from_dt, grain: g }),
+                    to: Some(TimePoint::Instant { value: to_dt, grain: g }),
+                })
+            } else {
+                Some(make_interval(from_dt, to_dt, interval_grain))
+            }
         }
         TimeForm::NthGrain { n, grain, past, interval: true } => {
             let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time);
@@ -586,8 +625,8 @@ fn resolve_on_date(form: &TimeForm, date: NaiveDate, ref_time: DateTime<Utc>, di
 fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeValue {
     let g = Grain::from_str(grain);
     TimeValue::Interval {
-        from: Some(TimePoint { value: from, grain: g }),
-        to: Some(TimePoint { value: to, grain: g }),
+        from: Some(TimePoint::Naive { value: from.naive_utc(), grain: g }),
+        to: Some(TimePoint::Naive { value: to.naive_utc(), grain: g }),
     }
 }
 
