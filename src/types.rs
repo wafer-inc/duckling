@@ -366,7 +366,6 @@ impl Range {
     pub(crate) fn new(start: usize, end: usize) -> Self {
         Range { start, end }
     }
-
 }
 
 #[derive(Debug, Clone)]

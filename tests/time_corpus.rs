@@ -2695,9 +2695,49 @@ fn test_time_by_2pm() {
 }
 
 #[test]
+fn test_time_eod() {
+    check_time_interval(
+        "EOD",
+        dt(2013, 2, 12, 17, 0, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "hour",
+    );
+    check_time_interval(
+        "end of day",
+        dt(2013, 2, 12, 17, 0, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "hour",
+    );
+    check_time_interval(
+        "end of the day",
+        dt(2013, 2, 12, 17, 0, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "hour",
+    );
+    check_time_interval(
+        "the end of the day",
+        dt(2013, 2, 12, 17, 0, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
 fn test_time_by_eod() {
     check_time_interval(
         "by EOD",
+        dt(2013, 2, 12, 4, 30, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "second",
+    );
+    check_time_interval(
+        "by end of day",
+        dt(2013, 2, 12, 4, 30, 0),
+        dt(2013, 2, 13, 0, 0, 0),
+        "second",
+    );
+    check_time_interval(
+        "by the end of the day",
         dt(2013, 2, 12, 4, 30, 0),
         dt(2013, 2, 13, 0, 0, 0),
         "second",
@@ -3025,9 +3065,84 @@ fn test_time_9_tomorrow_evening() {
 
 #[test]
 fn test_time_march() {
-    check_time_naive("March", dt(2013, 3, 1, 0, 0, 0), "month");
     check_time_naive("in March", dt(2013, 3, 1, 0, 0, 0), "month");
     check_time_naive("during March", dt(2013, 3, 1, 0, 0, 0), "month");
+}
+
+#[test]
+fn test_may_and_march_as_verbs() {
+    // "may" and "march" should not be parsed as months when used as verbs
+    let results = parse_time("I may be incomplete or out of date, and we march to the beat.");
+    let has_time = results
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::Time(_)));
+    assert!(
+        !has_time,
+        "Should not parse 'may'/'march' as months in verb context, got: {:?}",
+        results
+    );
+}
+
+#[test]
+fn test_may_and_march_as_months() {
+    // But they should still work when used with date context
+    check_time_naive("in May", dt(2013, 5, 1, 0, 0, 0), "month");
+    check_time_naive("May 3rd", dt(2013, 5, 3, 0, 0, 0), "day");
+    check_time_naive("last May", dt(2012, 5, 1, 0, 0, 0), "month");
+    check_time_naive("next March", dt(2013, 3, 1, 0, 0, 0), "month");
+    check_time_naive("March 15", dt(2013, 3, 15, 0, 0, 0), "day");
+    check_time_naive("March 15, 2015", dt(2015, 3, 15, 0, 0, 0), "day");
+}
+
+#[test]
+fn test_iso_datetime_no_spurious_interval() {
+    // "2025-03-17 at 4.35.24 PM" should parse as a single datetime with no spurious interval
+    check_time_naive(
+        "2025-03-17 at 4.35.24 PM",
+        dt(2025, 3, 17, 16, 35, 24),
+        "second",
+    );
+    let results = parse_time("2025-03-17 at 4.35.24 PM");
+    let has_interval = results
+        .iter()
+        .any(|e| matches!(&e.value, DimensionValue::Time(TimeValue::Interval { .. })));
+    assert!(
+        !has_interval,
+        "Should not produce spurious interval, got: {:?}",
+        results
+    );
+}
+
+#[test]
+fn test_dot_separated_times() {
+    // Dot separator support (matching Haskell's [:.] in time regexes)
+    check_time_naive("4.35 PM", dt(2013, 2, 12, 16, 35, 0), "minute");
+    check_time_naive("10.30", dt(2013, 2, 12, 10, 30, 0), "minute");
+    check_time_naive("4.35.24 PM", dt(2013, 2, 12, 16, 35, 24), "second");
+}
+
+#[test]
+fn test_iso_date_no_spurious_interval() {
+    // "2018-04-01" should parse as a single date, not also as an interval
+    let results = parse_time("On 2018-04-01 we met.");
+    let date_count = results
+        .iter()
+        .filter(|e| matches!(&e.value, DimensionValue::Time(_)))
+        .count();
+    let has_correct_date = results.iter().any(|e| {
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, grain: Grain::Day }))
+            if value.date() == chrono::NaiveDate::from_ymd_opt(2018, 4, 1).unwrap())
+    });
+    assert!(
+        has_correct_date,
+        "Expected date 2018-04-01, got: {:?}",
+        results
+    );
+    assert_eq!(
+        date_count, 1,
+        "Expected exactly 1 time entity (no spurious interval), got: {:?}",
+        results
+    );
 }
 
 #[test]

@@ -93,10 +93,7 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
 
 /// Apply regex-leading rules to the document to find initial tokens.
 /// Uses pre-computed regex cache.
-fn apply_regex_rules(
-    rules: &[Rule],
-    regex_cache: &[Option<RegexMatches>],
-) -> Stash {
+fn apply_regex_rules(rules: &[Rule], regex_cache: &[Option<RegexMatches>]) -> Stash {
     let mut stash = Stash::new();
 
     for (i, rule) in rules.iter().enumerate() {

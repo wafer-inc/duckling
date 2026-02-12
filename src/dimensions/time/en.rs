@@ -113,7 +113,8 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                let month = match text.to_lowercase().as_ref() {
+                let lower = text.to_lowercase();
+                let month = match lower.as_ref() {
                     "january" | "jan" => 1,
                     "february" | "feb" => 2,
                     "march" | "mar" => 3,
@@ -128,7 +129,14 @@ pub fn rules() -> Vec<Rule> {
                     "december" | "dec" => 12,
                     _ => return None,
                 };
-                Some(TokenData::Time(TimeData::new(TimeForm::Month(month))))
+                // "may" and "march" are ambiguous with verbs — mark latent
+                // so they only resolve when composed with other date parts
+                let latent = matches!(lower.as_ref(), "may" | "march");
+                if latent {
+                    Some(TokenData::Time(TimeData::latent(TimeForm::Month(month))))
+                } else {
+                    Some(TokenData::Time(TimeData::new(TimeForm::Month(month))))
+                }
             }),
         },
         // ====================================================================
@@ -337,6 +345,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let t = time_data(&nodes[1].token_data)?;
                 let mut result = t.clone();
+                result.latent = false;
                 result.early_late = Some(match keyword.as_str() {
                     "late" => EarlyLate::Late,
                     "mid" => EarlyLate::Mid,
@@ -405,7 +414,7 @@ pub fn rules() -> Vec<Rule> {
         // HH:MM
         Rule {
             name: "time HH:MM".to_string(),
-            pattern: vec![regex(r"\b(\d{1,2}):(\d{2})\b")],
+            pattern: vec![regex(r"\b(\d{1,2})[:\.](\d{2})\b")],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -422,10 +431,10 @@ pub fn rules() -> Vec<Rule> {
                 }
             }),
         },
-        // HH:MM:SS
+        // HH:MM:SS (also HH.MM.SS)
         Rule {
             name: "time HH:MM:SS".to_string(),
-            pattern: vec![regex(r"\b(\d{1,2}):(\d{2}):(\d{2})\b")],
+            pattern: vec![regex(r"\b(\d{1,2})[:\.](\d{2})[:\.](\d{2})\b")],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -522,7 +531,9 @@ pub fn rules() -> Vec<Rule> {
         // HH:MM:SS + am/pm
         Rule {
             name: "HH:MM:SS ampm".to_string(),
-            pattern: vec![regex(r"\b(\d{1,2}):(\d{2}):(\d{2})\s?([ap])\.?(\s?m\.?)?")],
+            pattern: vec![regex(
+                r"\b(\d{1,2})[:\.](\d{2})[:\.](\d{2})\s?([ap])\.?(\s?m\.?)?",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -551,7 +562,7 @@ pub fn rules() -> Vec<Rule> {
         // HH:MM + am/pm
         Rule {
             name: "HH:MM ampm".to_string(),
-            pattern: vec![regex(r"\b(\d{1,2}):(\d{2})\s?([ap])\.?(\s?m\.?)?")],
+            pattern: vec![regex(r"\b(\d{1,2})[:\.](\d{2})\s?([ap])\.?(\s?m\.?)?")],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -851,7 +862,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex(r"\b(on|during)\b"), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[1].token_data)?;
-                Some(TokenData::Time(t.clone()))
+                let mut result = t.clone();
+                result.latent = false;
+                Some(TokenData::Time(result))
             }),
         },
         // "in March", "in 2014" - contextual passthrough
@@ -1408,6 +1421,7 @@ pub fn rules() -> Vec<Rule> {
                     TimeForm::DayOfWeek(_) | TimeForm::Month(_) => {
                         let mut new_t = t.clone();
                         new_t.direction = Some(Direction::FarFuture);
+                        new_t.latent = false;
                         Some(TokenData::Time(new_t))
                     }
                     _ => None,
@@ -2687,10 +2701,10 @@ pub fn rules() -> Vec<Rule> {
                 }
             }),
         },
-        // "end of the month" / "beginning of the month" / "end of the year" / etc.
+        // "end of the month" / "beginning of the month" / "end of the year" / "end of day" / etc.
         Rule {
-            name: "end/beginning of the month/year".to_string(),
-            pattern: vec![regex(r"\b(beginning|end) of (the )?(month|year)\b")],
+            name: "end/beginning of the day/month/year".to_string(),
+            pattern: vec![regex(r"\b(beginning|end) of (the )?(day|month|year)\b")],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -2705,10 +2719,10 @@ pub fn rules() -> Vec<Rule> {
                 })))
             }),
         },
-        // "the beginning of the year" / "the end of the year"
+        // "the beginning of the year" / "the end of the year" / "the end of the day"
         Rule {
-            name: "the beginning/end of the year".to_string(),
-            pattern: vec![regex(r"\bthe (beginning|end) of (the )?(month|year)\b")],
+            name: "the beginning/end of the day/year".to_string(),
+            pattern: vec![regex(r"\bthe (beginning|end) of (the )?(day|month|year)\b")],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -2945,7 +2959,7 @@ pub fn rules() -> Vec<Rule> {
         // <time> + <time> for general composition (e.g., "tomorrow at 5pm", "Monday morning")
         Rule {
             name: "<time> <time> compose".to_string(),
-            pattern: vec![predicate(is_not_latent_time), dim(DimensionKind::Time)],
+            pattern: vec![dim(DimensionKind::Time), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let t1 = time_data(&nodes[0].token_data)?;
                 let t2 = time_data(&nodes[1].token_data)?;
@@ -2953,8 +2967,19 @@ pub fn rules() -> Vec<Rule> {
                 if std::mem::discriminant(&t1.form) == std::mem::discriminant(&t2.form) {
                     return None;
                 }
-                // Don't compose two latent tokens
+                // At least one must be non-latent
                 if t1.latent && t2.latent {
+                    return None;
+                }
+                // Don't compose Month + latent Hour (e.g., "April" + "1" as hour)
+                // The day-of-month case is handled by dedicated <month> <integer> rules
+                let month_plus_latent_hour = (matches!(t1.form, TimeForm::Month(_))
+                    && t2.latent
+                    && matches!(t2.form, TimeForm::Hour(_, _)))
+                    || (matches!(t2.form, TimeForm::Month(_))
+                        && t1.latent
+                        && matches!(t1.form, TimeForm::Hour(_, _)));
+                if month_plus_latent_hour {
                     return None;
                 }
                 Some(TokenData::Time(compose(t1, t2)))
@@ -2981,13 +3006,50 @@ pub fn rules() -> Vec<Rule> {
         // ====================================================================
         // Time intervals
         // ====================================================================
-        // <time> - <time> (e.g., "9:30 - 11:00", "3-4pm", "8am - 1pm")
+        // <time> - <time> (e.g., "9:30 - 11:00", "8am - 1pm")
+        // Both endpoints must be non-latent (matches Haskell's isNotLatent)
+        // to avoid matching date separators as intervals (e.g., "2018-04-01")
         Rule {
             name: "<time> - <time> interval".to_string(),
             pattern: vec![
-                dim(DimensionKind::Time),
+                predicate(is_not_latent_time),
                 regex(r"\s*[\-\u{2013}]\s*"),
-                dim(DimensionKind::Time),
+                predicate(is_not_latent_time),
+            ],
+            production: Box::new(|nodes| {
+                let t1 = time_data(&nodes[0].token_data)?;
+                let t2 = time_data(&nodes[2].token_data)?;
+                // Don't form interval between Year and DateMDY without year
+                // (fragments of ISO dates like "On 2018" + "-" + "04-01")
+                let year_date_fragment = (matches!(t1.form, TimeForm::Year(_))
+                    && matches!(t2.form, TimeForm::DateMDY { year: None, .. }))
+                    || (matches!(t2.form, TimeForm::Year(_))
+                        && matches!(t1.form, TimeForm::DateMDY { year: None, .. }));
+                if year_date_fragment {
+                    return None;
+                }
+                Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                    Box::new(t1.clone()),
+                    Box::new(t2.clone()),
+                    false,
+                ))))
+            }),
+        },
+        // Haskell: ruleIntervalTODDash — "<time-of-day> - <time-of-day>"
+        // First must be non-latent TOD, second can be latent TOD
+        // Handles "3pm - 5", "8am - 11", etc.
+        Rule {
+            name: "<tod> - <tod> interval".to_string(),
+            pattern: vec![
+                predicate(|td| {
+                    matches!(td, TokenData::Time(d) if !d.latent && matches!(d.form,
+                    TimeForm::Hour(_, _) | TimeForm::HourMinute(_, _, _) | TimeForm::HourMinuteSecond(_, _, _)))
+                }),
+                regex(r"\s*[\-\u{2013}]\s*|:|\bto\b|\bth?ru\b|\bthrough\b|\b(un)?til(l)?\b"),
+                predicate(|td| {
+                    matches!(td, TokenData::Time(d) if matches!(d.form,
+                    TimeForm::Hour(_, _) | TimeForm::HourMinute(_, _, _) | TimeForm::HourMinuteSecond(_, _, _)))
+                }),
             ],
             production: Box::new(|nodes| {
                 let t1 = time_data(&nodes[0].token_data)?;
@@ -2995,6 +3057,50 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
                     Box::new(t1.clone()),
                     Box::new(t2.clone()),
+                    false,
+                ))))
+            }),
+        },
+        // Haskell: ruleIntervalTODAMPM — "hh(:mm) - <tod> am|pm"
+        // Handles "3-4pm", "3:30-6pm", "9-11am" where AM/PM applies to both endpoints
+        Rule {
+            name: "hh(:mm) - <tod> am|pm interval".to_string(),
+            pattern: vec![
+                regex(r"(?:from )?((?:[01]?\d)|(?:2[0-3]))(?:[:.]([0-5]\d))?"),
+                regex(r"\s*[\-\u{2013}]\s*|\bto\b|\bth?ru\b|\bthrough\b|\b(un)?til(l)?\b"),
+                predicate(|td| {
+                    matches!(td, TokenData::Time(d) if matches!(d.form,
+                    TimeForm::Hour(_, _) | TimeForm::HourMinute(_, _, _) | TimeForm::HourMinuteSecond(_, _, _)))
+                }),
+                regex(r"(?:in the )?([ap])(?:\s|\.)?m?\.?"),
+            ],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let h: u32 = m.group(1)?.parse().ok()?;
+                let t2 = time_data(&nodes[2].token_data)?;
+                let ampm = match &nodes[3].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let is_pm = ampm.to_lowercase() == "p";
+                // Build td1 from the regex-matched hour(:minute)
+                let td1_form = match m.group(2) {
+                    Some(mm) => {
+                        let min: u32 = mm.parse().ok()?;
+                        TimeForm::HourMinute(h, min, true)
+                    }
+                    None => TimeForm::Hour(h, true),
+                };
+                let td1_applied = apply_ampm(&td1_form, is_pm)?;
+                let td2_applied = apply_ampm(&t2.form, is_pm)?;
+                let td1_time = time_data(&td1_applied)?;
+                let td2_time = time_data(&td2_applied)?;
+                Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                    Box::new(td1_time.clone()),
+                    Box::new(td2_time.clone()),
                     false,
                 ))))
             }),

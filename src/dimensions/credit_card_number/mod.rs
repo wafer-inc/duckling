@@ -81,7 +81,7 @@ pub fn luhn_check(number: &str) -> bool {
         sum += val;
         double = !double;
     }
-    sum % 10 == 0 
+    sum % 10 == 0
 }
 
 pub fn resolve(data: &CreditCardNumberData) -> DimensionValue {

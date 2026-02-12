@@ -24,7 +24,11 @@ impl Document {
                 next_non_ws = byte_pos;
             }
             // Fill all byte positions within this character
-            for item in first_non_adjacent.iter_mut().skip(byte_pos).take(ch.len_utf8()) {
+            for item in first_non_adjacent
+                .iter_mut()
+                .skip(byte_pos)
+                .take(ch.len_utf8())
+            {
                 *item = next_non_ws;
             }
         }

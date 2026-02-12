@@ -181,7 +181,6 @@ impl AmountOfMoneyData {
         self.max_value = Some(v);
         self
     }
-
 }
 
 pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<DimensionValue> {
