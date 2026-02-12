@@ -896,8 +896,23 @@ pub fn rules() -> Vec<Rule> {
             }),
         },
         Rule {
+            name: "<duration> from today".to_string(),
+            pattern: vec![dim(DimensionKind::Duration), regex(r"\bfrom today\b")],
+            production: Box::new(|nodes| {
+                let dur = match &nodes[0].token_data {
+                    TokenData::Duration(d) => d,
+                    _ => return None,
+                };
+                // "from today" → Composed(Today, RelativeGrain) preserves day grain
+                Some(TokenData::Time(TimeData::new(TimeForm::Composed(
+                    Box::new(TimeData::new(TimeForm::Today)),
+                    Box::new(TimeData::new(TimeForm::RelativeGrain { n: dur.value, grain: dur.grain })),
+                ))))
+            }),
+        },
+        Rule {
             name: "<duration> from now".to_string(),
-            pattern: vec![dim(DimensionKind::Duration), regex(r"\b(from now|from today)\b")],
+            pattern: vec![dim(DimensionKind::Duration), regex(r"\bfrom now\b")],
             production: Box::new(|nodes| {
                 let dur = match &nodes[0].token_data {
                     TokenData::Duration(d) => d,
@@ -1141,8 +1156,13 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[0].token_data)?;
                 match &t.form {
-                    TimeForm::Year(_) => {
-                        let mut result = t.clone();
+                    TimeForm::Year(y) => {
+                        let suffix = match &nodes[1].token_data {
+                            TokenData::RegexMatch(m) => m.group(1).unwrap_or("").to_lowercase(),
+                            _ => String::new(),
+                        };
+                        let year = if suffix.contains('b') { -y.abs() } else { *y };
+                        let mut result = TimeData::new(TimeForm::Year(year));
                         result.latent = false;
                         Some(TokenData::Time(result))
                     }
@@ -1161,6 +1181,11 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let num = numeral_data(&nodes[1].token_data)?;
                 let year = num.value as i32;
+                let suffix = match &nodes[2].token_data {
+                    TokenData::RegexMatch(m) => m.group(1).unwrap_or("").to_lowercase(),
+                    _ => String::new(),
+                };
+                let year = if suffix.contains('b') { -year } else { year };
                 Some(TokenData::Time(TimeData::new(TimeForm::Year(year))))
             }),
         },
@@ -1545,6 +1570,41 @@ pub fn rules() -> Vec<Rule> {
                 })))
             }),
         },
+        // "the week of <date>" → week containing that date
+        Rule {
+            name: "the week of <time>".to_string(),
+            pattern: vec![
+                regex(r"\b(the )?week of\b"),
+                dim(DimensionKind::Time),
+            ],
+            production: Box::new(|nodes| {
+                let base = time_data(&nodes[1].token_data)?;
+                Some(TokenData::Time(TimeData::new(TimeForm::NthGrainOfTime {
+                    n: 1,
+                    grain: Grain::Week,
+                    base: Box::new(base.clone()),
+                })))
+            }),
+        },
+        // "the month" / "the week" / "the year" → current period (same as "this")
+        Rule {
+            name: "the <grain>".to_string(),
+            pattern: vec![
+                regex(r"\bthe\b"),
+                regex(r"\b(week|month|year|yr|quarter|qtr)\b"),
+            ],
+            production: Box::new(|nodes| {
+                let grain_text = match &nodes[1].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let grain = text_to_grain(grain_text)?;
+                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset {
+                    grain,
+                    offset: 0,
+                })))
+            }),
+        },
         // ====================================================================
         // Last/next N <grain>
         // ====================================================================
@@ -1695,6 +1755,68 @@ pub fn rules() -> Vec<Rule> {
                 } else {
                     None
                 }
+            }),
+        },
+        // <month> + integer → date (e.g., "Feb 10", "Jul 18")
+        Rule {
+            name: "<month> <integer>".to_string(),
+            pattern: vec![
+                predicate(|td| matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::Month(_)))),
+                predicate(is_integer_between(1, 31)),
+            ],
+            production: Box::new(|nodes| {
+                let month = match &nodes[0].token_data {
+                    TokenData::Time(d) => match &d.form {
+                        TimeForm::Month(m) => *m,
+                        _ => return None,
+                    },
+                    _ => return None,
+                };
+                let day = numeral_data(&nodes[1].token_data)?.value as u32;
+                if day >= 1 && day <= 31 {
+                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
+                        month,
+                        day,
+                        year: None,
+                    })))
+                } else {
+                    None
+                }
+            }),
+        },
+        // <dow>,? <month> <numeral/ordinal> (e.g., "Sunday, Feb 10", "Fri, Jul 18")
+        Rule {
+            name: "<dow> <month> <day>".to_string(),
+            pattern: vec![
+                predicate(|td| matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::DayOfWeek(_)))),
+                regex(r",?\s*"),
+                predicate(|td| matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::Month(_)))),
+                predicate(|td| {
+                    matches!(td, TokenData::Numeral(_) | TokenData::Ordinal(_))
+                }),
+            ],
+            production: Box::new(|nodes| {
+                let dow = match &nodes[0].token_data {
+                    TokenData::Time(d) => match &d.form {
+                        TimeForm::DayOfWeek(d) => *d,
+                        _ => return None,
+                    },
+                    _ => return None,
+                };
+                let month = match &nodes[2].token_data {
+                    TokenData::Time(d) => match &d.form {
+                        TimeForm::Month(m) => *m,
+                        _ => return None,
+                    },
+                    _ => return None,
+                };
+                let day = get_dom_value(&nodes[3].token_data)?;
+                let date = TimeData::new(TimeForm::DateMDY { month, day, year: None });
+                let dow_td = TimeData::new(TimeForm::DayOfWeek(dow));
+                Some(TokenData::Time(TimeData::new(TimeForm::Composed(
+                    Box::new(dow_td),
+                    Box::new(date),
+                ))))
             }),
         },
         // <integer> of <month> (e.g., "15 of february")
@@ -2461,7 +2583,7 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(TimeData::new(TimeForm::Holiday(holiday_name, Some(year)))))
             }),
         },
-        // <duration> after/from <time> (e.g., "3 days after christmas")
+        // <duration> after/from <time> (e.g., "3 days after christmas", "15 min from 1pm")
         Rule {
             name: "<duration> after <time>".to_string(),
             pattern: vec![
@@ -2475,9 +2597,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let t = time_data(&nodes[2].token_data)?;
-                // Set base to past-direction so "one year after christmas" uses past christmas
-                let mut base = t.clone();
-                base.direction = Some(Direction::Past);
+                let base = t.clone();
                 // Create a composed form: base time + relative offset
                 Some(TokenData::Time(TimeData::new(TimeForm::Composed(
                     Box::new(base),
@@ -2711,18 +2831,34 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(t.clone()))
             }),
         },
-        // for <duration> from/starting <time>
+        // for <duration> from/starting <time> (e.g., "for 30 minutes from 4pm")
         Rule {
             name: "for <duration> from <time>".to_string(),
             pattern: vec![
                 regex(r"\bfor\b"),
                 dim(DimensionKind::Duration),
-                regex(r"\b(from|starting|starting from)\b"),
+                regex(r"\b(from|starting|starting from|beginning)\b"),
                 dim(DimensionKind::Time),
             ],
             production: Box::new(|nodes| {
+                let dur = match &nodes[1].token_data {
+                    TokenData::Duration(d) => d,
+                    _ => return None,
+                };
                 let t = time_data(&nodes[3].token_data)?;
-                Some(TokenData::Time(t.clone()))
+                // Create interval: [time, time + duration]
+                let end = TimeData::new(TimeForm::Composed(
+                    Box::new(t.clone()),
+                    Box::new(TimeData::new(TimeForm::RelativeGrain {
+                        n: dur.value,
+                        grain: dur.grain,
+                    })),
+                ));
+                Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                    Box::new(t.clone()),
+                    Box::new(end),
+                    false,
+                ))))
             }),
         },
         // from <time> for <duration>
@@ -2735,8 +2871,23 @@ pub fn rules() -> Vec<Rule> {
                 dim(DimensionKind::Duration),
             ],
             production: Box::new(|nodes| {
+                let dur = match &nodes[3].token_data {
+                    TokenData::Duration(d) => d,
+                    _ => return None,
+                };
                 let t = time_data(&nodes[1].token_data)?;
-                Some(TokenData::Time(t.clone()))
+                let end = TimeData::new(TimeForm::Composed(
+                    Box::new(t.clone()),
+                    Box::new(TimeData::new(TimeForm::RelativeGrain {
+                        n: dur.value,
+                        grain: dur.grain,
+                    })),
+                ));
+                Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                    Box::new(t.clone()),
+                    Box::new(end),
+                    false,
+                ))))
             }),
         },
         // ====================================================================
@@ -2796,7 +2947,7 @@ pub fn rules() -> Vec<Rule> {
             name: "<integer> past <time>".to_string(),
             pattern: vec![
                 predicate(is_integer_between(1, 59)),
-                regex(r"\b(minutes? )?(past|after)\b"),
+                regex(r"\b(minutes? )?(past|after|from)\b"),
                 dim(DimensionKind::Time),
             ],
             production: Box::new(|nodes| {
@@ -2863,8 +3014,34 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex(
                 r"\b(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})\s*/\s*(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})\b",
             )],
-            production: Box::new(|_| {
-                Some(TokenData::Time(TimeData::new(TimeForm::Now)))
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let y1: i32 = m.group(1)?.parse().ok()?;
+                let mo1: u32 = m.group(2)?.parse().ok()?;
+                let d1: u32 = m.group(3)?.parse().ok()?;
+                let h1: u32 = m.group(4)?.parse().ok()?;
+                let mi1: u32 = m.group(5)?.parse().ok()?;
+                let s1: u32 = m.group(6)?.parse().ok()?;
+                let y2: i32 = m.group(7)?.parse().ok()?;
+                let mo2: u32 = m.group(8)?.parse().ok()?;
+                let d2: u32 = m.group(9)?.parse().ok()?;
+                let h2: u32 = m.group(10)?.parse().ok()?;
+                let mi2: u32 = m.group(11)?.parse().ok()?;
+                let s2: u32 = m.group(12)?.parse().ok()?;
+                let from = TimeData::new(TimeForm::Composed(
+                    Box::new(TimeData::new(TimeForm::HourMinuteSecond(h1, mi1, s1))),
+                    Box::new(TimeData::new(TimeForm::DateMDY { month: mo1, day: d1, year: Some(y1) })),
+                ));
+                let to = TimeData::new(TimeForm::Composed(
+                    Box::new(TimeData::new(TimeForm::HourMinuteSecond(h2, mi2, s2))),
+                    Box::new(TimeData::new(TimeForm::DateMDY { month: mo2, day: d2, year: Some(y2) })),
+                ));
+                Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                    Box::new(from), Box::new(to), false,
+                ))))
             }),
         },
         // ====================================================================

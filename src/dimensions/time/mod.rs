@@ -195,19 +195,67 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             }
 
             let (mut from_dt, from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
-            let (to_dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+            let (mut to_dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+
+            // Get the raw hours for AM/PM disambiguation
+            let from_hour = match &from_data.form {
+                TimeForm::Hour(h, _) => Some(*h),
+                TimeForm::HourMinute(h, _, _) => Some(*h),
+                _ => None,
+            };
+            let to_hour = match &to_data.form {
+                TimeForm::Hour(h, _) => Some(*h),
+                TimeForm::HourMinute(h, _, _) => Some(*h),
+                _ => None,
+            };
+            let from_is_12h = match &from_data.form {
+                TimeForm::Hour(_, b) => *b,
+                TimeForm::HourMinute(_, _, b) => *b,
+                _ => false,
+            };
+            let to_is_12h = match &to_data.form {
+                TimeForm::Hour(_, b) => *b,
+                TimeForm::HourMinute(_, _, b) => *b,
+                _ => false,
+            };
+
             // Disambiguate "from" Hour based on "to" Hour context
             // e.g., "3-4pm" → from=Hour(3, true), to=Hour(16, false) → from should be 15:00
-            if let TimeForm::Hour(h, true) = &from_data.form {
-                if let TimeForm::Hour(to_h, _) = &to_data.form {
-                    if *to_h >= 12 && *h < 12 {
-                        from_dt = ref_time.date_naive()
-                            .and_hms_opt(*h + 12, 0, 0)
-                            .unwrap_or(from_dt.naive_utc())
-                            .and_utc();
+            if from_is_12h {
+                if let Some(to_h) = to_hour {
+                    if let Some(from_h) = from_hour {
+                        if to_h >= 12 && from_h < 12 {
+                            let mins = match &from_data.form {
+                                TimeForm::HourMinute(_, m, _) => *m,
+                                _ => 0,
+                            };
+                            from_dt = ref_time.date_naive()
+                                .and_hms_opt(from_h + 12, mins, 0)
+                                .unwrap_or(from_dt.naive_utc())
+                                .and_utc();
+                        }
                     }
                 }
             }
+            // Disambiguate "to" based on "from" context
+            // e.g., "8am until 6" → to=Hour(6, true), from is 8am → to should be 18:00
+            if to_is_12h {
+                if let Some(from_h) = from_hour {
+                    if let Some(to_h) = to_hour {
+                        if to_h < 12 && from_h < to_h + 12 && !from_is_12h {
+                            let mins = match &to_data.form {
+                                TimeForm::HourMinute(_, m, _) => *m,
+                                _ => 0,
+                            };
+                            to_dt = ref_time.date_naive()
+                                .and_hms_opt(to_h + 12, mins, 0)
+                                .unwrap_or(to_dt.naive_utc())
+                                .and_utc();
+                        }
+                    }
+                }
+            }
+
             // Ensure from <= to (if from ended up after to on same day, fix)
             if from_dt > to_dt {
                 from_dt = from_dt - Duration::days(1);
@@ -357,6 +405,49 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
                     }
                 }
             }
+            // Interval + date (or date + interval) composition
+            // e.g., "1pm-2pm tomorrow" = Composed(Interval(1pm, 2pm), Tomorrow)
+            // or "Thursday from 9a to 11a" = Composed(DayOfWeek, Interval(9, 11))
+            fn is_interval(f: &TimeForm) -> bool {
+                matches!(f, TimeForm::Interval(_, _, _))
+            }
+            fn is_date_form(f: &TimeForm) -> bool {
+                matches!(f, TimeForm::Tomorrow | TimeForm::Yesterday | TimeForm::DayOfWeek(_)
+                    | TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. }
+                    | TimeForm::Today | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday
+                    | TimeForm::GrainOffset { .. } | TimeForm::Holiday(..))
+            }
+
+            if let TimeForm::Interval(from_td, to_td, open) = &primary.form {
+                if is_date_form(&secondary.form) {
+                    let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                    let date = date_dt.date_naive();
+                    let (from_dt, from_grain) = resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
+                    let (mut to_dt, _) = resolve_on_date(&to_td.form, date, ref_time, to_td.direction);
+                    if !open {
+                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form);
+                    }
+                    let to_grain = form_grain(&to_td.form);
+                    let from_g = form_grain(&from_td.form);
+                    let interval_grain = if from_g < to_grain { from_g } else { to_grain };
+                    return Some(make_interval(from_dt, to_dt, interval_grain.as_str()));
+                }
+            }
+            if let TimeForm::Interval(from_td, to_td, open) = &secondary.form {
+                if is_date_form(&primary.form) {
+                    let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                    let date = date_dt.date_naive();
+                    let (from_dt, _) = resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
+                    let (mut to_dt, _) = resolve_on_date(&to_td.form, date, ref_time, to_td.direction);
+                    if !open {
+                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form);
+                    }
+                    let to_grain = form_grain(&to_td.form);
+                    let from_g = form_grain(&from_td.form);
+                    let interval_grain = if from_g < to_grain { from_g } else { to_grain };
+                    return Some(make_interval(from_dt, to_dt, interval_grain.as_str()));
+                }
+            }
             None // not an interval composed form
         }
         // NthGrainOfTime and LastCycleOfTime are resolved as simple values in resolve_simple_datetime
@@ -397,6 +488,36 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>) -> Option<R
             Some(make_interval(from, to, "hour"))
         }
         _ => None,
+    }
+}
+
+/// Resolve a time form onto a specific date (for interval + date composition)
+fn resolve_on_date(form: &TimeForm, date: NaiveDate, ref_time: DateTime<Utc>, direction: Option<Direction>) -> (DateTime<Utc>, &'static str) {
+    match form {
+        TimeForm::Hour(h, is_12h) => {
+            let dt = date.and_hms_opt(*h, 0, 0).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
+            (dt, "hour")
+        }
+        TimeForm::HourMinute(h, m, is_12h) => {
+            let dt = date.and_hms_opt(*h, *m, 0).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
+            (dt, "minute")
+        }
+        TimeForm::HourMinuteSecond(h, m, s) => {
+            let dt = date.and_hms_opt(*h, *m, *s).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
+            (dt, "second")
+        }
+        TimeForm::Composed(primary, secondary) => {
+            // Resolve composed time on this date
+            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction);
+            let new_dt = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())
+                .unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
+            (new_dt, grain)
+        }
+        _ => {
+            // For non-clock forms, resolve normally but override the date
+            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction);
+            (dt, grain)
+        }
     }
 }
 
@@ -1068,30 +1189,54 @@ fn resolve_composed(
         TimeForm::RelativeGrain { n, grain } => {
             // "today in one hour" → add to ref_time (not midnight)
             // "3 years from today" → add years but keep today's date
-            let base = match &primary.form {
-                TimeForm::Today | TimeForm::Now => ref_time,
-                _ => {
-                    let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
-                    dt
-                }
-            };
-            let result = match grain {
-                Grain::Year => add_years(base, *n as i32),
-                Grain::Month => add_months(base, *n as i32),
-                Grain::Week => base + Duration::weeks(*n),
-                Grain::Day => base + Duration::days(*n),
-                Grain::Hour => base + Duration::hours(*n),
-                Grain::Minute => base + Duration::minutes(*n),
-                Grain::Second => base + Duration::seconds(*n),
-                Grain::Quarter => add_months(base, *n as i32 * 3),
-            };
-            // For "today in one hour" etc., use lower grain
-            // For "3 days after Easter", primary is a day-level form → keep day grain
             let is_day_level_base = matches!(&primary.form,
                 TimeForm::Holiday(..) | TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_)
                 | TimeForm::DayOfWeek(_) | TimeForm::Tomorrow | TimeForm::Yesterday
                 | TimeForm::DayAfterTomorrow | TimeForm::DayBeforeYesterday
                 | TimeForm::Today);
+
+            fn apply_duration(base: DateTime<Utc>, n: i64, grain: &Grain) -> DateTime<Utc> {
+                match grain {
+                    Grain::Year => add_years(base, n as i32),
+                    Grain::Month => add_months(base, n as i32),
+                    Grain::Week => base + Duration::weeks(n),
+                    Grain::Day => base + Duration::days(n),
+                    Grain::Hour => base + Duration::hours(n),
+                    Grain::Minute => base + Duration::minutes(n),
+                    Grain::Second => base + Duration::seconds(n),
+                    Grain::Quarter => add_months(base, n as i32 * 3),
+                }
+            }
+
+            let base = match &primary.form {
+                TimeForm::Today | TimeForm::Now => ref_time,
+                _ => {
+                    // For day-level bases (holidays, dates), try both past and future
+                    // occurrences and pick the one whose result is nearest-future
+                    if is_day_level_base && *n > 0 {
+                        let future_base = {
+                            let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                            dt
+                        };
+                        let past_base = {
+                            let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, Some(Direction::Past));
+                            dt
+                        };
+                        let future_result = apply_duration(future_base, *n, grain);
+                        let past_result = apply_duration(past_base, *n, grain);
+                        // Pick nearest future, or if both future, pick closest
+                        if past_result >= ref_time && (future_result < ref_time || past_result <= future_result) {
+                            past_base
+                        } else {
+                            future_base
+                        }
+                    } else {
+                        let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                        dt
+                    }
+                }
+            };
+            let result = apply_duration(base, *n, grain);
             if is_day_level_base && *grain >= Grain::Day {
                 return (grain_start(result, Grain::Day), "day");
             }
@@ -1224,20 +1369,35 @@ fn resolve_composed(
         return resolve_composed(primary, &new_secondary, ref_time);
     }
 
-    // DOW + specific date → use the date (DOW is just a hint)
-    if let TimeForm::DayOfWeek(_) = &primary.form {
+    // DOW + specific date → use the date, validating DOW match
+    // If DOW doesn't match, find the next year where it does
+    if let TimeForm::DayOfWeek(dow) = &primary.form {
         match &secondary.form {
-            TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_) | TimeForm::Holiday(..) => {
+            TimeForm::DateMDY { month, day, year } => {
+                let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                return (find_dow_date_intersection(*dow, date_dt, *month, *day, *year), "day");
+            }
+            TimeForm::Holiday(..) => {
                 return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+            }
+            TimeForm::DayOfMonth(day) => {
+                return (find_dow_dom_intersection(*dow, *day, ref_time), "day");
             }
             _ => {}
         }
     }
-    // Specific date + DOW → use the date
-    if let TimeForm::DayOfWeek(_) = &secondary.form {
+    // Specific date + DOW → use the date, validating DOW match
+    if let TimeForm::DayOfWeek(dow) = &secondary.form {
         match &primary.form {
-            TimeForm::DateMDY { .. } | TimeForm::DayOfMonth(_) | TimeForm::Holiday(..) => {
+            TimeForm::DateMDY { month, day, year } => {
+                let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                return (find_dow_date_intersection(*dow, date_dt, *month, *day, *year), "day");
+            }
+            TimeForm::Holiday(..) => {
                 return resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            }
+            TimeForm::DayOfMonth(day) => {
+                return (find_dow_dom_intersection(*dow, *day, ref_time), "day");
             }
             _ => {}
         }
@@ -2044,6 +2204,58 @@ fn last_dow_of_month(year: i32, month: u32, dow: u32) -> NaiveDate {
 }
 
 /// Find the closest occurrence of a specific day of week to a given date.
+/// Given a DOW and a specific date (month/day, optional year), find the nearest occurrence
+/// where the date falls on the given DOW. Checks both past and future.
+fn find_dow_date_intersection(dow: u32, base_dt: DateTime<Utc>, month: u32, day: u32, year: Option<i32>) -> DateTime<Utc> {
+    if let Some(y) = year {
+        // Year is fixed — just return the date regardless of DOW
+        return NaiveDate::from_ymd_opt(y, month, day)
+            .unwrap_or(base_dt.date_naive())
+            .and_hms_opt(0, 0, 0).unwrap().and_utc();
+    }
+    // Search both forward and backward to find the nearest year where DOW matches
+    let ref_date = base_dt.date_naive();
+    let start_y = base_dt.year();
+    let mut best: Option<NaiveDate> = None;
+    for delta in -3..=7i32 {
+        let y = start_y + delta;
+        if let Some(date) = NaiveDate::from_ymd_opt(y, month, day) {
+            if date.weekday().num_days_from_monday() == dow {
+                match best {
+                    None => best = Some(date),
+                    Some(prev) => {
+                        if (date - ref_date).num_days().abs() < (prev - ref_date).num_days().abs() {
+                            best = Some(date);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    best.unwrap_or(base_dt.date_naive()).and_hms_opt(0, 0, 0).unwrap().and_utc()
+}
+
+/// Find next date where both DOW and day-of-month match.
+/// E.g., "Thu 15th" — find next 15th that falls on a Thursday.
+fn find_dow_dom_intersection(dow: u32, day: u32, ref_time: DateTime<Utc>) -> DateTime<Utc> {
+    // Search forward from ref_time up to 12 months
+    let mut dt = ref_time;
+    for _ in 0..12 {
+        let y = dt.year();
+        let m = dt.month();
+        if let Some(date) = NaiveDate::from_ymd_opt(y, m, day) {
+            let candidate = date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+            if candidate > ref_time && date.weekday().num_days_from_monday() == dow {
+                return candidate;
+            }
+        }
+        // Move to next month
+        dt = add_months(NaiveDate::from_ymd_opt(y, m, 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_utc(), 1);
+    }
+    // Fallback: just return the next occurrence of that day
+    midnight(ref_time)
+}
+
 fn closest_dow(date: NaiveDate, target_dow: u32) -> NaiveDate {
     let date_dow = date.weekday().num_days_from_monday();
     let forward = ((target_dow as i32 - date_dow as i32) + 7) % 7;
