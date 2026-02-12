@@ -1,5 +1,15 @@
+use std::sync::OnceLock;
+
 use crate::dimensions;
 use crate::types::{DimensionKind, Rule};
+
+/// Cached full rule set (all dimensions) for English.
+static ALL_RULES: OnceLock<Vec<Rule>> = OnceLock::new();
+
+/// Get all compiled rules for English, cached after first compilation.
+pub fn all_rules() -> &'static [Rule] {
+    ALL_RULES.get_or_init(|| rules_uncached(&[]))
+}
 
 pub fn supported_dimensions() -> Vec<DimensionKind> {
     vec![
@@ -22,7 +32,7 @@ pub fn supported_dimensions() -> Vec<DimensionKind> {
 
 /// Collect all rules needed for the given dimensions in English.
 /// Automatically includes dependency dimensions.
-pub fn rules(dims: &[DimensionKind]) -> Vec<Rule> {
+fn rules_uncached(dims: &[DimensionKind]) -> Vec<Rule> {
     let mut needed: Vec<DimensionKind> = Vec::new();
 
     // Add requested dims and their dependencies

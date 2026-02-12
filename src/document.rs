@@ -6,6 +6,9 @@ pub struct Document {
     text: String,
     lower: String,
     byte_len: usize,
+    /// first_non_adjacent[i] = index of first non-whitespace byte at or after position i.
+    /// If none exists, equals byte_len. Used for O(1) adjacency checks.
+    first_non_adjacent: Vec<usize>,
 }
 
 impl Document {
@@ -13,10 +16,25 @@ impl Document {
         let lower = text.to_lowercase();
         let byte_len = text.len();
 
+        // Precompute first_non_adjacent: for each byte position, the index of the
+        // first non-whitespace character at or after that position.
+        let mut first_non_adjacent = vec![byte_len; byte_len + 1];
+        let mut next_non_ws = byte_len;
+        for (byte_pos, ch) in text.char_indices().rev() {
+            if !ch.is_whitespace() {
+                next_non_ws = byte_pos;
+            }
+            // Fill all byte positions within this character
+            for j in byte_pos..byte_pos + ch.len_utf8() {
+                first_non_adjacent[j] = next_non_ws;
+            }
+        }
+
         Document {
             text: text.to_string(),
             lower,
             byte_len,
+            first_non_adjacent,
         }
     }
 
@@ -36,13 +54,13 @@ impl Document {
         self.byte_len == 0
     }
 
-    /// Check if two ranges are adjacent (no non-whitespace between them)
+    /// Check if two ranges are adjacent (no non-whitespace between them).
+    /// Uses precomputed first_non_adjacent array for O(1) lookup.
     pub fn is_adjacent(&self, end_a: usize, start_b: usize) -> bool {
         if end_a > start_b {
             return false;
         }
-        let between = &self.text[end_a..start_b];
-        between.chars().all(|c| c.is_whitespace())
+        self.first_non_adjacent[end_a] >= start_b
     }
 
     /// Check if position is at a word boundary

@@ -42,11 +42,27 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let doc = Document::new(text);
     let mut stash = Stash::new();
 
+    // Pre-compute regex matches for all regex-leading rules once.
+    // Regex matches against document text never change between iterations.
+    let regex_cache: Vec<Option<Vec<(Range, Vec<Option<String>>)>>> = rules
+        .iter()
+        .map(|rule| {
+            if rule.pattern.is_empty() {
+                return None;
+            }
+            if let PatternItem::Regex(ref re) = rule.pattern[0] {
+                Some(find_regex_matches(&doc, re))
+            } else {
+                None
+            }
+        })
+        .collect();
+
     // Track seen (start, end, rule_name) to deduplicate and prevent exponential growth
     let mut seen: HashSet<(usize, usize, Option<String>)> = HashSet::new();
 
     // Phase 1: Apply all regex-leading rules to find initial tokens
-    let initial = apply_regex_rules(&doc, rules);
+    let initial = apply_regex_rules(rules, &regex_cache);
     for node in initial.all_nodes() {
         let key = (node.range.start, node.range.end, node.rule_name.clone());
         seen.insert(key);
@@ -56,7 +72,7 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     // Phase 2: Saturation loop - keep applying rules until no new tokens
     let max_iterations = 10;
     for _ in 0..max_iterations {
-        let new_stash = apply_all_rules(&doc, rules, &stash);
+        let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache);
         let mut actually_new = Stash::new();
         for node in new_stash.all_nodes() {
             let key = (node.range.start, node.range.end, node.rule_name.clone());
@@ -74,19 +90,28 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
 }
 
 /// Apply regex-leading rules to the document to find initial tokens.
-fn apply_regex_rules(doc: &Document, rules: &[Rule]) -> Stash {
+/// Uses pre-computed regex cache.
+fn apply_regex_rules(
+    rules: &[Rule],
+    regex_cache: &[Option<Vec<(Range, Vec<Option<String>>)>>],
+) -> Stash {
     let mut stash = Stash::new();
 
-    for rule in rules {
+    for (i, rule) in rules.iter().enumerate() {
         if rule.pattern.is_empty() {
             continue;
         }
-        if let PatternItem::Regex(ref re) = rule.pattern[0] {
-            let matches = find_regex_matches(doc, re);
+        if let PatternItem::Regex(_) = &rule.pattern[0] {
+            let matches = match &regex_cache[i] {
+                Some(m) => m,
+                None => continue,
+            };
             for (range, groups) in matches {
                 let regex_node = Node {
-                    range,
-                    token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                    range: *range,
+                    token_data: TokenData::RegexMatch(RegexMatchData {
+                        groups: groups.clone(),
+                    }),
                     children: Vec::new(),
                     rule_name: None,
                 };
@@ -94,14 +119,13 @@ fn apply_regex_rules(doc: &Document, rules: &[Rule]) -> Stash {
                 if rule.pattern.len() == 1 {
                     // Single-pattern rule: produce directly
                     if let Some(token_data) = (rule.production)(&[&regex_node]) {
-                        let mut node = Node::new(range, token_data);
+                        let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
                         node.children = vec![regex_node];
                         stash.add(node);
                     }
                 } else {
                     // Multi-pattern rule: store the regex match for later combination
-                    // We'll handle this in the saturation loop
                     stash.add(regex_node);
                 }
             }
@@ -112,11 +136,24 @@ fn apply_regex_rules(doc: &Document, rules: &[Rule]) -> Stash {
 }
 
 /// Apply all rules against the current stash to find new tokens.
-fn apply_all_rules(doc: &Document, rules: &[Rule], stash: &Stash) -> Stash {
+/// Skips single-pattern regex rules (already fully handled in phase 1).
+fn apply_all_rules(
+    doc: &Document,
+    rules: &[Rule],
+    stash: &Stash,
+    regex_cache: &[Option<Vec<(Range, Vec<Option<String>>)>>],
+) -> Stash {
     let mut new_stash = Stash::new();
 
-    for rule in rules {
-        let produced = match_rule(doc, rule, stash);
+    for (i, rule) in rules.iter().enumerate() {
+        // Skip single-pattern regex rules - already fully handled in phase 1
+        if rule.pattern.len() == 1 {
+            if let PatternItem::Regex(_) = &rule.pattern[0] {
+                continue;
+            }
+        }
+        let cached = regex_cache[i].as_ref();
+        let produced = match_rule(doc, rule, stash, cached);
         for node in produced {
             new_stash.add(node);
         }
@@ -126,7 +163,13 @@ fn apply_all_rules(doc: &Document, rules: &[Rule], stash: &Stash) -> Stash {
 }
 
 /// Try to match a rule against the document and stash, producing new nodes.
-fn match_rule(doc: &Document, rule: &Rule, stash: &Stash) -> Vec<Node> {
+/// Uses cached regex matches when available.
+fn match_rule(
+    doc: &Document,
+    rule: &Rule,
+    stash: &Stash,
+    cached_regex: Option<&Vec<(Range, Vec<Option<String>>)>>,
+) -> Vec<Node> {
     let mut results = Vec::new();
 
     if rule.pattern.is_empty() {
@@ -134,20 +177,25 @@ fn match_rule(doc: &Document, rule: &Rule, stash: &Stash) -> Vec<Node> {
     }
 
     match &rule.pattern[0] {
-        PatternItem::Regex(re) => {
-            // Start with regex matches
-            let matches = find_regex_matches(doc, re);
+        PatternItem::Regex(_) => {
+            // Use cached regex matches
+            let matches = match cached_regex {
+                Some(m) => m,
+                None => return results,
+            };
             for (range, groups) in matches {
                 let regex_node = Node {
-                    range,
-                    token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                    range: *range,
+                    token_data: TokenData::RegexMatch(RegexMatchData {
+                        groups: groups.clone(),
+                    }),
                     children: Vec::new(),
                     rule_name: None,
                 };
 
                 if rule.pattern.len() == 1 {
                     if let Some(token_data) = (rule.production)(&[&regex_node]) {
-                        let mut node = Node::new(range, token_data);
+                        let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
                         node.children = vec![regex_node];
                         results.push(node);
@@ -221,6 +269,7 @@ fn match_rule(doc: &Document, rule: &Rule, stash: &Stash) -> Vec<Node> {
 }
 
 /// Continue matching the remaining pattern items after a partial match.
+/// Uses position-filtered stash iteration for efficiency.
 fn match_remaining(
     doc: &Document,
     rule: &Rule,
@@ -294,9 +343,9 @@ fn match_remaining(
             }
         }
         PatternItem::Dimension(dim) => {
-            for node in stash.all_nodes() {
+            // Use position-filtered iteration instead of scanning all nodes
+            for node in stash.nodes_starting_from(after_pos) {
                 if node.token_data.dimension_kind() == Some(*dim)
-                    && node.range.start >= after_pos
                     && doc.is_adjacent(after_pos, node.range.start)
                 {
                     let mut next_matched = matched_so_far.clone();
@@ -314,9 +363,9 @@ fn match_remaining(
             }
         }
         PatternItem::Predicate(pred) => {
-            for node in stash.all_nodes() {
+            // Use position-filtered iteration instead of scanning all nodes
+            for node in stash.nodes_starting_from(after_pos) {
                 if pred(&node.token_data)
-                    && node.range.start >= after_pos
                     && doc.is_adjacent(after_pos, node.range.start)
                 {
                     let mut next_matched = matched_so_far.clone();

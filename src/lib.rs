@@ -43,7 +43,7 @@ pub fn parse(
     options: &Options,
 ) -> Vec<Entity> {
     let rules = lang::rules_for(locale.lang, dims);
-    let mut entities = engine::parse_and_resolve(text, &rules, context, options, dims);
+    let mut entities = engine::parse_and_resolve(text, rules, context, options, dims);
     ranking::rank(&mut entities);
     ranking::remove_overlapping(entities)
 }

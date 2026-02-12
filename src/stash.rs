@@ -47,4 +47,10 @@ impl Stash {
     pub fn positions(&self) -> impl Iterator<Item = &usize> {
         self.nodes.keys()
     }
+
+    /// Iterate over nodes starting at or after the given position.
+    /// Uses BTreeMap's range for efficient lookup.
+    pub fn nodes_starting_from(&self, pos: usize) -> impl Iterator<Item = &Node> {
+        self.nodes.range(pos..).flat_map(|(_, v)| v.iter())
+    }
 }
