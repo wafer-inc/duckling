@@ -367,17 +367,6 @@ impl Range {
         Range { start, end }
     }
 
-    pub(crate) fn len(&self) -> usize {
-        self.end - self.start
-    }
-
-    pub(crate) fn is_empty(&self) -> bool {
-        self.start == self.end
-    }
-
-    pub(crate) fn overlaps(&self, other: &Range) -> bool {
-        self.start < other.end && other.start < self.end
-    }
 }
 
 #[derive(Debug, Clone)]

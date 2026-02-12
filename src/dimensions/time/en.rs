@@ -756,10 +756,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(2)?,
                     _ => return None,
                 };
-                let is_pm = match pod_text.to_lowercase().as_ref() {
-                    "afternoon" | "evening" => true,
-                    _ => false,
-                };
+                let is_pm = matches!(pod_text.to_lowercase().as_ref(), "afternoon" | "evening");
                 let td = time_data(&nodes[0].token_data)?;
                 match &td.form {
                     TimeForm::Hour(h, true) => {

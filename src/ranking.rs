@@ -2,7 +2,7 @@ use crate::types::Entity;
 
 /// Rank and filter entities using heuristic ranking.
 /// Prefers longer matches and non-overlapping results.
-pub fn rank(entities: &mut Vec<Entity>) {
+pub fn rank(entities: &mut [Entity]) {
     // Sort by start position, then by length (longer first)
     entities.sort_by(|a, b| {
         a.start.cmp(&b.start).then_with(|| {

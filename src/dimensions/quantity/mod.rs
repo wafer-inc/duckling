@@ -51,11 +51,6 @@ impl QuantityData {
         }
     }
 
-    pub fn with_product(mut self, product: &str) -> Self {
-        self.product = Some(product.to_string());
-        self
-    }
-
     pub fn with_interval(mut self, from: f64, to: f64) -> Self {
         self.value = None;
         self.min_value = Some(from);

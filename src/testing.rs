@@ -2,12 +2,6 @@ use crate::engine;
 use crate::resolve::{Context, Options};
 use crate::types::{DimensionKind, Entity, Rule};
 
-/// A corpus example: input text and expected outputs.
-pub struct Example {
-    pub text: String,
-    pub check: Box<dyn Fn(&Entity) -> bool>,
-}
-
 /// A corpus is a collection of examples for testing.
 pub struct Corpus {
     pub context: Context,
@@ -40,7 +34,7 @@ pub fn check_corpus(corpus: &Corpus, rules: &[Rule], dims: &[DimensionKind]) -> 
     for (texts, check) in &corpus.examples {
         for text in texts {
             let entities = engine::parse_and_resolve(text, rules, &corpus.context, &options, dims);
-            let any_match = entities.iter().any(check);
+            let any_match = entities.iter().any(|e| check(e));
             if !any_match {
                 let dim_str = dims
                     .iter()

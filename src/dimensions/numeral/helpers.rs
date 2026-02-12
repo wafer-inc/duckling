@@ -8,17 +8,6 @@ pub fn numeral_data(token: &TokenData) -> Option<&NumeralData> {
     }
 }
 
-pub fn is_numeral(token: &TokenData) -> bool {
-    matches!(token, TokenData::Numeral(_))
-}
-
-pub fn is_integer(token: &TokenData) -> bool {
-    match token {
-        TokenData::Numeral(data) => data.value == data.value.floor(),
-        _ => false,
-    }
-}
-
 /// Matches non-negative numbers (v >= 0).
 /// Equivalent to Haskell Duckling's `isPositive`.
 pub fn is_positive(token: &TokenData) -> bool {
@@ -37,31 +26,10 @@ pub fn is_natural(token: &TokenData) -> bool {
     }
 }
 
-pub fn number_between(low: f64, high: f64) -> Box<dyn Fn(&TokenData) -> bool + Send + Sync> {
-    Box::new(move |token: &TokenData| {
-        if let TokenData::Numeral(data) = token {
-            data.value >= low && data.value <= high
-        } else {
-            false
-        }
-    })
-}
-
-pub fn number_with(low: f64, high: f64) -> Box<dyn Fn(&TokenData) -> bool + Send + Sync> {
-    number_between(low, high)
-}
-
 pub fn is_multipliable(token: &TokenData) -> bool {
     match token {
         TokenData::Numeral(data) => data.multipliable,
         _ => false,
-    }
-}
-
-pub fn double_value(token: &TokenData) -> Option<f64> {
-    match token {
-        TokenData::Numeral(data) => Some(data.value),
-        _ => None,
     }
 }
 

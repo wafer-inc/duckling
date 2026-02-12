@@ -19,7 +19,6 @@ pub enum VolumeUnit {
     Cup,
     Pint,
     Quart,
-    FluidOunce,
     Tablespoon,
     Teaspoon,
 }
@@ -34,7 +33,6 @@ impl VolumeUnit {
             VolumeUnit::Cup => "cup",
             VolumeUnit::Pint => "pint",
             VolumeUnit::Quart => "quart",
-            VolumeUnit::FluidOunce => "fluid ounce",
             VolumeUnit::Tablespoon => "tablespoon",
             VolumeUnit::Teaspoon => "teaspoon",
         }
@@ -70,11 +68,6 @@ impl VolumeData {
             min_value: None,
             max_value: None,
         }
-    }
-
-    pub fn with_unit(mut self, unit: VolumeUnit) -> Self {
-        self.unit = Some(unit);
-        self
     }
 
     pub fn with_interval(mut self, from: f64, to: f64) -> Self {

@@ -3,11 +3,11 @@ pub mod en;
 use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum Currency {
     // Ambiguous
     Cent,
     Dinar,
-    Dirham,
     Dollar,
     Pound,
     Rial,
@@ -68,7 +68,6 @@ impl Currency {
         match self {
             Currency::Cent => "cent",
             Currency::Dinar => "dinar",
-            Currency::Dirham => "dirham",
             Currency::Dollar => "USD",
             Currency::Pound => "GBP",
             Currency::Rial => "rial",
@@ -183,10 +182,6 @@ impl AmountOfMoneyData {
         self
     }
 
-    pub fn mk_latent(mut self) -> Self {
-        self.latent = true;
-        self
-    }
 }
 
 pub fn resolve(data: &AmountOfMoneyData, with_latent: bool) -> Option<DimensionValue> {

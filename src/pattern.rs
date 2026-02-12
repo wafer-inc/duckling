@@ -10,14 +10,6 @@ pub fn regex(pattern: &str) -> PatternItem {
     )
 }
 
-/// Create a regex pattern item with an exact regex (no auto case-insensitive flag).
-pub fn regex_exact(pattern: &str) -> PatternItem {
-    PatternItem::Regex(
-        Regex::new(pattern)
-            .unwrap_or_else(|e| panic!("Invalid regex pattern '{}': {}", pattern, e)),
-    )
-}
-
 /// Create a dimension pattern item that matches any token of the given dimension.
 pub fn dim(kind: DimensionKind) -> PatternItem {
     PatternItem::Dimension(kind)

@@ -10,10 +10,3 @@ pub fn rules_for(lang: Lang, _dims: &[DimensionKind]) -> &'static [Rule] {
         Lang::EN => en::all_rules(),
     }
 }
-
-/// Get supported dimensions for a language.
-pub fn supported_dimensions(lang: Lang) -> Vec<DimensionKind> {
-    match lang {
-        Lang::EN => en::supported_dimensions(),
-    }
-}

@@ -10,6 +10,7 @@ pub(crate) mod pattern;
 pub(crate) mod ranking;
 pub(crate) mod resolve;
 pub(crate) mod stash;
+#[cfg(test)]
 pub(crate) mod testing;
 pub(crate) mod types;
 

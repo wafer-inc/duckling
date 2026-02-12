@@ -22,16 +22,8 @@ impl Stash {
         self.count += 1;
     }
 
-    pub fn nodes_at(&self, pos: usize) -> &[Node] {
-        self.nodes.get(&pos).map(|v| v.as_slice()).unwrap_or(&[])
-    }
-
     pub fn all_nodes(&self) -> impl Iterator<Item = &Node> {
         self.nodes.values().flat_map(|v| v.iter())
-    }
-
-    pub fn len(&self) -> usize {
-        self.count
     }
 
     pub fn is_empty(&self) -> bool {
@@ -42,10 +34,6 @@ impl Stash {
         for node in other.all_nodes() {
             self.add(node.clone());
         }
-    }
-
-    pub fn positions(&self) -> impl Iterator<Item = &usize> {
-        self.nodes.keys()
     }
 
     /// Iterate over nodes starting at or after the given position.

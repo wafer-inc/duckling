@@ -9,6 +9,8 @@ use crate::types::{
     DimensionKind, Entity, Node, PatternItem, Range, RegexMatchData, Rule, TokenData,
 };
 
+type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
+
 /// Parse text and resolve all entities.
 pub fn parse_and_resolve(
     text: &str,
@@ -44,7 +46,7 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
 
     // Pre-compute regex matches for all regex-leading rules once.
     // Regex matches against document text never change between iterations.
-    let regex_cache: Vec<Option<Vec<(Range, Vec<Option<String>>)>>> = rules
+    let regex_cache: Vec<Option<RegexMatches>> = rules
         .iter()
         .map(|rule| {
             if rule.pattern.is_empty() {
@@ -93,7 +95,7 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
 /// Uses pre-computed regex cache.
 fn apply_regex_rules(
     rules: &[Rule],
-    regex_cache: &[Option<Vec<(Range, Vec<Option<String>>)>>],
+    regex_cache: &[Option<RegexMatches>],
 ) -> Stash {
     let mut stash = Stash::new();
 
@@ -141,7 +143,7 @@ fn apply_all_rules(
     doc: &Document,
     rules: &[Rule],
     stash: &Stash,
-    regex_cache: &[Option<Vec<(Range, Vec<Option<String>>)>>],
+    regex_cache: &[Option<RegexMatches>],
 ) -> Stash {
     let mut new_stash = Stash::new();
 
@@ -168,7 +170,7 @@ fn match_rule(
     doc: &Document,
     rule: &Rule,
     stash: &Stash,
-    cached_regex: Option<&Vec<(Range, Vec<Option<String>>)>>,
+    cached_regex: Option<&RegexMatches>,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
