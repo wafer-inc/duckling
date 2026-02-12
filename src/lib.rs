@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 pub mod dimensions;
 pub mod document;
 pub mod engine;
@@ -50,6 +52,15 @@ pub fn parse(
 }
 
 /// Convenience function to parse text with default settings for English.
+///
+/// ```
+/// use duckling::{parse_en, Entity, DimensionKind, DimensionValue};
+///
+/// assert_eq!(parse_en("forty-two", &[DimensionKind::Numeral]), vec![Entity {
+///     body: "forty-two".into(), start: 0, end: 9, latent: None,
+///     value: DimensionValue::Numeral(42.0),
+/// }]);
+/// ```
 pub fn parse_en(text: &str, dims: &[DimensionKind]) -> Vec<Entity> {
     let locale = Locale::new(Lang::EN, None);
     let context = Context::default();

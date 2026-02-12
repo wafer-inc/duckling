@@ -56,20 +56,58 @@ impl fmt::Display for DimensionKind {
     }
 }
 
-/// Used by Temperature, Distance, Volume, Quantity, AmountOfMoney
-#[derive(Debug, Clone, serde::Serialize)]
+/// A measurement with a numeric value and unit. Used by Temperature, Distance,
+/// Volume, Quantity, and AmountOfMoney dimensions.
+///
+/// ```
+/// use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementValue};
+///
+/// let results = parse_en("$42.50", &[DimensionKind::AmountOfMoney]);
+/// assert_eq!(results[0].value, DimensionValue::AmountOfMoney(MeasurementValue::Value {
+///     value: 42.5, unit: "USD".into(),
+/// }));
+/// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum MeasurementValue {
     Value { value: f64, unit: String },
     Interval { from: Option<MeasurementPoint>, to: Option<MeasurementPoint> },
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct MeasurementPoint {
     pub value: f64,
     pub unit: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+/// A resolved time point — either an absolute UTC instant or a naive wall-clock time.
+///
+/// ```
+/// use duckling::{parse, Locale, Lang, Context, Options, DimensionKind,
+///                DimensionValue, TimeValue, TimePoint, Grain};
+/// use chrono::{NaiveDate, TimeZone, Utc};
+///
+/// let locale = Locale::new(Lang::EN, None);
+/// let context = Context {
+///     reference_time: Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
+///     ..Context::default()
+/// };
+/// let options = Options::default();
+///
+/// // Wall-clock times are Naive (no timezone baked in)
+/// let results = parse("tomorrow at 3pm", &locale, &[DimensionKind::Time], &context, &options);
+/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
+///     value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap(),
+///     grain: Grain::Hour,
+/// })));
+///
+/// // Relative offsets from now are Instant (pinned to UTC)
+/// let results = parse("in one hour", &locale, &[DimensionKind::Time], &context, &options);
+/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Instant {
+///     value: Utc.with_ymd_and_hms(2013, 2, 12, 5, 30, 0).unwrap(),
+///     grain: Grain::Minute,
+/// })));
+/// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimePoint {
     Instant { value: DateTime<Utc>, grain: Grain },
     Naive { value: NaiveDateTime, grain: Grain },
@@ -83,13 +121,64 @@ impl TimePoint {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+/// A resolved time value — either a single point or an interval.
+///
+/// ```
+/// use duckling::{parse, Locale, Lang, Context, Options, DimensionKind,
+///                DimensionValue, TimeValue, TimePoint, Grain};
+/// use chrono::{NaiveDate, TimeZone, Utc};
+///
+/// let locale = Locale::new(Lang::EN, None);
+/// let context = Context {
+///     reference_time: Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
+///     ..Context::default()
+/// };
+/// let options = Options::default();
+///
+/// // Single time point
+/// let results = parse("tomorrow", &locale, &[DimensionKind::Time], &context, &options);
+/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
+///     value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(0, 0, 0).unwrap(),
+///     grain: Grain::Day,
+/// })));
+///
+/// // Time interval
+/// let results = parse("from 3pm to 5pm", &locale, &[DimensionKind::Time], &context, &options);
+/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Interval {
+///     from: Some(TimePoint::Naive {
+///         value: NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(15, 0, 0).unwrap(),
+///         grain: Grain::Hour,
+///     }),
+///     to: Some(TimePoint::Naive {
+///         value: NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(18, 0, 0).unwrap(),
+///         grain: Grain::Hour,
+///     }),
+/// }));
+/// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimeValue {
     Single(TimePoint),
     Interval { from: Option<TimePoint>, to: Option<TimePoint> },
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+/// The resolved value of a parsed entity.
+///
+/// ```
+/// use duckling::{parse_en, DimensionKind, DimensionValue, Grain};
+///
+/// assert_eq!(parse_en("thirty three", &[DimensionKind::Numeral])[0].value,
+///     DimensionValue::Numeral(33.0));
+///
+/// assert_eq!(parse_en("the 3rd", &[DimensionKind::Ordinal])[0].value,
+///     DimensionValue::Ordinal(3));
+///
+/// assert_eq!(parse_en("3 days", &[DimensionKind::Duration])[0].value,
+///     DimensionValue::Duration { value: 3, grain: Grain::Day, normalized_seconds: 259200 });
+///
+/// assert_eq!(parse_en("user@example.com", &[DimensionKind::Email])[0].value,
+///     DimensionValue::Email("user@example.com".into()));
+/// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum DimensionValue {
     Numeral(f64),
     Ordinal(i64),
@@ -257,7 +346,17 @@ impl fmt::Debug for Rule {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+/// A parsed entity extracted from text, with its position, matched text, and resolved value.
+///
+/// ```
+/// use duckling::{parse_en, Entity, DimensionKind, DimensionValue};
+///
+/// assert_eq!(parse_en("I need 42 widgets", &[DimensionKind::Numeral]), vec![Entity {
+///     body: "42".into(), start: 7, end: 9, latent: None,
+///     value: DimensionValue::Numeral(42.0),
+/// }]);
+/// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Entity {
     pub body: String,
     pub start: usize,
