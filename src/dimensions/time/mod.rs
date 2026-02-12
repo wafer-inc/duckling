@@ -274,7 +274,7 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
                 });
             }
 
-            let (mut from_dt, from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
+            let (mut from_dt, _from_grain) = resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
             let (mut to_dt, _) = resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
 
             // Apply per-endpoint timezone shifts (Haskell: each predicate carries its own shift)
@@ -509,9 +509,6 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
             // Interval + date (or date + interval) composition
             // e.g., "1pm-2pm tomorrow" = Composed(Interval(1pm, 2pm), Tomorrow)
             // or "Thursday from 9a to 11a" = Composed(DayOfWeek, Interval(9, 11))
-            fn is_interval(f: &TimeForm) -> bool {
-                matches!(f, TimeForm::Interval(_, _, _))
-            }
             fn is_date_form(f: &TimeForm) -> bool {
                 matches!(f, TimeForm::Tomorrow | TimeForm::Yesterday | TimeForm::DayOfWeek(_)
                     | TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. }
@@ -523,7 +520,7 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
                 if is_date_form(&secondary.form) {
                     let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
                     let date = date_dt.date_naive();
-                    let (from_dt, from_grain) = resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
+                    let (from_dt, _from_grain) = resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
                     let (mut to_dt, _) = resolve_on_date(&to_td.form, date, ref_time, to_td.direction);
                     if !open {
                         to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form);
@@ -595,11 +592,11 @@ fn try_resolve_as_interval(data: &TimeData, ref_time: DateTime<Utc>, context: &C
 /// Resolve a time form onto a specific date (for interval + date composition)
 fn resolve_on_date(form: &TimeForm, date: NaiveDate, ref_time: DateTime<Utc>, direction: Option<Direction>) -> (DateTime<Utc>, &'static str) {
     match form {
-        TimeForm::Hour(h, is_12h) => {
+        TimeForm::Hour(h, _is_12h) => {
             let dt = date.and_hms_opt(*h, 0, 0).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
             (dt, "hour")
         }
-        TimeForm::HourMinute(h, m, is_12h) => {
+        TimeForm::HourMinute(h, m, _is_12h) => {
             let dt = date.and_hms_opt(*h, *m, 0).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
             (dt, "minute")
         }
@@ -607,7 +604,7 @@ fn resolve_on_date(form: &TimeForm, date: NaiveDate, ref_time: DateTime<Utc>, di
             let dt = date.and_hms_opt(*h, *m, *s).unwrap_or(date.and_hms_opt(0, 0, 0).unwrap()).and_utc();
             (dt, "second")
         }
-        TimeForm::Composed(primary, secondary) => {
+        TimeForm::Composed(_primary, _secondary) => {
             // Resolve composed time on this date
             let (dt, grain) = resolve_simple_datetime(form, ref_time, direction);
             let new_dt = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())
@@ -632,10 +629,6 @@ fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeVal
 
 /// For closed intervals, add one grain to "to".
 /// Uses the finer grain between from and to (matching Haskell behavior).
-fn adjust_interval_end(to: DateTime<Utc>, to_form: &TimeForm) -> DateTime<Utc> {
-    adjust_interval_end_with_from(to, to_form, to_form)
-}
-
 fn adjust_interval_end_with_from(to: DateTime<Utc>, to_form: &TimeForm, from_form: &TimeForm) -> DateTime<Utc> {
     let to_grain = form_grain(to_form);
     let from_grain = form_grain(from_form);
@@ -1589,14 +1582,14 @@ fn resolve_composed(
 
     // Nested Composed: if one side is Composed, try to resolve it first
     if let TimeForm::Composed(a, b) = &primary.form {
-        let (primary_dt, primary_grain) = resolve_composed(a, b, ref_time);
+        let (primary_dt, _primary_grain) = resolve_composed(a, b, ref_time);
         let new_primary = TimeData::new(TimeForm::DateMDY {
             month: primary_dt.month(), day: primary_dt.day(), year: Some(primary_dt.year()),
         });
         return resolve_composed(&new_primary, secondary, ref_time);
     }
     if let TimeForm::Composed(a, b) = &secondary.form {
-        let (secondary_dt, secondary_grain) = resolve_composed(a, b, ref_time);
+        let (secondary_dt, _secondary_grain) = resolve_composed(a, b, ref_time);
         let new_secondary = TimeData::new(TimeForm::DateMDY {
             month: secondary_dt.month(), day: secondary_dt.day(), year: Some(secondary_dt.year()),
         });
@@ -1635,7 +1628,7 @@ fn resolve_composed(
             }
             // GrainOffset + DOW: find the DOW within the grain period
             // e.g., "last week's sunday" → Sunday of last week
-            TimeForm::GrainOffset { grain, offset } => {
+            TimeForm::GrainOffset { grain: _, offset: _ } => {
                 let (period_start, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
                 // Find the target DOW within the period
                 let period_date = period_start.date_naive();
@@ -1654,7 +1647,7 @@ fn resolve_composed(
     }
     // DOW + GrainOffset: same as above but reversed
     if let TimeForm::DayOfWeek(dow) = &primary.form {
-        if let TimeForm::GrainOffset { grain, offset } = &secondary.form {
+        if let TimeForm::GrainOffset { grain: _, offset: _ } = &secondary.form {
             let (period_start, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
             let period_date = period_start.date_naive();
             let current_dow = period_date.weekday().num_days_from_monday();
@@ -2603,18 +2596,6 @@ fn find_dow_dom_intersection(dow: u32, day: u32, ref_time: DateTime<Utc>) -> Dat
     midnight(ref_time)
 }
 
-fn closest_dow(date: NaiveDate, target_dow: u32) -> NaiveDate {
-    let date_dow = date.weekday().num_days_from_monday();
-    let forward = ((target_dow as i32 - date_dow as i32) + 7) % 7;
-    let backward = ((date_dow as i32 - target_dow as i32) + 7) % 7;
-    if forward == 0 {
-        date // same day
-    } else if forward <= backward {
-        date + Duration::days(forward as i64)
-    } else {
-        date - Duration::days(backward as i64)
-    }
-}
 
 /// Find the closest weekday (Mon-Fri) to a given date.
 fn closest_weekday(date: NaiveDate) -> NaiveDate {

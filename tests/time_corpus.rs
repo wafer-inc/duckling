@@ -29,6 +29,7 @@ fn dt(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32) -> NaiveDateTime {
 }
 
 /// Build a DateTime<Utc> from components (for instant/absolute time tests)
+#[allow(dead_code)]
 fn dt_utc(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32) -> DateTime<Utc> {
     dt(y, m, d, h, mi, s).and_utc()
 }
