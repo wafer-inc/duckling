@@ -1,15 +1,6 @@
-use std::sync::OnceLock;
-
 use crate::dimensions;
+use crate::locale::Region;
 use crate::types::{DimensionKind, Rule};
-
-/// Cached full rule set (all dimensions) for English.
-static ALL_RULES: OnceLock<Vec<Rule>> = OnceLock::new();
-
-/// Get all compiled rules for English, cached after first compilation.
-pub fn all_rules() -> &'static [Rule] {
-    ALL_RULES.get_or_init(|| rules_uncached(&[]))
-}
 
 pub fn supported_dimensions() -> Vec<DimensionKind> {
     vec![
@@ -30,40 +21,32 @@ pub fn supported_dimensions() -> Vec<DimensionKind> {
     ]
 }
 
-/// Collect all rules needed for the given dimensions in English.
-/// Automatically includes dependency dimensions.
-fn rules_uncached(dims: &[DimensionKind]) -> Vec<Rule> {
-    let mut needed: Vec<DimensionKind> = Vec::new();
+/// EN default rules when no locale is specified.
+pub(crate) fn default_rules(needed: &[DimensionKind]) -> Vec<Rule> {
+    // Haskell EN default rules include standard EN language rules.
+    lang_rules(needed)
+}
 
-    // Add requested dims and their dependencies
-    for dim in dims {
-        add_with_deps(*dim, &mut needed);
-    }
-
-    // If no specific dims requested, include all
-    if needed.is_empty() {
-        needed = supported_dimensions();
-    }
-
+/// EN language rules.
+pub(crate) fn lang_rules(needed: &[DimensionKind]) -> Vec<Rule> {
     let mut rules = Vec::new();
-
-    for dim in &needed {
+    for dim in needed {
         match dim {
-            DimensionKind::Numeral => rules.extend(dimensions::numeral::en::rules()),
+            DimensionKind::Numeral => rules.extend(dimensions::numeral::en::lang_rules()),
             DimensionKind::Ordinal => rules.extend(dimensions::ordinal::en::rules()),
             DimensionKind::Temperature => rules.extend(dimensions::temperature::en::rules()),
-            DimensionKind::Distance => rules.extend(dimensions::distance::en::rules()),
+            DimensionKind::Distance => rules.extend(dimensions::distance::en::lang_rules()),
             DimensionKind::Volume => rules.extend(dimensions::volume::en::rules()),
             DimensionKind::Quantity => rules.extend(dimensions::quantity::en::rules()),
-            DimensionKind::AmountOfMoney => rules.extend(dimensions::amount_of_money::en::rules()),
-            DimensionKind::Email => rules.extend(dimensions::email::rules::rules()),
-            DimensionKind::PhoneNumber => rules.extend(dimensions::phone_number::rules::rules()),
-            DimensionKind::Url => rules.extend(dimensions::url::rules::rules()),
-            DimensionKind::CreditCardNumber => {
-                rules.extend(dimensions::credit_card_number::rules::rules())
+            DimensionKind::AmountOfMoney => {
+                rules.extend(dimensions::amount_of_money::en::lang_rules())
             }
+            DimensionKind::Email => {}
+            DimensionKind::PhoneNumber => {}
+            DimensionKind::Url => {}
+            DimensionKind::CreditCardNumber => {}
             DimensionKind::TimeGrain => rules.extend(dimensions::time_grain::en::rules()),
-            DimensionKind::Duration => rules.extend(dimensions::duration::en::rules()),
+            DimensionKind::Duration => rules.extend(dimensions::duration::en::lang_rules()),
             DimensionKind::Time => rules.extend(dimensions::time::en::rules()),
         }
     }
@@ -71,13 +54,8 @@ fn rules_uncached(dims: &[DimensionKind]) -> Vec<Rule> {
     rules
 }
 
-fn add_with_deps(dim: DimensionKind, needed: &mut Vec<DimensionKind>) {
-    if needed.contains(&dim) {
-        return;
-    }
-    // Add dependencies first
-    for dep in dimensions::dimension_dependencies(dim) {
-        add_with_deps(dep, needed);
-    }
-    needed.push(dim);
+/// Region-specific rule overlays for English locales.
+/// No region overlays are implemented yet, so this currently returns empty.
+pub(crate) fn locale_rules(_region: Option<Region>, _needed: &[DimensionKind]) -> Vec<Rule> {
+    Vec::new()
 }

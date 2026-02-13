@@ -10,6 +10,7 @@ use crate::types::{
 };
 
 type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
+type SeenKey = (usize, usize, Option<String>, String);
 
 /// Parse text and resolve all entities.
 pub fn parse_and_resolve(
@@ -60,24 +61,24 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
         })
         .collect();
 
-    // Track seen (start, end, rule_name) to deduplicate and prevent exponential growth
-    let mut seen: HashSet<(usize, usize, Option<String>)> = HashSet::new();
+    // Track seen nodes to deduplicate while preserving alternative parses
+    // with different token payloads at the same span/rule.
+    let mut seen: HashSet<SeenKey> = HashSet::new();
 
     // Phase 1: Apply all regex-leading rules to find initial tokens
     let initial = apply_regex_rules(rules, &regex_cache);
     for node in initial.all_nodes() {
-        let key = (node.range.start, node.range.end, node.rule_name.clone());
+        let key = dedup_key(node);
         seen.insert(key);
     }
     stash.merge(&initial);
 
     // Phase 2: Saturation loop - keep applying rules until no new tokens
-    let max_iterations = 10;
-    for _ in 0..max_iterations {
+    loop {
         let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache);
         let mut actually_new = Stash::new();
         for node in new_stash.all_nodes() {
-            let key = (node.range.start, node.range.end, node.rule_name.clone());
+            let key = dedup_key(node);
             if seen.insert(key) {
                 actually_new.add(node.clone());
             }
@@ -89,6 +90,15 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     }
 
     stash
+}
+
+fn dedup_key(node: &Node) -> SeenKey {
+    (
+        node.range.start,
+        node.range.end,
+        node.rule_name.clone(),
+        format!("{:?}", node.token_data),
+    )
 }
 
 /// Apply regex-leading rules to the document to find initial tokens.
@@ -405,4 +415,90 @@ fn extract_groups(caps: &regex::Captures, original: &str) -> Vec<Option<String>>
         }));
     }
     groups
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::dimensions::numeral::NumeralData;
+    use crate::dimensions::ordinal::OrdinalData;
+    use crate::pattern::{predicate, regex};
+    use crate::resolve::{Context, Options};
+    use crate::types::DimensionValue;
+
+    #[test]
+    fn saturation_is_fixpoint_not_hard_capped() {
+        let rules = vec![
+            Rule {
+                name: "seed".to_string(),
+                pattern: vec![regex(r"x")],
+                production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(0.0)))),
+            },
+            Rule {
+                name: "inc".to_string(),
+                pattern: vec![predicate(|td| matches!(td, TokenData::Numeral(_)))],
+                production: Box::new(|nodes| match &nodes[0].token_data {
+                    TokenData::Numeral(n) if n.value < 12.0 => {
+                        Some(TokenData::Numeral(NumeralData::new(n.value + 1.0)))
+                    }
+                    _ => None,
+                }),
+            },
+        ];
+
+        let entities = parse_and_resolve(
+            "x",
+            &rules,
+            &Context::default(),
+            &Options { with_latent: false },
+            &[DimensionKind::Numeral],
+        );
+        let has_12 = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Numeral(v) if (*v - 12.0).abs() < 0.01));
+        assert!(
+            has_12,
+            "Expected saturation to produce 12, got: {:?}",
+            entities
+        );
+    }
+
+    #[test]
+    fn dedup_keeps_alternative_payloads_for_same_span_and_rule() {
+        let rules = vec![
+            Rule {
+                name: "seed".to_string(),
+                pattern: vec![regex(r"x")],
+                production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(1.0)))),
+            },
+            Rule {
+                name: "seed".to_string(),
+                pattern: vec![regex(r"x")],
+                production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(2.0)))),
+            },
+            Rule {
+                name: "select-two".to_string(),
+                pattern: vec![predicate(
+                    |td| matches!(td, TokenData::Numeral(n) if (n.value - 2.0).abs() < 0.01),
+                )],
+                production: Box::new(|_| Some(TokenData::Ordinal(OrdinalData::new(2)))),
+            },
+        ];
+
+        let entities = parse_and_resolve(
+            "x",
+            &rules,
+            &Context::default(),
+            &Options { with_latent: false },
+            &[DimensionKind::Ordinal],
+        );
+        let has_ordinal_2 = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Ordinal(2)));
+        assert!(
+            has_ordinal_2,
+            "Expected ordinal(2) from alternate derivation, got: {:?}",
+            entities
+        );
+    }
 }

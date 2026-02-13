@@ -303,6 +303,24 @@ pub fn rules() -> Vec<Rule> {
     ]
 }
 
+fn is_common_rule_name(name: &str) -> bool {
+    name == "number as distance"
+}
+
+pub fn common_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| is_common_rule_name(&r.name))
+        .collect()
+}
+
+pub fn lang_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| !is_common_rule_name(&r.name))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::dimensions::numeral;

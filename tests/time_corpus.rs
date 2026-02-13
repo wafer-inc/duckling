@@ -3114,6 +3114,23 @@ fn test_iso_datetime_no_spurious_interval() {
 }
 
 #[test]
+fn test_debug_issues() {
+    let r1 = parse_time("Apr 1 2018");
+    eprintln!("'Apr 1 2018': {:?}", r1);
+    let r2 = parse_time("Apr 1");
+    eprintln!("'Apr 1': {:?}", r2);
+    let r3 = parse_time("Apr 1 2018 at 6:03pm");
+    eprintln!("'Apr 1 2018 at 6:03pm': {:?}", r3);
+    let r4 = parse_time("April 1, 2018 6:03pm");
+    eprintln!("'April 1, 2018 6:03pm': {:?}", r4);
+    let r5 = parse_time("last April 1");
+    eprintln!("'last April 1': {:?}", r5);
+    let r6 = parse_time("last April");
+    eprintln!("'last April': {:?}", r6);
+    panic!("debug output above");
+}
+
+#[test]
 fn test_dot_separated_times() {
     // Dot separator support (matching Haskell's [:.] in time regexes)
     check_time_naive("4.35 PM", dt(2013, 2, 12, 16, 35, 0), "minute");

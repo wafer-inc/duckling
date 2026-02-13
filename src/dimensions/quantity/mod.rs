@@ -1,4 +1,16 @@
 pub mod en;
+pub mod es;
+pub mod ar;
+pub mod fr;
+pub mod hr;
+pub mod km;
+pub mod ko;
+pub mod mn;
+pub mod nl;
+pub mod pt;
+pub mod ro;
+pub mod ru;
+pub mod zh;
 
 use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 
@@ -17,6 +29,7 @@ pub enum QuantityUnit {
     Gram,
     Ounce,
     Pound,
+    Tablespoon,
 }
 
 impl QuantityUnit {
@@ -26,6 +39,7 @@ impl QuantityUnit {
             QuantityUnit::Gram => "gram",
             QuantityUnit::Ounce => "ounce",
             QuantityUnit::Pound => "pound",
+            QuantityUnit::Tablespoon => "tablespoon",
         }
     }
 }

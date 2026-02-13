@@ -464,6 +464,24 @@ pub fn rules() -> Vec<Rule> {
     ]
 }
 
+fn is_common_rule_name(name: &str) -> bool {
+    matches!(name, "integer (numeric)" | "fractional number")
+}
+
+pub fn common_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| is_common_rule_name(&r.name))
+        .collect()
+}
+
+pub fn lang_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| !is_common_rule_name(&r.name))
+        .collect()
+}
+
 /// Helper to convert number words to their values.
 fn word_to_number(word: &str) -> Option<f64> {
     match word.to_lowercase().as_str() {

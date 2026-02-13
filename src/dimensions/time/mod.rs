@@ -1,4 +1,31 @@
 pub mod en;
+pub mod es;
+pub mod bg;
+pub mod ar;
+pub mod ca;
+pub mod da;
+pub mod de;
+pub mod el;
+pub mod fr;
+pub mod ga;
+pub mod he;
+pub mod hr;
+pub mod hu;
+pub mod it;
+pub mod ja;
+pub mod ka;
+pub mod ko;
+pub mod nb;
+pub mod nl;
+pub mod pl;
+pub mod pt;
+pub mod ro;
+pub mod ru;
+pub mod sv;
+pub mod tr;
+pub mod uk;
+pub mod vi;
+pub mod zh;
 
 use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
@@ -2720,10 +2747,59 @@ fn resolve_holiday_interval(name: &str, year: i32) -> Option<(NaiveDate, NaiveDa
     }
 
     // GYSD: 3-day interval
-    if name == "gysd" || name.starts_with("global youth service") {
+    if name == "gysd"
+        || name.starts_with("global youth service")
+        || name.starts_with("national youth service")
+    {
         if let Some(start) = gysd_date(year) {
             return Some((start, start + Duration::days(3)));
         }
+    }
+
+    // EMS week: 3rd Sunday of May to following Sunday
+    if name.starts_with("ems week") {
+        let start = nth_dow_of_month(year, 5, 6, 3); // 3rd Sunday in May
+        return Some((start, start + Duration::days(7)));
+    }
+
+    // Royal Hobart Regatta: 3 days ending on 2nd Monday in February
+    if name == "royal hobart regatta" {
+        let end = nth_dow_of_month(year, 2, 0, 2);
+        let start = end - Duration::days(2);
+        return Some((start, end + Duration::days(1)));
+    }
+
+    // National Arbor Week (ZA): September 1..7 inclusive
+    if name == "national arbor week" {
+        let start = NaiveDate::from_ymd_opt(year, 9, 1)?;
+        return Some((start, start + Duration::days(7)));
+    }
+
+    // NAIDOC Week (AU): Sunday before 2nd Friday in July through following Sunday
+    if name == "naidoc week" {
+        let second_friday = nth_dow_of_month(year, 7, 4, 2); // 4=Friday
+        let start = second_friday - Duration::days(5);
+        let end_exclusive = second_friday + Duration::days(2);
+        return Some((start, end_exclusive));
+    }
+
+    // Royal Queensland Show / Ekka (AU): 10-day interval from computed start Friday in August
+    if name == "ekka"
+        || name == "royal queensland show"
+        || name == "royal national agricultural show"
+        || name == "rna show"
+    {
+        if let Some(start) = royal_queensland_show_start(year) {
+            return Some((start, start + Duration::days(10)));
+        }
+    }
+
+    // Labour Day weekend (CA): from previous Friday 18:00 to Tuesday 00:00 after Labour Day Monday
+    if name.starts_with("labor day weekend") || name.starts_with("labour day weekend") {
+        let labor_day = nth_dow_of_month(year, 9, 0, 1);
+        let start = labor_day - Duration::days(3);
+        let end_exclusive = labor_day + Duration::days(1);
+        return Some((start, end_exclusive));
     }
 
     None
@@ -2781,6 +2857,63 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
         }
         s if s.contains("valentine") => return NaiveDate::from_ymd_opt(year, 2, 14),
         "halloween" => return NaiveDate::from_ymd_opt(year, 10, 31),
+        "independence day" => return NaiveDate::from_ymd_opt(year, 7, 4),
+        "canada day" => return NaiveDate::from_ymd_opt(year, 7, 1),
+        "dominion day" => return NaiveDate::from_ymd_opt(year, 7, 1),
+        "anzac day" => return NaiveDate::from_ymd_opt(year, 4, 25),
+        "garifuna settlement day" => return NaiveDate::from_ymd_opt(year, 11, 19),
+        "indian arrival day" => return NaiveDate::from_ymd_opt(year, 5, 30),
+        "rizal day" => return NaiveDate::from_ymd_opt(year, 12, 30),
+        "shivaji jayanti" => return NaiveDate::from_ymd_opt(year, 2, 19),
+        "hazarat ali's birthday" => return rajab(year).map(|d| d + Duration::days(12)),
+        "reconciliation day" => {
+            let base = NaiveDate::from_ymd_opt(year, 5, 26)?;
+            let delta = (7 + 0_i64 - i64::from(base.weekday().num_days_from_monday())) % 7;
+            return Some(base + Duration::days(delta));
+        }
+        s if s.starts_with("day of") && (s.contains("vow") || s.contains("reconciliation")) => {
+            return NaiveDate::from_ymd_opt(year, 12, 16);
+        }
+        "heritage day" => return NaiveDate::from_ymd_opt(year, 9, 24),
+        "vimy ridge day" => return NaiveDate::from_ymd_opt(year, 4, 9),
+        "orangemen's day" | "the twelfth" | "the glorious twelfth" => {
+            return NaiveDate::from_ymd_opt(year, 7, 12);
+        }
+        "victoria day" | "sovereign's birthday" => {
+            let base = NaiveDate::from_ymd_opt(year, 5, 25)?;
+            let back = i64::from(base.weekday().num_days_from_monday());
+            return Some(base - Duration::days(back));
+        }
+        "discovery day" => {
+            let base = NaiveDate::from_ymd_opt(year, 6, 24)?;
+            return Some(closest_weekday(base));
+        }
+        "civic day"
+        | "civic holiday"
+        | "british columbia day"
+        | "natal day"
+        | "new brunswick day"
+        | "saskatchewan day"
+        | "terry fox day" => return Some(nth_dow_of_month(year, 8, 0, 1)),
+        "family day" | "islander day" | "louis riel day" | "nova scotia heritage day" => {
+            return Some(nth_dow_of_month(year, 2, 0, 3));
+        }
+        "national patriots day" | "national patriot's day" => {
+            let base = NaiveDate::from_ymd_opt(year, 5, 25)?;
+            let back = i64::from(base.weekday().num_days_from_monday());
+            return Some(base - Duration::days(back));
+        }
+        "royal queensland show day" | "ekka day" | "rna show day" => {
+            if let Some(start) = royal_queensland_show_start(year) {
+                return Some(start + Duration::days(5));
+            }
+        }
+        s if s.starts_with("veteran") => return NaiveDate::from_ymd_opt(year, 11, 11),
+        "law day" | "lei day" | "loyalty day" => return NaiveDate::from_ymd_opt(year, 5, 1),
+        s if s.contains("lincoln") => return NaiveDate::from_ymd_opt(year, 2, 12),
+        "guy fawkes day" => return NaiveDate::from_ymd_opt(year, 11, 5),
+        "groundhog day" | "groundhogs day" => return NaiveDate::from_ymd_opt(year, 2, 2),
+        "siblings day" | "national sibling day" => return NaiveDate::from_ymd_opt(year, 4, 10),
         "world vegan day" => return NaiveDate::from_ymd_opt(year, 11, 1),
         s if s.contains("patrick") || s.contains("paddy") => {
             return NaiveDate::from_ymd_opt(year, 3, 17)
@@ -2800,6 +2933,21 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     // Thanksgiving (4th Thursday of November)
     if name.starts_with("thanksgiving") {
         return Some(nth_dow_of_month(year, 11, 3, 4)); // 3=Thursday, 4th occurrence
+    }
+
+    // Memorial Day / Decoration Day (last Monday of May)
+    if name.starts_with("memorial") || name.starts_with("decoration") {
+        return Some(last_dow_of_month(year, 5, 0)); // 0=Monday
+    }
+
+    // Labor/Labour Day (default: 1st Monday of September)
+    if name.starts_with("labor day") || name.starts_with("labour day") {
+        return Some(nth_dow_of_month(year, 9, 0, 1)); // 0=Monday, 1st occurrence
+    }
+
+    // UK August Bank Holiday (last Monday of August)
+    if name.contains("bank holiday") {
+        return Some(last_dow_of_month(year, 8, 0)); // 0=Monday
     }
 
     // Black Friday (day after Thanksgiving)
@@ -2822,6 +2970,89 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
         || name.contains("idaho human")
     {
         return Some(nth_dow_of_month(year, 1, 0, 3)); // 0=Monday, 3rd occurrence
+    }
+
+    // Presidents' Day / Washington's Birthday aliases (3rd Monday of February)
+    if name.contains("washington")
+        || name.contains("president")
+        || name.contains("daisy gatson bates")
+    {
+        return Some(nth_dow_of_month(year, 2, 0, 3)); // 0=Monday, 3rd occurrence
+    }
+
+    // Mother's Day (2nd Sunday of May)
+    if name.contains("mother") && name.contains("day") {
+        return Some(nth_dow_of_month(year, 5, 6, 2)); // 6=Sunday, 2nd occurrence
+    }
+
+    // UK Mothering Sunday (3 weeks before Easter)
+    if name.contains("mothering sunday") {
+        return Some(easter_date(year) - Duration::days(21));
+    }
+
+    // Father's Day (3rd Sunday of June)
+    if name.contains("father") && name.contains("day") {
+        return Some(nth_dow_of_month(year, 6, 6, 3)); // 6=Sunday, 3rd occurrence
+    }
+
+    // National Grandparents Day (2nd Sunday in September)
+    if name.contains("grandparents") {
+        return Some(nth_dow_of_month(year, 9, 6, 2)); // 6=Sunday, 2nd occurrence
+    }
+
+    // Military Spouse Day (Friday before Mother's Day)
+    if name.contains("military spouse") {
+        let mothers_day = nth_dow_of_month(year, 5, 6, 2);
+        return Some(mothers_day - Duration::days(2)); // Friday
+    }
+
+    // Emancipation Day (DC observed date)
+    if name.starts_with("emancipation") {
+        return Some(observed_emancipation_day(year));
+    }
+
+    // Tax Day (April 15 adjusted for weekend and Emancipation Day)
+    if name == "tax day" {
+        return Some(compute_tax_day(year));
+    }
+
+    // Emergency Medical Services for Children Day (Wednesday in EMS week)
+    if name.starts_with("emsc day") {
+        let ems_week_start = nth_dow_of_month(year, 5, 6, 3); // 3rd Sunday in May
+        return Some(ems_week_start + Duration::days(3));
+    }
+
+    // Administrative Professionals' Day (Wednesday of last full week in April)
+    if name.contains("administrative")
+        || name.contains("secretaries")
+        || name.starts_with("admins day")
+    {
+        return Some(administrative_professionals_day(year));
+    }
+
+    // Daylight Saving start/end day (US rules)
+    if name.contains("daylight saving") || name.contains("daylight savings") {
+        if name.contains("start") {
+            return Some(nth_dow_of_month(year, 3, 6, 2)); // 2nd Sunday in March
+        }
+        if name.contains("end") {
+            return Some(nth_dow_of_month(year, 11, 6, 1)); // 1st Sunday in November
+        }
+    }
+
+    // Super Tuesday family
+    if name.contains("super tuesday")
+        || name.contains("giga tuesday")
+        || name.contains("mega giga tuesday")
+        || name.contains("super duper tuesday")
+        || name.contains("tsunami tuesday")
+    {
+        return super_tuesday_date(year);
+    }
+
+    // Mini-Tuesday
+    if name.contains("mini-tuesday") || name.contains("mini tuesday") {
+        return mini_tuesday_date(year);
     }
 
     // Easter-based holidays
@@ -2911,6 +3142,21 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     // GYSD / Global Youth Service Day (varies)
     if name == "gysd" || name.starts_with("global youth service") {
         return gysd_date(year);
+    }
+
+    // National Heroes' Day (PH): last Monday of August
+    if name == "national heroes' day" || name == "national heroes day" {
+        return Some(last_dow_of_month(year, 8, 0));
+    }
+
+    // Heroes' Day aliases
+    if name == "heroes' day" || name == "heroes day" || name == "kruger day" {
+        return Some(NaiveDate::from_ymd_opt(year, 10, 10)?);
+    }
+
+    // Hosay (TT): Day of Ashura
+    if name == "hosay" {
+        return islamic_new_year(year).map(|d| d + Duration::days(9));
     }
 
     // Earth Hour (last Saturday of March)
@@ -3101,6 +3347,57 @@ fn last_dow_of_month(year: i32, month: u32, dow: u32) -> NaiveDate {
     last - Duration::days(diff as i64)
 }
 
+fn observed_emancipation_day(year: i32) -> NaiveDate {
+    let d = NaiveDate::from_ymd_opt(year, 4, 16).unwrap();
+    match d.weekday().num_days_from_monday() {
+        5 => d - Duration::days(1), // Saturday -> Friday
+        6 => d + Duration::days(1), // Sunday -> Monday
+        _ => d,
+    }
+}
+
+fn compute_tax_day(year: i32) -> NaiveDate {
+    let mut d = NaiveDate::from_ymd_opt(year, 4, 15).unwrap();
+    let emancipation = observed_emancipation_day(year);
+    while matches!(d.weekday().num_days_from_monday(), 5 | 6) || d == emancipation {
+        d += Duration::days(1);
+    }
+    d
+}
+
+fn administrative_professionals_day(year: i32) -> NaiveDate {
+    // Wednesday of the last full week in April (Sunday-start week).
+    let mut sunday = NaiveDate::from_ymd_opt(year, 4, 30).unwrap();
+    while sunday.weekday().num_days_from_sunday() != 0 {
+        sunday -= Duration::days(1);
+    }
+    if sunday.month() != 4 || (sunday + Duration::days(6)).month() != 4 {
+        sunday -= Duration::days(7);
+    }
+    sunday + Duration::days(3) // Wednesday
+}
+
+fn super_tuesday_date(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2000 => (3, 7),
+        2004 => (3, 2),
+        2008 => (2, 5),
+        2012 => (3, 6),
+        2016 => (3, 1),
+        2020 => (3, 3),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
+fn mini_tuesday_date(year: i32) -> Option<NaiveDate> {
+    let (m, d) = match year {
+        2004 => (2, 3),
+        _ => return None,
+    };
+    NaiveDate::from_ymd_opt(year, m, d)
+}
+
 /// Find the closest occurrence of a specific day of week to a given date.
 /// Given a DOW and a specific date (month/day, optional year), find the nearest occurrence
 /// where the date falls on the given DOW. Checks both past and future.
@@ -3179,6 +3476,16 @@ fn closest_weekday(date: NaiveDate) -> NaiveDate {
         5 => date - Duration::days(1), // Saturday → Friday
         6 => date + Duration::days(1), // Sunday → Monday
         _ => date,
+    }
+}
+
+fn royal_queensland_show_start(year: i32) -> Option<NaiveDate> {
+    // First Friday in August, unless that falls before Aug 5, then use second Friday.
+    let first_friday = nth_dow_of_month(year, 8, 4, 1);
+    if first_friday.day() < 5 {
+        Some(nth_dow_of_month(year, 8, 4, 2))
+    } else {
+        Some(first_friday)
     }
 }
 

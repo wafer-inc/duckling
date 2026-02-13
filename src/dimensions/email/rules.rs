@@ -50,6 +50,21 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Email(EmailData::new(&email)))
             }),
         },
+        // Icelandic spelled-out email: "alice ingi example.io"
+        Rule {
+            name: "email spelled out (is)".to_string(),
+            pattern: vec![regex(r"([\w\._+-]+)\s+ingi\s+([\w_-]+(\.[\w_-]+)+)")],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let local = m.group(1)?;
+                let domain = m.group(2)?;
+                let email = format!("{}@{}", local, domain);
+                Some(TokenData::Email(EmailData::new(&email)))
+            }),
+        },
     ]
 }
 

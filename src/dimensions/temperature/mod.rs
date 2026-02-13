@@ -1,4 +1,20 @@
+pub mod ca;
 pub mod en;
+pub mod es;
+pub mod ar;
+pub mod ga;
+pub mod fr;
+pub mod hr;
+pub mod hi;
+pub mod it;
+pub mod ja;
+pub mod km;
+pub mod ko;
+pub mod mn;
+pub mod pt;
+pub mod ro;
+pub mod tr;
+pub mod zh;
 
 use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 

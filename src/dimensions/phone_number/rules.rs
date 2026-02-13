@@ -3,6 +3,89 @@ use crate::types::{Rule, TokenData};
 
 use super::PhoneNumberData;
 
+fn normalize_decimal_digits(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            // Arabic-Indic
+            '٠' => '0',
+            '١' => '1',
+            '٢' => '2',
+            '٣' => '3',
+            '٤' => '4',
+            '٥' => '5',
+            '٦' => '6',
+            '٧' => '7',
+            '٨' => '8',
+            '٩' => '9',
+            // Extended Arabic-Indic
+            '۰' => '0',
+            '۱' => '1',
+            '۲' => '2',
+            '۳' => '3',
+            '۴' => '4',
+            '۵' => '5',
+            '۶' => '6',
+            '۷' => '7',
+            '۸' => '8',
+            '۹' => '9',
+            _ => c,
+        })
+        .collect()
+}
+
+fn decode_escaped_arabic_indic_digits(s: &str) -> String {
+    let mut out = String::new();
+    let mut chunk = String::new();
+
+    let flush_chunk = |chunk: &str, out: &mut String| {
+        if chunk.is_empty() {
+            return;
+        }
+        if chunk.len() % 4 == 0 {
+            let mut ok = true;
+            for group in chunk.as_bytes().chunks(4) {
+                let g = std::str::from_utf8(group).ok().and_then(|x| x.parse::<u32>().ok());
+                match g {
+                    Some(cp @ 1632..=1641) => {
+                        let d = (cp - 1632) as u8 + b'0';
+                        out.push(d as char);
+                    }
+                    _ => {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+            if ok {
+                return;
+            }
+        }
+        out.push_str(chunk);
+    };
+
+    for ch in s.chars() {
+        if ch.is_ascii_digit() {
+            chunk.push(ch);
+        } else {
+            flush_chunk(&chunk, &mut out);
+            chunk.clear();
+            out.push(ch);
+        }
+    }
+    flush_chunk(&chunk, &mut out);
+    out
+}
+
+fn canonical_phone_digits(s: &str) -> String {
+    let normalized = normalize_decimal_digits(s);
+    let decoded = decode_escaped_arabic_indic_digits(&normalized);
+    decoded.chars().filter(|c| c.is_ascii_digit()).collect()
+}
+
+fn decimal_digit_count(s: &str) -> usize {
+    canonical_phone_digits(s).len()
+}
+
 pub fn rules() -> Vec<Rule> {
     vec![
         // Comprehensive phone number rule ported from Haskell.
@@ -13,7 +96,7 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "phone number".to_string(),
             pattern: vec![regex(
-                r"(?:\(?\+(\d{1,2})\)?[\s\-\.]*)?([\d(][\d()\s\-\.]{4,14}[\d)])(?:\s*e?xt?\.?\s*(\d{1,20}))?",
+                r"(?:\(?\+(\d{1,4})\)?[\s\-\.]*)?([\d(][\d()\s\-\.]{4,120}[\d)])(?:\s*(?:e?xt?\.?|x|فرعي)\s*(\d{1,40}))?",
             )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
@@ -25,23 +108,19 @@ pub fn rules() -> Vec<Rule> {
                 let extension = m.group(3);
 
                 // Count digits in the body
-                let body_digits: String = body.chars().filter(|c| c.is_ascii_digit()).collect();
-                if body_digits.len() < 7 || body_digits.len() > 15 {
+                let body_digits = decimal_digit_count(body);
+                if body_digits < 7 || body_digits > 15 {
                     return None;
                 }
 
                 // Build the cleaned phone number value (matching Haskell's cleanup)
                 let mut value = String::new();
                 if let Some(code) = prefix {
-                    value.push_str(&format!("(+{}) ", code));
+                    value.push_str(&format!("(+{}) ", canonical_phone_digits(code)));
                 }
-                let cleaned: String = body
-                    .chars()
-                    .filter(|c| !matches!(c, '.' | ' ' | '-' | '\t' | '(' | ')'))
-                    .collect();
-                value.push_str(&cleaned);
+                value.push_str(&canonical_phone_digits(body));
                 if let Some(ext) = extension {
-                    value.push_str(&format!(" ext {}", ext));
+                    value.push_str(&format!(" ext {}", canonical_phone_digits(ext)));
                 }
 
                 Some(TokenData::PhoneNumber(PhoneNumberData::new(&value)))

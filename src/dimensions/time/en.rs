@@ -1123,6 +1123,94 @@ pub fn rules() -> Vec<Rule> {
                 }
             }),
         },
+        // DD/MM(/YY) where first number can't be a month (e.g., "15/2", "31/10/74")
+        Rule {
+            name: "date DD/MM(/YY)".to_string(),
+            pattern: vec![regex(
+                r"\b(\d{1,2})\s?[/\-]\s?(\d{1,2})(?:\s?[/\-]\s?(\d{2,4}))?\b",
+            )],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let day: u32 = m.group(1)?.parse().ok()?;
+                let month: u32 = m.group(2)?.parse().ok()?;
+                let year = m.group(3).and_then(|y| {
+                    let yr: i32 = y.parse().ok()?;
+                    if yr < 100 {
+                        if yr < 50 {
+                            Some(yr + 2000)
+                        } else {
+                            Some(yr + 1900)
+                        }
+                    } else {
+                        Some(yr)
+                    }
+                });
+                if (13..=31).contains(&day) && (1..=12).contains(&month) {
+                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
+                        month,
+                        day,
+                        year,
+                    })))
+                } else {
+                    None
+                }
+            }),
+        },
+        // MM DD YYYY (e.g., "10 31 1974")
+        Rule {
+            name: "date MM DD YYYY".to_string(),
+            pattern: vec![regex(r"\b(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\b")],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let month: u32 = m.group(1)?.parse().ok()?;
+                let day: u32 = m.group(2)?.parse().ok()?;
+                let mut year: i32 = m.group(3)?.parse().ok()?;
+                if year < 100 {
+                    year = if year < 50 { year + 2000 } else { year + 1900 };
+                }
+                if (1..=12).contains(&month) && (1..=31).contains(&day) {
+                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
+                        month,
+                        day,
+                        year: Some(year),
+                    })))
+                } else {
+                    None
+                }
+            }),
+        },
+        // DD MM YYYY where first number can't be a month (e.g., "31 10 1974")
+        Rule {
+            name: "date DD MM YYYY".to_string(),
+            pattern: vec![regex(r"\b(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\b")],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let day: u32 = m.group(1)?.parse().ok()?;
+                let month: u32 = m.group(2)?.parse().ok()?;
+                let mut year: i32 = m.group(3)?.parse().ok()?;
+                if year < 100 {
+                    year = if year < 50 { year + 2000 } else { year + 1900 };
+                }
+                if (13..=31).contains(&day) && (1..=12).contains(&month) {
+                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
+                        month,
+                        day,
+                        year: Some(year),
+                    })))
+                } else {
+                    None
+                }
+            }),
+        },
         // MM/YYYY (e.g., "2/2013", "11/2014")
         Rule {
             name: "date MM/YYYY".to_string(),
@@ -1201,6 +1289,12 @@ pub fn rules() -> Vec<Rule> {
                     Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
                         month: v1,
                         day: v2,
+                        year: Some(year),
+                    })))
+                } else if (13..=31).contains(&v1) && (1..=12).contains(&v2) {
+                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
+                        month: v2,
+                        day: v1,
                         year: Some(year),
                     })))
                 } else {
@@ -3815,6 +3909,67 @@ fn holidays_regex() -> String {
         r"black\s+friday",
         // Thanksgiving
         r"thanksgiving(\s+day)?",
+        // US/Intl: Memorial / Labor-Labour and locale-specific civic holidays
+        r"(memorial|decoration)\s+day",
+        r"labou?r\s+day",
+        r"independence\s+day",
+        r"canada\s+day",
+        r"dominion\s+day",
+        r"anzac\s+day",
+        r"royal\s+hobart\s+regatta",
+        r"(royal\s+(national\s+agricultural|queensland)|rna)\s+show(\s+day)?",
+        r"ekka(\s+day)?",
+        r"reconciliation\s+day",
+        r"garifuna\s+settlement\s+day",
+        r"indian\s+arrival\s+day",
+        r"hosay",
+        r"rizal\s+day",
+        r"shivaji\s+jayanti",
+        r"hazarat\s+ali'?s\s+birthday",
+        r"(national\s+)?heroes'?s?\s+day",
+        r"day\s+of(\s+the)?\s+(covenant|reconciliation|vow)",
+        r"national\s+arbor\s+week",
+        r"naidoc\s+week",
+        r"kruger\s+day",
+        r"vimy\s+ridge\s+day",
+        r"(orangemen'?s?\s+day|the\s+(glorious\s+)?twelfth)",
+        r"(sovereign'?s?\s+birthday|victoria\s+day)",
+        r"discovery\s+day",
+        r"(civic\s+holiday|(british\s+columbia|civic|natal|new\s+brunswick|saskatchewan|terry\s+fox)\s+day)",
+        r"(family|islander|louis\s+riel|nova\s+scotia\s+heritage)\s+day",
+        r"national\s+patriot('?s|s')?\s+day",
+        r"labou?r\s+day\s+week(\s|-)?ends?",
+        r"heritage\s+day",
+        r"veterans?\s+day",
+        r"law\s+day",
+        r"lei\s+day",
+        r"loyalty\s+day",
+        r"george\s+washington\s+day",
+        r"washington'?s?\s+birthday",
+        r"presidents?'?\s+day",
+        r"daisy\s+gatson\s+bates\s+day",
+        r"lincoln'?s'?\s+birthday",
+        r"lincoln\s+birthday",
+        r"abraham\s+lincoln'?s'?\s+birthday",
+        r"guy\s+fawkes\s+day",
+        r"father'?s?\s+day",
+        r"mother'?s?\s+day",
+        r"mothering\s+sunday",
+        r"whitsunday",
+        r"(august|summer|late\s+summer)\s+bank\s+holiday",
+        r"national\s+grandparents\s+day",
+        r"military\s+spouse\s+day",
+        r"groundhogs?\s+day",
+        r"emancipation\s+day",
+        r"tax\s+day",
+        r"(national\s+)?sibling(s)?\s+day",
+        r"(administrative\s+professionals?'?|administrative\s+professional'?s?|secretaries'?|admins?)\s+day",
+        r"national\s+youth\s+service\s+day",
+        r"ems\s+week",
+        r"emsc\s+day",
+        r"daylight\s+savings?\s+(start|end)(\s+day)?",
+        r"(super|giga|mega\s+giga|super\s+duper|tsunami)\s+tue\.?(sday)?",
+        r"mini(\s*-\s*|\s+)tue\.?(sday)?",
         // Boss's Day
         r"boss'?s?(\s+day)?",
         // MLK Day (from Haskell: (MLK|Martin Luther King('?s)?,?)( Jr\.?| Junior)? day)
@@ -3883,6 +4038,9 @@ fn holidays_regex() -> String {
         r"amun\s+jadid",
         r"(day\s+of\s+)?ashura",
         r"ramadan",
+        r"ramadh[ae]n",
+        r"ramzaan",
+        r"ramzan",
         r"isra\s+and\s+mi'?raj",
         r"the\s+prophet'?s\s+ascension",
         r"the\s+night\s+journey",

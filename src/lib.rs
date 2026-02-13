@@ -49,7 +49,7 @@ pub fn parse(
     context: &Context,
     options: &Options,
 ) -> Vec<Entity> {
-    let rules = lang::rules_for(locale.lang, dims);
+    let rules = lang::rules_for(*locale, dims);
     let mut entities = engine::parse_and_resolve(text, rules, context, options, dims);
     ranking::rank(&mut entities);
     ranking::remove_overlapping(entities)
@@ -61,7 +61,7 @@ pub fn parse(
 /// use duckling::{parse_en, Entity, DimensionKind, DimensionValue};
 ///
 /// assert_eq!(parse_en("forty-two", &[DimensionKind::Numeral]), vec![Entity {
-///     body: "forty-two".into(), start: 0, end: 9, latent: None,
+///     body: "forty-two".into(), start: 0, end: 9, latent: Some(false),
 ///     value: DimensionValue::Numeral(42.0),
 /// }]);
 /// ```
@@ -224,5 +224,138 @@ mod integration_tests {
         // Should handle parsing with all dimensions enabled
         let entities = parse_en("tomorrow at 3pm for $50", &[]);
         assert!(!entities.is_empty(), "Expected some entities, got none");
+    }
+
+    #[test]
+    fn test_entity_non_latent_flag_is_set() {
+        let entities = parse_en("forty-two", &[DimensionKind::Numeral]);
+        let found = entities.iter().any(|e| {
+            matches!(&e.value, DimensionValue::Numeral(v) if (*v - 42.0).abs() < 0.01)
+                && e.latent == Some(false)
+        });
+        assert!(
+            found,
+            "Expected numeral entity with latent=Some(false), got: {:?}",
+            entities
+        );
+    }
+
+    #[test]
+    fn test_entity_latent_flag_is_set_when_enabled() {
+        let locale = Locale::new(Lang::EN, None);
+        let context = Context::default();
+        let options = Options { with_latent: true };
+        let entities = parse(
+            "morning",
+            &locale,
+            &[DimensionKind::Time],
+            &context,
+            &options,
+        );
+        let found = entities
+            .iter()
+            .any(|e| matches!(&e.value, DimensionValue::Time(_)) && e.latent == Some(true));
+        assert!(
+            found,
+            "Expected latent time entity with latent=Some(true), got: {:?}",
+            entities
+        );
+    }
+
+    #[test]
+    fn test_parse_money_grand() {
+        let entities = parse_en("a grand", &[DimensionKind::AmountOfMoney]);
+        let found = entities.iter().any(|e| {
+            matches!(
+                &e.value,
+                DimensionValue::AmountOfMoney(MeasurementValue::Value { value, unit })
+                    if (*value - 1000.0).abs() < 0.01 && unit == "USD"
+            )
+        });
+        assert!(
+            found,
+            "Expected amount-of-money for 'a grand', got: {:?}",
+            entities
+        );
+    }
+
+    #[test]
+    fn test_parse_money_symbol_non_en_common_rule() {
+        let locale = Locale::new(Lang::ES, None);
+        let context = Context {
+            locale,
+            ..Context::default()
+        };
+        let entities = parse(
+            "$10",
+            &locale,
+            &[DimensionKind::AmountOfMoney],
+            &context,
+            &Options::default(),
+        );
+        let found = entities.iter().any(|e| {
+            matches!(
+                &e.value,
+                DimensionValue::AmountOfMoney(MeasurementValue::Value { value, .. })
+                    if (*value - 10.0).abs() < 0.01
+            )
+        });
+        assert!(found, "Expected '$10' in non-EN locale, got: {:?}", entities);
+    }
+
+    #[test]
+    fn test_parse_time_dmy_slash_stays_naive() {
+        use chrono::{TimeZone, Utc};
+        let locale = Locale::new(Lang::EN, Some(Region::GB));
+        let context = Context {
+            reference_time: Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
+            locale,
+            timezone_offset_minutes: -120,
+        };
+        let options = Options::default();
+        let entities = parse("15/2", &locale, &[DimensionKind::Time], &context, &options);
+        let found = entities.iter().any(|e| {
+            matches!(
+                &e.value,
+                DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, .. }))
+                    if value.date() == chrono::NaiveDate::from_ymd_opt(2013, 2, 15).unwrap()
+            )
+        });
+        assert!(
+            found,
+            "Expected naive time entity for '15/2', got: {:?}",
+            entities
+        );
+    }
+
+    #[test]
+    fn test_parse_time_mdy_space_stays_naive() {
+        use chrono::{TimeZone, Utc};
+        let locale = Locale::new(Lang::EN, Some(Region::US));
+        let context = Context {
+            reference_time: Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
+            locale,
+            timezone_offset_minutes: -120,
+        };
+        let options = Options::default();
+        let entities = parse(
+            "10 31 1974",
+            &locale,
+            &[DimensionKind::Time],
+            &context,
+            &options,
+        );
+        let found = entities.iter().any(|e| {
+            matches!(
+                &e.value,
+                DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, .. }))
+                    if value.date() == chrono::NaiveDate::from_ymd_opt(1974, 10, 31).unwrap()
+            )
+        });
+        assert!(
+            found,
+            "Expected naive time entity for '10 31 1974', got: {:?}",
+            entities
+        );
     }
 }

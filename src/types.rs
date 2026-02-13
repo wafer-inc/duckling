@@ -343,6 +343,14 @@ impl TokenData {
             TokenData::RegexMatch(_) => None,
         }
     }
+
+    pub(crate) fn is_latent(&self) -> bool {
+        match self {
+            TokenData::AmountOfMoney(data) => data.latent,
+            TokenData::Time(data) => data.latent,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -427,7 +435,7 @@ impl fmt::Debug for Rule {
 /// use duckling::{parse_en, Entity, DimensionKind, DimensionValue};
 ///
 /// assert_eq!(parse_en("I need 42 widgets", &[DimensionKind::Numeral]), vec![Entity {
-///     body: "42".into(), start: 7, end: 9, latent: None,
+///     body: "42".into(), start: 7, end: 9, latent: Some(false),
 ///     value: DimensionValue::Numeral(42.0),
 /// }]);
 /// ```

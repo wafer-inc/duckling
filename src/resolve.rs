@@ -34,6 +34,7 @@ pub struct Options {
 /// Resolve a node into a structured entity.
 pub fn resolve(node: &Node, context: &Context, options: &Options, text: &str) -> Option<Entity> {
     let body = text[node.range.start..node.range.end].to_string();
+    let latent = node.token_data.is_latent();
     let resolved = resolve_token(&node.token_data, context, options)?;
 
     Some(Entity {
@@ -41,7 +42,7 @@ pub fn resolve(node: &Node, context: &Context, options: &Options, text: &str) ->
         start: node.range.start,
         end: node.range.end,
         value: resolved,
-        latent: None,
+        latent: Some(latent),
     })
 }
 

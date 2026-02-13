@@ -75,7 +75,7 @@ fn lookup_currency(s: &str) -> Option<Currency> {
         "dkk" => Some(Currency::DKK),
         "dollar" | "dollars" => Some(Currency::Dollar),
         "egp" => Some(Currency::EGP),
-        "\u{20ac}" | "eur" | "euro" | "euros" | "eurs" | "\u{20ac}ur" | "\u{20ac}uro"
+        "\u{20ac}" | "x20ac" | "eur" | "euro" | "euros" | "eurs" | "\u{20ac}ur" | "\u{20ac}uro"
         | "\u{20ac}uros" | "\u{20ac}urs" => Some(Currency::EUR),
         "gbp" => Some(Currency::GBP),
         "gel" | "lari" | "\u{20be}" => Some(Currency::GEL),
@@ -131,7 +131,7 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "currencies".to_string(),
             pattern: vec![regex(
-                r"(aed|aud|bgn|brl|byn|\u{00a2}|cad|chf|cny|czk|c|\$|dinars?|dkk|dollars?|egp|(e|\u{20ac})uro?s?|\u{20ac}|gbp|gel|\u{20be}|hkd|hrk|idr|ils|\u{20aa}|inr|iqd|jmd|jod|\u{00a5}|jpy|lari|krw|kwd|lbp|mad|\u{20ae}|mnt|tugriks?|myr|rm|nis|nok|nzd|\u{00a3}|pkr|pln|pta?s?|qar|\u{20bd}|rs\.?|riy?als?|ron|rub|rupees?|sar|sek|sgd|shekels?|thb|ttd|\u{20b4}|uah|us(d|\$)|vnd|yen|yuan|zar|tl|lira|\u{20ba})",
+                r"(aed|aud|bgn|brl|byn|\u{00a2}|cad|chf|cny|czk|c|\$|dinars?|dkk|dollars?|egp|(e|\u{20ac}|x20ac)uro?s?|\u{20ac}|x20ac|gbp|gel|\u{20be}|hkd|hrk|idr|ils|\u{20aa}|inr|iqd|jmd|jod|\u{00a5}|jpy|lari|krw|kwd|lbp|mad|\u{20ae}|mnt|tugriks?|myr|rm|nis|nok|nzd|\u{00a3}|pkr|pln|pta?s?|qar|\u{20bd}|rs\.?|riy?als?|ron|rub|rupees?|sar|sek|sgd|shekels?|thb|ttd|\u{20b4}|uah|us(d|\$)|vnd|yen|yuan|zar|tl|lira|\u{20ba})",
             )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
@@ -317,6 +317,49 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
                     Currency::Unnamed,
                 )))
+            }),
+        },
+        // a grand
+        Rule {
+            name: "a grand".to_string(),
+            pattern: vec![regex(r"a grand")],
+            production: Box::new(|_| {
+                Some(TokenData::AmountOfMoney(
+                    AmountOfMoneyData::currency_only(Currency::Unnamed).with_value(1000.0),
+                ))
+            }),
+        },
+        // <amount> grand
+        Rule {
+            name: "<amount> grand".to_string(),
+            pattern: vec![predicate(is_positive), regex(r"grand")],
+            production: Box::new(|nodes| {
+                let num = numeral_data(&nodes[0].token_data)?;
+                Some(TokenData::AmountOfMoney(
+                    AmountOfMoneyData::currency_only(Currency::Unnamed)
+                        .with_value(1000.0 * num.value),
+                ))
+            }),
+        },
+        // dollar coin
+        Rule {
+            name: "dollar coin".to_string(),
+            pattern: vec![regex(r"(nickel|dime|quarter)s?")],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let coin = m.group(1)?.to_lowercase();
+                let value = match coin.as_str() {
+                    "nickel" => 0.05,
+                    "dime" => 0.1,
+                    "quarter" => 0.25,
+                    _ => return None,
+                };
+                Some(TokenData::AmountOfMoney(
+                    AmountOfMoneyData::currency_only(Currency::Dollar).with_value(value),
+                ))
             }),
         },
         // a <currency>: "a dollar", "an euro"
@@ -519,6 +562,27 @@ pub fn rules() -> Vec<Rule> {
             }),
         },
     ]
+}
+
+fn is_common_rule_name(name: &str) -> bool {
+    matches!(
+        name,
+        "currencies" | "<amount> <unit>" | "<unit> <amount>" | "<amount> (latent)"
+    )
+}
+
+pub fn common_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| is_common_rule_name(&r.name))
+        .collect()
+}
+
+pub fn lang_rules() -> Vec<Rule> {
+    rules()
+        .into_iter()
+        .filter(|r| !is_common_rule_name(&r.name))
+        .collect()
 }
 
 #[cfg(test)]

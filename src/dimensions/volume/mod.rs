@@ -1,4 +1,21 @@
+pub mod ar;
+pub mod ca;
+pub mod de;
 pub mod en;
+pub mod es;
+pub mod ga;
+pub mod fr;
+pub mod hr;
+pub mod it;
+pub mod km;
+pub mod ko;
+pub mod mn;
+pub mod nl;
+pub mod pt;
+pub mod ro;
+pub mod ru;
+pub mod tr;
+pub mod zh;
 
 use crate::types::{DimensionValue, MeasurementPoint, MeasurementValue};
 
@@ -15,6 +32,7 @@ pub enum VolumeUnit {
     Gallon,
     Litre,
     Millilitre,
+    Centilitre,
     Hectolitre,
     Cup,
     Pint,
@@ -29,6 +47,7 @@ impl VolumeUnit {
             VolumeUnit::Gallon => "gallon",
             VolumeUnit::Litre => "litre",
             VolumeUnit::Millilitre => "millilitre",
+            VolumeUnit::Centilitre => "centilitre",
             VolumeUnit::Hectolitre => "hectolitre",
             VolumeUnit::Cup => "cup",
             VolumeUnit::Pint => "pint",
