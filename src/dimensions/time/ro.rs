@@ -73,6 +73,16 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 6, day, year: None })))
             }),
         },
+        Rule {
+            name: "christmas day (ro)".to_string(),
+            pattern: vec![regex("ziua de craciun|ziua de crăciun")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 12, day: 25, year: None })))),
+        },
+        Rule {
+            name: "craciun (ro)".to_string(),
+            pattern: vec![regex("craciun|crăciun")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 12, day: 25, year: None })))),
+        },
     ]);
     rules
 }

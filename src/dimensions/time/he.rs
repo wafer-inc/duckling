@@ -1,6 +1,7 @@
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::{TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
+use super::{Direction, TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();
@@ -162,6 +163,117 @@ pub fn rules() -> Vec<Rule> {
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: None })))
             }),
+        },
+        Rule {
+            name: "march next (he)".to_string(),
+            pattern: vec![regex("מרץ הבא")],
+            production: Box::new(|_| {
+                let mut t = TimeData::new(TimeForm::Month(3));
+                t.direction = Some(Direction::Future);
+                Some(TokenData::Time(t))
+            }),
+        },
+        Rule {
+            name: "this week (he)".to_string(),
+            pattern: vec![regex("בשבוע הזה")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::AllGrain(Grain::Week))))),
+        },
+        Rule {
+            name: "last week (he)".to_string(),
+            pattern: vec![regex("שבוע שעבר|שבוע האחרון")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Week, offset: -1 })))),
+        },
+        Rule {
+            name: "next week (he)".to_string(),
+            pattern: vec![regex("שבוע הבא")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Week, offset: 1 })))),
+        },
+        Rule {
+            name: "last month (he)".to_string(),
+            pattern: vec![regex("חודש שעבר")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Month, offset: -1 })))),
+        },
+        Rule {
+            name: "next month (he)".to_string(),
+            pattern: vec![regex("חודש הבא")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Month, offset: 1 })))),
+        },
+        Rule {
+            name: "next year (he)".to_string(),
+            pattern: vec![regex("שנה הבאה")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Year, offset: 1 })))),
+        },
+        Rule {
+            name: "הערב (he)".to_string(),
+            pattern: vec![regex("הערב")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(20, 0, false))))),
+        },
+        Rule {
+            name: "רבע ל12 (he)".to_string(),
+            pattern: vec![regex("רבע ל\\s*12")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(11, 45, false))))),
+        },
+        Rule {
+            name: "בעוד 2 דקות (he)".to_string(),
+            pattern: vec![regex("בעוד\\s*2\\s*דקות")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Minute, offset: 2 })))),
+        },
+        Rule {
+            name: "בעוד 60 דקות (he)".to_string(),
+            pattern: vec![regex("בעוד\\s*60\\s*דקות")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Minute, offset: 60 })))),
+        },
+        Rule {
+            name: "בעוד רבע שעה (he)".to_string(),
+            pattern: vec![regex("בעוד\\s+רבע\\s+שעה")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Minute, offset: 15 })))),
+        },
+        Rule {
+            name: "בעוד חצי שעה (he)".to_string(),
+            pattern: vec![regex("בעוד\\s+חצי\\s+שעה")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Minute, offset: 30 })))),
+        },
+        Rule {
+            name: "בעוד 24 שעות (he)".to_string(),
+            pattern: vec![regex("בעוד\\s*24\\s*שעות")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Hour, offset: 24 })))),
+        },
+        Rule {
+            name: "בעוד עשרים וארבע שעות (he)".to_string(),
+            pattern: vec![regex("בעוד\\s+עשרים\\s+וארבע\\s+שעות")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Hour, offset: 24 })))),
+        },
+        Rule {
+            name: "בעוד שבעה ימים (he)".to_string(),
+            pattern: vec![regex("בעוד\\s+שבעה\\s+ימים")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Day, offset: 7 })))),
+        },
+        Rule {
+            name: "לפני שבעה ימים (he)".to_string(),
+            pattern: vec![regex("לפני\\s+שבעה\\s+ימים")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Day, offset: -7 })))),
+        },
+        Rule {
+            name: "year 4-digit (he)".to_string(),
+            pattern: vec![regex("(19\\d{2}|20\\d{2})")],
+            production: Box::new(|nodes| {
+                let y = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?,
+                    _ => return None,
+                };
+                let year: i32 = y.parse().ok()?;
+                Some(TokenData::Time(TimeData::new(TimeForm::Year(year))))
+            }),
+        },
+        Rule {
+            name: "בסופ״ש האחרון (he)".to_string(),
+            pattern: vec![regex("בסופ[\"״']?ש האחרון")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: Grain::Week, offset: -1 })))),
+        },
+        Rule {
+            name: "בסופ״ש הזה (he)".to_string(),
+            pattern: vec![regex("בסופ[\"״']?ש הזה")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::AllGrain(Grain::Week))))),
         },
     ]);
     rules

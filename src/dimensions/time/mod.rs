@@ -3064,7 +3064,22 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
             }
             return Some(easter);
         }
+        s if s.starts_with("ascension day")
+            || s.starts_with("ascension of jesus")
+            || s.starts_with("ascension thursday") =>
+        {
+            return Some(easter + Duration::days(39))
+        }
+        s if s.starts_with("corpus christi")
+            || s.starts_with("feast of corpus christi")
+            || s.starts_with("body and blood of christ") =>
+        {
+            return Some(easter + Duration::days(60))
+        }
         "good friday" => return Some(easter - Duration::days(2)),
+        s if s.starts_with("holy saturday") || s.starts_with("black saturday") => {
+            return Some(easter - Duration::days(1))
+        }
         s if s.starts_with("palm sunday") || s.starts_with("branch sunday") => {
             return Some(easter - Duration::days(7))
         }
@@ -3098,11 +3113,17 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     // Orthodox Easter-based holidays
     let orthodox = orthodox_easter_date(year);
     if name.starts_with("orthodox") {
+        if name.contains("easter") && name.contains("mon") {
+            return Some(orthodox + Duration::days(1));
+        }
         if name.contains("easter") {
             return Some(orthodox);
         }
         if name.contains("good friday") || name.contains("great friday") {
             return Some(orthodox - Duration::days(2));
+        }
+        if name.contains("holy saturday") || name.contains("black saturday") {
+            return Some(orthodox - Duration::days(1));
         }
     }
     // Clean Monday and its aliases (Haskell: (orthodox\s+)?(ash|clean|green|pure|shrove)\s+monday)
@@ -3620,6 +3641,9 @@ fn resolve_jewish_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     }
     if name == "shavuot" {
         return passover(year).map(|d| d + Duration::days(49));
+    }
+    if name.starts_with("lag baomer") || name.starts_with("lag b'omer") {
+        return passover(year).map(|d| d + Duration::days(33));
     }
     if name.starts_with("chanukah") || name.starts_with("hanuk") || name.starts_with("hannuk") {
         return chanukah(year);

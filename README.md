@@ -26,7 +26,7 @@ let options = Options::default();
 let results = parse("tomorrow at 3pm", &locale, &[DimensionKind::Time], &context, &options);
 assert_eq!(results, vec![Entity {
     body: "tomorrow at 3pm".into(),
-    start: 0, end: 15, latent: None,
+    start: 0, end: 15, latent: Some(false),
     value: DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
         value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap(),
         grain: Grain::Hour,
@@ -37,7 +37,7 @@ assert_eq!(results, vec![Entity {
 let results = parse("80 degrees fahrenheit", &locale, &[DimensionKind::Temperature], &context, &options);
 assert_eq!(results, vec![Entity {
     body: "80 degrees fahrenheit".into(),
-    start: 0, end: 21, latent: None,
+    start: 0, end: 21, latent: Some(false),
     value: DimensionValue::Temperature(MeasurementValue::Value {
         value: 80.0, unit: "fahrenheit".into(),
     }),
@@ -47,7 +47,7 @@ assert_eq!(results, vec![Entity {
 let results = parse("forty-two", &locale, &[DimensionKind::Numeral], &context, &options);
 assert_eq!(results, vec![Entity {
     body: "forty-two".into(),
-    start: 0, end: 9, latent: None,
+    start: 0, end: 9, latent: Some(false),
     value: DimensionValue::Numeral(42.0),
 }]);
 ```
