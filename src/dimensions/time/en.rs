@@ -4495,6 +4495,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let mut t = time_data(&nodes[1].token_data)?.clone();
+                t.latent = false;
                 t.early_late = Some(match kind.as_str() {
                     "late" => EarlyLate::Late,
                     "mid" => EarlyLate::Mid,

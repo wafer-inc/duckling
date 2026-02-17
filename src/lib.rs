@@ -74,7 +74,7 @@ pub fn parse(
     let rules = lang::rules_for(*locale, dims);
     let stash = engine::parse_string(text, rules);
     let ranked_nodes = ranking::rank_nodes(stash.all_nodes().cloned().collect(), locale, dims);
-    let entities: Vec<Entity> = ranked_nodes
+    let resolved: Vec<Entity> = ranked_nodes
         .iter()
         .filter(|node| {
             node.token_data
@@ -83,6 +83,13 @@ pub fn parse(
                 .unwrap_or(false)
         })
         .filter_map(|node| resolve::resolve(node, context, options, text))
+        .collect();
+    // Dedup resolved entities by (range, value, latent), matching Haskell's
+    // Set.fromList on ResolvedToken which compares (range, rval, isLatent).
+    let mut seen = std::collections::HashSet::new();
+    let entities: Vec<Entity> = resolved
+        .into_iter()
+        .filter(|e| seen.insert((e.start, e.end, format!("{:?}", e.value), e.latent)))
         .collect();
     ranking::remove_overlapping(entities)
 }

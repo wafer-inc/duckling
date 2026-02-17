@@ -85,7 +85,9 @@ pub type Classifiers = HashMap<String, Classifier>;
 
 #[derive(Debug, Deserialize)]
 struct JsonClassData {
+    #[serde(deserialize_with = "deserialize_f64_with_inf")]
     prior: f64,
+    #[serde(deserialize_with = "deserialize_f64_with_inf")]
     unseen: f64,
     likelihoods: HashMap<String, f64>,
     #[serde(default)]
@@ -267,7 +269,8 @@ fn classifiers_for_locale(locale: &Locale) -> Classifiers {
     static TR_XX: OnceLock<Classifiers> = OnceLock::new();
 
     fn load(json: &str) -> Classifiers {
-        let raw: HashMap<String, JsonClassifier> = serde_json::from_str(json).unwrap_or_default();
+        let raw: HashMap<String, JsonClassifier> =
+            serde_json::from_str(json).expect("failed to parse classifier JSON");
         raw.into_iter()
             .map(|(rule, jc)| {
                 let ok_data = ClassData {
@@ -343,15 +346,14 @@ pub fn rank_nodes(nodes: Vec<Node>, locale: &Locale, dims: &[DimensionKind]) -> 
         .map(|c| c.node.clone())
         .collect();
 
+    // Dedup matching Haskell's Set.fromList on ResolvedToken, which uses
+    // (range, rval, latent) — notably excluding the rule/node.
+    // Since we operate on unresolved Nodes, we use token_data debug string
+    // as a proxy for the resolved value.
     let mut uniq = Vec::new();
     let mut seen = HashSet::new();
     for n in winners {
-        let key = (
-            n.range.start,
-            n.range.end,
-            n.rule_name.clone(),
-            format!("{:?}", n.token_data),
-        );
+        let key = (n.range.start, n.range.end, format!("{:?}", n.token_data));
         if seen.insert(key) {
             uniq.push(n);
         }
