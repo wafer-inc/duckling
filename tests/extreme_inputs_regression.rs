@@ -277,9 +277,8 @@ fn test_real_world_event_listing_exact_entities() {
             743,
             814,
             DimensionValue::Url {
-                value:
-                    "https://www.google.com/maps/search/?api=1&query=41.924216%2C-87.6370405"
-                        .into(),
+                value: "https://www.google.com/maps/search/?api=1&query=41.924216%2C-87.6370405"
+                    .into(),
                 domain: "google.com".into(),
             },
             l,

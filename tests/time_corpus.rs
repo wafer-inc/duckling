@@ -4960,6 +4960,157 @@ fn test_latent_examples() {
 }
 
 // ============================================================
+// Weekend resolution with custom reference times
+// Tests Haskell predNth semantics for this/next/last weekend
+// ============================================================
+
+fn parse_time_with_context(text: &str, context: &Context) -> Vec<Entity> {
+    let locale = Locale::new(Lang::EN, None);
+    let options = Options::default();
+    parse(text, &locale, &[DimensionKind::Time], context, &options)
+}
+
+fn check_time_interval_with_context(
+    text: &str,
+    context: &Context,
+    expected_from: NaiveDateTime,
+    expected_to: NaiveDateTime,
+    expected_grain: &str,
+) {
+    let entities = parse_time_with_context(text, context);
+    let eg = grain(expected_grain);
+    let found = entities.iter().any(|e| match &e.value {
+        DimensionValue::Time(TimeValue::Interval {
+            from: Some(f),
+            to: Some(t),
+        }) => {
+            let (fv, fg) = tp_value_grain(f);
+            let (tv, tg) = tp_value_grain(t);
+            fv == expected_from && tv == expected_to && (fg == eg || tg == eg)
+        }
+        _ => false,
+    });
+    assert!(
+        found,
+        "Expected time interval from '{:?}' to '{:?}' grain '{}' for '{}', got: {:?}",
+        expected_from,
+        expected_to,
+        expected_grain,
+        text,
+        entities
+            .iter()
+            .map(|e| format!("{:?}={:?}", e.value.dim_kind(), e.value))
+            .collect::<Vec<_>>()
+    );
+}
+
+/// Saturday Feb 9, 2013 10:00 — inside a weekend
+fn make_saturday_context() -> Context {
+    Context {
+        reference_time: Utc.with_ymd_and_hms(2013, 2, 9, 10, 0, 0).unwrap(),
+        locale: Locale::new(Lang::EN, None),
+        timezone_offset_minutes: -120,
+    }
+}
+
+/// Friday Feb 8, 2013 20:00 — inside a weekend (Friday evening)
+fn make_friday_evening_context() -> Context {
+    Context {
+        reference_time: Utc.with_ymd_and_hms(2013, 2, 8, 20, 0, 0).unwrap(),
+        locale: Locale::new(Lang::EN, None),
+        timezone_offset_minutes: -120,
+    }
+}
+
+#[test]
+fn test_weekend_inside_saturday_this() {
+    // "this weekend" from Saturday → current weekend
+    let ctx = make_saturday_context();
+    check_time_interval_with_context(
+        "this weekend",
+        &ctx,
+        dt(2013, 2, 8, 18, 0, 0),
+        dt(2013, 2, 11, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_inside_saturday_next() {
+    // "next weekend" from Saturday → skip current, next weekend
+    let ctx = make_saturday_context();
+    check_time_interval_with_context(
+        "next weekend",
+        &ctx,
+        dt(2013, 2, 15, 18, 0, 0),
+        dt(2013, 2, 18, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_inside_saturday_last() {
+    // "last weekend" from Saturday → previous weekend
+    let ctx = make_saturday_context();
+    check_time_interval_with_context(
+        "last weekend",
+        &ctx,
+        dt(2013, 2, 1, 18, 0, 0),
+        dt(2013, 2, 4, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_inside_friday_evening_this() {
+    // "this weekend" from Friday evening → current weekend
+    let ctx = make_friday_evening_context();
+    check_time_interval_with_context(
+        "this weekend",
+        &ctx,
+        dt(2013, 2, 8, 18, 0, 0),
+        dt(2013, 2, 11, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_inside_friday_evening_next() {
+    // "next weekend" from Friday evening → skip current, next weekend
+    let ctx = make_friday_evening_context();
+    check_time_interval_with_context(
+        "next weekend",
+        &ctx,
+        dt(2013, 2, 15, 18, 0, 0),
+        dt(2013, 2, 18, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_outside_tuesday_this() {
+    // "this weekend" from Tuesday (default ref_time) → upcoming weekend
+    // This is the existing test_time_this_weekend but explicit
+    check_time_interval(
+        "this weekend",
+        dt(2013, 2, 15, 18, 0, 0),
+        dt(2013, 2, 18, 0, 0, 0),
+        "hour",
+    );
+}
+
+#[test]
+fn test_weekend_outside_tuesday_last() {
+    // "last weekend" from Tuesday → most recent past weekend
+    check_time_interval(
+        "last weekend",
+        dt(2013, 2, 8, 18, 0, 0),
+        dt(2013, 2, 11, 0, 0, 0),
+        "hour",
+    );
+}
+
+// ============================================================
 // diffCorpus - uses different reference time (2013-02-15 04:30:00 UTC-2)
 // These tests are commented out because they require a different
 // reference time than the default (2013-02-12T04:30:00+00:00).

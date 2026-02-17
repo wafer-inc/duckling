@@ -585,7 +585,7 @@ fn try_resolve_as_interval(
             Some(make_interval(from, to, "hour"))
         }
         TimeForm::Weekend => {
-            let (from, to) = resolve_weekend_interval(ref_time, data.direction);
+            let (from, to) = resolve_weekend_interval(ref_time, data.direction)?;
             Some(make_interval(from, to, "hour"))
         }
         TimeForm::AllGrain(g) => {
@@ -2348,54 +2348,76 @@ fn resolve_nth_grain_interval(
 fn resolve_weekend_interval(
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
-) -> (DateTime<Utc>, DateTime<Utc>) {
-    let dow = ref_time.weekday().num_days_from_monday();
-    // Weekend = [Friday 18:00, Monday 00:00)
-    match direction {
+) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
+    let dow = ref_time.weekday().num_days_from_monday(); // Mon=0..Sun=6
+    let hour = ref_time.hour();
+
+    // Haskell: weekend = interval' Open (intersect (dayOfWeek 5, hour 18), intersect (dayOfWeek 1, hour 0))
+    // Inside weekend: [Fri 18:00, Mon 00:00)
+    let inside_weekend = (dow == 4 && hour >= 18) || dow == 5 || dow == 6;
+
+    // Find the Friday of the most-recent-or-current weekend
+    let most_recent_friday = {
+        let days_back = if dow == 4 && hour >= 18 {
+            0 // Fri evening: today
+        } else if dow == 5 {
+            1 // Sat: yesterday
+        } else if dow == 6 {
+            2 // Sun: 2 days ago
+        } else if dow == 4 {
+            7 // Fri before 18: last week's Fri
+        } else {
+            i64::from(dow).checked_add(3)? // Mon=3, Tue=4, Wed=5, Thu=6
+        };
+        Duration::try_days(days_back).and_then(|d| midnight(ref_time).checked_sub_signed(d))?
+    };
+
+    // Choose which Friday based on direction (matching Haskell's predNth semantics)
+    let friday = match direction {
+        None => {
+            // "this weekend" — predNth 0 False: current if inside, upcoming if outside
+            if inside_weekend {
+                most_recent_friday
+            } else {
+                let days_fwd = 4_i64.checked_sub(i64::from(dow))?; // days to next Friday
+                Duration::try_days(days_fwd)
+                    .and_then(|d| midnight(ref_time).checked_add_signed(d))?
+            }
+        }
+        Some(Direction::Future) => {
+            // "next weekend" — predNth 0 True: skip current if inside, upcoming if outside
+            if inside_weekend {
+                Duration::try_days(7).and_then(|d| most_recent_friday.checked_add_signed(d))?
+            } else {
+                let days_fwd = 4_i64.checked_sub(i64::from(dow))?;
+                Duration::try_days(days_fwd)
+                    .and_then(|d| midnight(ref_time).checked_add_signed(d))?
+            }
+        }
         Some(Direction::Past) => {
-            // "this past weekend" or "last weekend"
-            // Find the most recent past Friday
-            let days_to_last_friday = if dow <= 4 {
-                // Mon-Fri: go back to last Friday
-                dow.saturating_add(3) as i64
+            // "last weekend" — predNth (-1) False: previous if inside, most-recent-past if outside
+            if inside_weekend {
+                Duration::try_days(7).and_then(|d| most_recent_friday.checked_sub_signed(d))?
             } else {
-                // Sat(5) -> 1 day back, Sun(6) -> 2 days back
-                dow.saturating_sub(4) as i64
-            };
-            let friday = midnight(
-                Duration::try_days(days_to_last_friday)
-                    .and_then(|d| ref_time.checked_sub_signed(d))
-                    .unwrap_or(ref_time),
-            );
-            let from = Duration::try_hours(18)
-                .and_then(|d| friday.checked_add_signed(d))
-                .unwrap_or(friday);
-            let to = Duration::try_hours(54)
-                .and_then(|d| from.checked_add_signed(d))
-                .unwrap_or(from); // Friday 18:00 to Monday 00:00
-            (from, to)
+                most_recent_friday
+            }
         }
-        _ => {
-            // Next weekend (or this weekend if before Saturday)
-            let days_to_friday = if dow <= 4 {
-                4_u32.saturating_sub(dow) as i64
+        Some(Direction::FarFuture) => {
+            // "weekend after next" — skip one extra
+            if inside_weekend {
+                Duration::try_days(14).and_then(|d| most_recent_friday.checked_add_signed(d))?
             } else {
-                11_u32.saturating_sub(dow) as i64
-            };
-            let friday = midnight(
-                Duration::try_days(days_to_friday)
-                    .and_then(|d| ref_time.checked_add_signed(d))
-                    .unwrap_or(ref_time),
-            );
-            let from = Duration::try_hours(18)
-                .and_then(|d| friday.checked_add_signed(d))
-                .unwrap_or(friday);
-            let to = Duration::try_hours(54)
-                .and_then(|d| from.checked_add_signed(d))
-                .unwrap_or(from);
-            (from, to)
+                let days_fwd = 4_i64.checked_sub(i64::from(dow))?;
+                let upcoming = Duration::try_days(days_fwd)
+                    .and_then(|d| midnight(ref_time).checked_add_signed(d))?;
+                Duration::try_days(7).and_then(|d| upcoming.checked_add_signed(d))?
+            }
         }
-    }
+    };
+
+    let from = Duration::try_hours(18).and_then(|d| friday.checked_add_signed(d))?;
+    let to = Duration::try_hours(54).and_then(|d| from.checked_add_signed(d))?;
+    Some((from, to))
 }
 
 // ============================================================
