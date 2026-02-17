@@ -104,7 +104,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let ones = ones_prefix(m.group(1).unwrap_or_default())?;
                 let tens = tens_ord(m.group(2)?)?;
-                Some(TokenData::Ordinal(OrdinalData::new(ones + tens)))
+                Some(TokenData::Ordinal(OrdinalData::new(ones.checked_add(tens)?)))
             }),
         },
         Rule {
@@ -123,7 +123,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(o) => o.value,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(n + o)))
+                Some(TokenData::Ordinal(OrdinalData::new(n.checked_add(o)?)))
             }),
         },
     ]

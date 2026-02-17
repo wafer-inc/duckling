@@ -48,7 +48,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Ordinal(OrdinalData::new(
-                    ordinals_map(unit)? + cardinals_map(tens)?,
+                    ordinals_map(unit)?.checked_add(cardinals_map(tens)?)?,
                 )))
             }),
         },
@@ -81,7 +81,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(10 + ordinals_map(unit)?)))
+                Some(TokenData::Ordinal(OrdinalData::new(10_i64.checked_add(ordinals_map(unit)?)?)))
             }),
         },
         Rule {

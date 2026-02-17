@@ -75,7 +75,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= d2.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)?))
             }),
         },
         Rule {
@@ -91,7 +91,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= d2.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)?))
             }),
         },
     ]

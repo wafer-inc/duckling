@@ -138,7 +138,7 @@ pub fn rules() -> Vec<Rule> {
                 let tens = tens_ordinal_map();
                 let units = one_to_nine_ordinal_map();
                 Some(TokenData::Ordinal(OrdinalData::new(
-                    tens.get(m1)? + units.get(m2)?,
+                    tens.get(m1)?.checked_add(*units.get(m2)?)?,
                 )))
             }),
         },

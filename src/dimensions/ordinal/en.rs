@@ -79,7 +79,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(2)?,
                     _ => return None,
                 };
-                let tens = match tens_text.to_lowercase().as_str() {
+                let tens: i64 = match tens_text.to_lowercase().as_str() {
                     "twenty" => 20,
                     "thirty" => 30,
                     "forty" => 40,
@@ -90,7 +90,7 @@ pub fn rules() -> Vec<Rule> {
                     "ninety" => 90,
                     _ => return None,
                 };
-                let units = match units_text.to_lowercase().as_str() {
+                let units: i64 = match units_text.to_lowercase().as_str() {
                     "first" => 1,
                     "second" => 2,
                     "third" => 3,
@@ -102,7 +102,7 @@ pub fn rules() -> Vec<Rule> {
                     "ninth" => 9,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(tens + units)))
+                Some(TokenData::Ordinal(OrdinalData::new(tens.checked_add(units)?)))
             }),
         },
         // Numeric ordinals: 1st, 2nd, 3rd, 4th, 21st, etc.

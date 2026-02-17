@@ -69,7 +69,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => ordinals_first_map(m.group(1)?)?,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(dozen + unit)))
+                Some(TokenData::Ordinal(OrdinalData::new(dozen.checked_add(unit)?)))
             }),
         },
         Rule {

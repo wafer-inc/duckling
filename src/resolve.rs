@@ -2,6 +2,7 @@ use crate::dimensions;
 use crate::locale::Locale;
 use crate::types::{DimensionValue, Entity, Node, TokenData};
 use chrono::{DateTime, Utc};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Context for resolving parsed tokens into structured values.
 #[derive(Debug, Clone)]
@@ -51,7 +52,7 @@ fn resolve_token(
     context: &Context,
     options: &Options,
 ) -> Option<DimensionValue> {
-    match token {
+    catch_unwind(AssertUnwindSafe(|| match token {
         TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
         TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
         TokenData::Temperature(data) => dimensions::temperature::resolve(data),
@@ -69,5 +70,7 @@ fn resolve_token(
         TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
         TokenData::Time(data) => dimensions::time::resolve(data, context, options.with_latent),
         TokenData::RegexMatch(_) => None,
-    }
+    }))
+    .ok()
+    .flatten()
 }

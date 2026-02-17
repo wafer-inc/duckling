@@ -7,11 +7,11 @@ use super::DurationData;
 
 fn n_plus_one_half(grain: Grain, n: i64) -> Option<DurationData> {
     match grain {
-        Grain::Minute => Some(DurationData::new(30 + 60 * n, Grain::Second)),
-        Grain::Hour => Some(DurationData::new(30 + 60 * n, Grain::Minute)),
-        Grain::Day => Some(DurationData::new(12 + 24 * n, Grain::Hour)),
-        Grain::Month => Some(DurationData::new(15 + 30 * n, Grain::Day)),
-        Grain::Year => Some(DurationData::new(6 + 12 * n, Grain::Month)),
+        Grain::Minute => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Second)),
+        Grain::Hour => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)),
+        Grain::Day => Some(DurationData::new(24_i64.checked_mul(n)?.checked_add(12)?, Grain::Hour)),
+        Grain::Month => Some(DurationData::new(30_i64.checked_mul(n)?.checked_add(15)?, Grain::Day)),
+        Grain::Year => Some(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)),
         _ => None,
     }
 }
@@ -55,7 +55,7 @@ pub fn rules() -> Vec<Rule> {
                 let frac = rm.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let total_minutes = 60 * h + (num * 60) / den;
+                let total_minutes = 60_i64.checked_mul(h)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Duration(DurationData::new(
                     total_minutes,
                     Grain::Minute,
@@ -68,7 +68,7 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let n = numeral_data(&nodes[0].token_data)?.value as i64;
                 Some(TokenData::Duration(DurationData::new(
-                    30 + 60 * n,
+                    60_i64.checked_mul(n)?.checked_add(30)?,
                     Grain::Minute,
                 )))
             }),
@@ -127,7 +127,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let left = DurationData::new(n, g);
-                Some(TokenData::Duration(left.combine(dd)))
+                Some(TokenData::Duration(left.combine(dd)?))
             }),
         },
     ]

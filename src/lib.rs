@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![warn(missing_docs)]
+#![warn(clippy::arithmetic_side_effects)]
 
 pub(crate) mod dimensions;
 pub(crate) mod document;

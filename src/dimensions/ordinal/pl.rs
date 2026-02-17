@@ -94,7 +94,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(o) => o.value,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(20 + value)))
+                Some(TokenData::Ordinal(OrdinalData::new(20_i64.checked_add(value)?)))
             }),
         },
         Rule {
@@ -113,7 +113,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(o) => o.value,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(30 + value)))
+                Some(TokenData::Ordinal(OrdinalData::new(30_i64.checked_add(value)?)))
             }),
         },
         Rule {

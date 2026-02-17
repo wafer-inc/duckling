@@ -57,7 +57,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let t = tens_cardinal(m.group(1)?)?;
                 let u = unit_ordinal(m.group(2)?)?;
-                Some(TokenData::Ordinal(OrdinalData::new(t + u)))
+                Some(TokenData::Ordinal(OrdinalData::new(t.checked_add(u)?)))
             }),
         },
         Rule {

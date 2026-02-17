@@ -55,7 +55,7 @@ pub fn rules() -> Vec<Rule> {
                 let frac = m.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let minutes = 60 * hh + (num * 60) / den;
+                let minutes = 60_i64.checked_mul(hh)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Duration(DurationData::new(minutes, Grain::Minute)))
             }),
         },
@@ -71,7 +71,7 @@ pub fn rules() -> Vec<Rule> {
                 let frac = m.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let seconds = 60 * mm + (num * 60) / den;
+                let seconds = 60_i64.checked_mul(mm)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Duration(DurationData::new(seconds, Grain::Second)))
             }),
         },
@@ -84,7 +84,7 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(30 + 60 * v, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
             }),
         },
         Rule {
@@ -96,7 +96,7 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(30 + 60 * v, Grain::Second)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Second)))
             }),
         },
         Rule {
@@ -146,7 +146,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= d2.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)?))
             }),
         },
         Rule {
@@ -166,7 +166,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= d2.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(d2)?))
             }),
         },
         Rule {
@@ -178,7 +178,7 @@ pub fn rules() -> Vec<Rule> {
                 if d1.grain <= d2.grain {
                     return None;
                 }
-                Some(TokenData::Duration(d1.combine(d2)))
+                Some(TokenData::Duration(d1.combine(d2)?))
             }),
         },
         Rule {
@@ -194,7 +194,7 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let h = numeral_data(&nodes[0].token_data)?.value as i64;
                 let m = numeral_data(&nodes[2].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(60 * h + m, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(h)?.checked_add(m)?, Grain::Minute)))
             }),
         },
     ]

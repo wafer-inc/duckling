@@ -59,7 +59,7 @@ pub fn rules() -> Vec<Rule> {
                 let frac = m.group(3)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let minutes = 60 * hh + (num * 60) / den;
+                let minutes = 60_i64.checked_mul(hh)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Duration(DurationData::new(minutes, Grain::Minute)))
             }),
         },
@@ -68,7 +68,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(is_natural), regex("buçuk sa(at)?")],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(30 + 60 * v, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
             }),
         },
         Rule {

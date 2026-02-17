@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use regex::Regex;
 
@@ -101,6 +102,12 @@ fn dedup_key(node: &Node) -> SeenKey {
     )
 }
 
+fn safe_production(rule: &Rule, nodes: &[&Node]) -> Option<TokenData> {
+    catch_unwind(AssertUnwindSafe(|| (rule.production)(nodes)))
+        .ok()
+        .flatten()
+}
+
 /// Apply regex-leading rules to the document to find initial tokens.
 /// Uses pre-computed regex cache.
 fn apply_regex_rules(rules: &[Rule], regex_cache: &[Option<RegexMatches>]) -> Stash {
@@ -127,7 +134,7 @@ fn apply_regex_rules(rules: &[Rule], regex_cache: &[Option<RegexMatches>]) -> St
 
                 if rule.pattern.len() == 1 {
                     // Single-pattern rule: produce directly
-                    if let Some(token_data) = (rule.production)(&[&regex_node]) {
+                    if let Some(token_data) = safe_production(rule, &[&regex_node]) {
                         let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
                         node.children = vec![regex_node];
@@ -203,7 +210,7 @@ fn match_rule(
                 };
 
                 if rule.pattern.len() == 1 {
-                    if let Some(token_data) = (rule.production)(&[&regex_node]) {
+                    if let Some(token_data) = safe_production(rule, &[&regex_node]) {
                         let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
                         node.children = vec![regex_node];
@@ -222,7 +229,7 @@ fn match_rule(
             for node in stash.all_nodes() {
                 if node.token_data.dimension_kind() == Some(*dim) {
                     if rule.pattern.len() == 1 {
-                        if let Some(token_data) = (rule.production)(&[node]) {
+                        if let Some(token_data) = safe_production(rule, &[node]) {
                             let mut new_node = Node::new(node.range, token_data);
                             new_node.rule_name = Some(rule.name.clone());
                             new_node.children = vec![node.clone()];
@@ -246,7 +253,7 @@ fn match_rule(
             for node in stash.all_nodes() {
                 if pred(&node.token_data) {
                     if rule.pattern.len() == 1 {
-                        if let Some(token_data) = (rule.production)(&[node]) {
+                        if let Some(token_data) = safe_production(rule, &[node]) {
                             let mut new_node = Node::new(node.range, token_data);
                             new_node.rule_name = Some(rule.name.clone());
                             new_node.children = vec![node.clone()];
@@ -286,7 +293,7 @@ fn match_remaining(
     if pattern_idx >= rule.pattern.len() {
         // All patterns matched - produce the result
         let refs: Vec<&Node> = matched_so_far.iter().collect();
-        if let Some(token_data) = (rule.production)(&refs) {
+        if let Some(token_data) = safe_production(rule, &refs) {
             let start = matched_so_far.first().unwrap().range.start;
             let end = matched_so_far.last().unwrap().range.end;
             let mut node = Node::new(Range::new(start, end), token_data);
@@ -305,8 +312,8 @@ fn match_remaining(
             if after_pos <= text.len() {
                 let search_text = &text[after_pos..];
                 if let Some(m) = re.find(search_text) {
-                    let abs_start = after_pos + m.start();
-                    let abs_end = after_pos + m.end();
+                    let abs_start = after_pos.saturating_add(m.start());
+                    let abs_end = after_pos.saturating_add(m.end());
                     // Must be adjacent
                     if doc.is_adjacent(after_pos, abs_start) {
                         let caps = re.captures(search_text);
@@ -315,8 +322,8 @@ fn match_remaining(
                                 let mut g = Vec::new();
                                 for i in 0..c.len() {
                                     g.push(c.get(i).map(|m2| {
-                                        let s = after_pos + m2.start();
-                                        let e = after_pos + m2.end();
+                                        let s = after_pos.saturating_add(m2.start());
+                                        let e = after_pos.saturating_add(m2.end());
                                         original[s..e].to_string()
                                     }));
                                 }
@@ -336,7 +343,7 @@ fn match_remaining(
                             doc,
                             rule,
                             stash,
-                            pattern_idx + 1,
+                            pattern_idx.saturating_add(1),
                             abs_end,
                             next_matched,
                         );
@@ -357,7 +364,7 @@ fn match_remaining(
                         doc,
                         rule,
                         stash,
-                        pattern_idx + 1,
+                        pattern_idx.saturating_add(1),
                         node.range.end,
                         next_matched,
                     );
@@ -375,7 +382,7 @@ fn match_remaining(
                         doc,
                         rule,
                         stash,
-                        pattern_idx + 1,
+                        pattern_idx.saturating_add(1),
                         node.range.end,
                         next_matched,
                     );

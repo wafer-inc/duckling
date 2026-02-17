@@ -19,7 +19,7 @@ impl Stash {
 
     pub fn add(&mut self, node: Node) {
         self.nodes.entry(node.range.start).or_default().push(node);
-        self.count += 1;
+        self.count = self.count.saturating_add(1);
     }
 
     pub fn all_nodes(&self) -> impl Iterator<Item = &Node> {

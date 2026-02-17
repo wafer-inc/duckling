@@ -22,11 +22,11 @@ fn duration_data(td: &TokenData) -> Option<&DurationData> {
 /// Matches Haskell's `nPlusOneHalf`.
 fn n_plus_one_half(grain: Grain, n: i64) -> Option<DurationData> {
     match grain {
-        Grain::Minute => Some(DurationData::new(30 + 60 * n, Grain::Second)),
-        Grain::Hour => Some(DurationData::new(30 + 60 * n, Grain::Minute)),
-        Grain::Day => Some(DurationData::new(12 + 24 * n, Grain::Hour)),
-        Grain::Month => Some(DurationData::new(15 + 30 * n, Grain::Day)),
-        Grain::Year => Some(DurationData::new(6 + 12 * n, Grain::Month)),
+        Grain::Minute => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Second)),
+        Grain::Hour => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)),
+        Grain::Day => Some(DurationData::new(24_i64.checked_mul(n)?.checked_add(12)?, Grain::Hour)),
+        Grain::Month => Some(DurationData::new(30_i64.checked_mul(n)?.checked_add(15)?, Grain::Day)),
+        Grain::Year => Some(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)),
         _ => None,
     }
 }
@@ -135,7 +135,7 @@ pub fn rules() -> Vec<Rule> {
                 let m_str = m.group(2)?;
                 let m_num: i64 = m_str.parse().ok()?;
                 let d: i64 = 10_i64.pow(m_str.len() as u32);
-                let total_minutes = 60 * h + (m_num * 60) / d;
+                let total_minutes = 60_i64.checked_mul(h)?.checked_add(m_num.checked_mul(60)?.checked_div(d)?)?;
                 Some(TokenData::Duration(DurationData::new(
                     total_minutes,
                     Grain::Minute,
@@ -155,7 +155,7 @@ pub fn rules() -> Vec<Rule> {
                 let s_str = rm.group(2)?;
                 let s_num: i64 = s_str.parse().ok()?;
                 let d: i64 = 10_i64.pow(s_str.len() as u32);
-                let total_seconds = 60 * mins + (s_num * 60) / d;
+                let total_seconds = 60_i64.checked_mul(mins)?.checked_add(s_num.checked_mul(60)?.checked_div(d)?)?;
                 Some(TokenData::Duration(DurationData::new(
                     total_seconds,
                     Grain::Second,
@@ -170,7 +170,7 @@ pub fn rules() -> Vec<Rule> {
                 let num = numeral_data(&nodes[0].token_data)?;
                 let v = num.value as i64;
                 Some(TokenData::Duration(DurationData::new(
-                    30 + 60 * v,
+                    60_i64.checked_mul(v)?.checked_add(30)?,
                     Grain::Minute,
                 )))
             }),
@@ -183,7 +183,7 @@ pub fn rules() -> Vec<Rule> {
                 let num = numeral_data(&nodes[0].token_data)?;
                 let v = num.value as i64;
                 Some(TokenData::Duration(DurationData::new(
-                    30 + 60 * v,
+                    60_i64.checked_mul(v)?.checked_add(30)?,
                     Grain::Second,
                 )))
             }),
@@ -245,7 +245,7 @@ pub fn rules() -> Vec<Rule> {
                 let h = numeral_data(&nodes[0].token_data)?.value as i64;
                 let m = numeral_data(&nodes[2].token_data)?.value as i64;
                 Some(TokenData::Duration(DurationData::new(
-                    m + 60 * h,
+                    60_i64.checked_mul(h)?.checked_add(m)?,
                     Grain::Minute,
                 )))
             }),
@@ -282,7 +282,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => 1, // default (empty or unrecognized)
                 };
                 Some(TokenData::Duration(DurationData::new(
-                    15 * q + 60 * h,
+                    15_i64.checked_mul(q)?.checked_add(60_i64.checked_mul(h)?)?,
                     Grain::Minute,
                 )))
             }),
@@ -307,7 +307,7 @@ pub fn rules() -> Vec<Rule> {
                     return None; // larger grain must come first
                 }
                 let d1 = DurationData::new(num.value as i64, g);
-                Some(TokenData::Duration(d1.combine(dd)))
+                Some(TokenData::Duration(d1.combine(dd)?))
             }),
         },
         // composite <duration>: "2 years 3 months" (no separator)
@@ -329,7 +329,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let d1 = DurationData::new(num.value as i64, g);
-                Some(TokenData::Duration(d1.combine(dd)))
+                Some(TokenData::Duration(d1.combine(dd)?))
             }),
         },
         // composite <duration> and <duration>: "an hour and 30 seconds"
@@ -346,7 +346,7 @@ pub fn rules() -> Vec<Rule> {
                 if d1.grain <= d2.grain {
                     return None; // larger grain must come first
                 }
-                Some(TokenData::Duration(d1.combine(d2)))
+                Some(TokenData::Duration(d1.combine(d2)?))
             }),
         },
     ]

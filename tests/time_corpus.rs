@@ -3164,6 +3164,42 @@ fn test_iso_date_no_spurious_interval() {
 }
 
 #[test]
+fn test_time_additional_regression_inputs() {
+    let should_parse = [
+        "On 2018-04-01 we met.",
+        "2018-04-01 18:03",
+        "April 1, 2018",
+        "1 April 2018",
+        "last April",
+        "next April 1",
+        "April 1",
+        "in 2 days",
+        "April 1, 2018 6:03pm",
+        "end of day",
+        "this weekend",
+        "Tuesday, March 11, 2025 at 8:15 PM\n(773) 348-8886\nlocation: 2300 N. Lincoln Park West  Chicago, IL United States 60614",
+    ];
+    for text in should_parse {
+        let results = parse_time(text);
+        assert!(
+            !results.is_empty(),
+            "Expected at least one time parse for {:?}, got none",
+            text
+        );
+    }
+
+    // Duration-like values under Time-only parsing: ensure they are exercised.
+    let _ = parse_time("3 hours");
+    let _ = parse_time("3h");
+}
+
+#[test]
+fn test_time_additional_regression_inputs_extreme_values() {
+    let _ = parse_time("in 999999999 months");
+    let _ = parse_time("in 9999999999999999 days");
+}
+
+#[test]
 fn test_time_tomorrow_afternoon_at_5() {
     check_time_naive("tomorrow afternoon at 5", dt(2013, 2, 13, 17, 0, 0), "hour");
     check_time_naive("at 5 tomorrow afternoon", dt(2013, 2, 13, 17, 0, 0), "hour");

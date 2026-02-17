@@ -73,15 +73,15 @@ pub fn luhn_check(number: &str) -> bool {
     for &d in digits.iter().rev() {
         let mut val = d;
         if double {
-            val *= 2;
+            val = val.saturating_mul(2);
             if val > 9 {
-                val -= 9;
+                val = val.saturating_sub(9);
             }
         }
-        sum += val;
+        sum = sum.saturating_add(val);
         double = !double;
     }
-    sum % 10 == 0
+    sum.checked_rem(10) == Some(0)
 }
 
 pub fn resolve(data: &CreditCardNumberData) -> DimensionValue {

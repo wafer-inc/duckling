@@ -78,7 +78,7 @@ fn parse_chinese_integer(raw: &str) -> Option<f64> {
     if s.chars().all(|c| digit_value(c).is_some()) {
         let mut n = String::new();
         for c in s.chars() {
-            n.push(char::from(b'0' + digit_value(c)? as u8));
+            n.push(char::from(b'0'.checked_add(digit_value(c)? as u8)?));
         }
         return n.parse::<f64>().ok();
     }

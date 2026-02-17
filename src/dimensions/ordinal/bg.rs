@@ -61,7 +61,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Ordinal(OrdinalData::new(
-                    dozens_lookup(m1)? + ord_lookup(m2)?,
+                    dozens_lookup(m1)?.checked_add(ord_lookup(m2)?)?,
                 )))
             }),
         },

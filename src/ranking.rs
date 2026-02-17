@@ -6,8 +6,8 @@ pub fn rank(entities: &mut [Entity]) {
     // Sort by start position, then by length (longer first)
     entities.sort_by(|a, b| {
         a.start.cmp(&b.start).then_with(|| {
-            let len_a = a.end - a.start;
-            let len_b = b.end - b.start;
+            let len_a = a.end.saturating_sub(a.start);
+            let len_b = b.end.saturating_sub(b.start);
             len_b.cmp(&len_a) // longer first
         })
     });

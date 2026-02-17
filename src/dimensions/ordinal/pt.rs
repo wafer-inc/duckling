@@ -78,7 +78,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(o) => o.value,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(t + u)))
+                Some(TokenData::Ordinal(OrdinalData::new(t.checked_add(u)?)))
             }),
         },
     ]

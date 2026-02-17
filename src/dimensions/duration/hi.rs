@@ -34,7 +34,7 @@ pub fn rules() -> Vec<Rule> {
                     "ढाई" => 2,
                     _ => return None,
                 };
-                Some(TokenData::Duration(DurationData::new(6 + 12 * n, Grain::Month)))
+                Some(TokenData::Duration(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)))
             }),
         },
         Rule {
@@ -50,7 +50,7 @@ pub fn rules() -> Vec<Rule> {
                     "ढाई" => 2,
                     _ => return None,
                 };
-                Some(TokenData::Duration(DurationData::new(30 + 60 * n, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)))
             }),
         },
         Rule {

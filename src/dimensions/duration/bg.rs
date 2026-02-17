@@ -16,11 +16,11 @@ fn is_positive_non_integer(td: &TokenData) -> bool {
 // Equivalent to Haskell's nPlusOneHalf for BG duration rules.
 fn n_plus_one_half(grain: Grain, n: i64) -> Option<DurationData> {
     match grain {
-        Grain::Minute => Some(DurationData::new(30 + 60 * n, Grain::Second)),
-        Grain::Hour => Some(DurationData::new(30 + 60 * n, Grain::Minute)),
-        Grain::Day => Some(DurationData::new(12 + 24 * n, Grain::Hour)),
-        Grain::Month => Some(DurationData::new(15 + 30 * n, Grain::Day)),
-        Grain::Year => Some(DurationData::new(6 + 12 * n, Grain::Month)),
+        Grain::Minute => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Second)),
+        Grain::Hour => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)),
+        Grain::Day => Some(DurationData::new(24_i64.checked_mul(n)?.checked_add(12)?, Grain::Hour)),
+        Grain::Month => Some(DurationData::new(30_i64.checked_mul(n)?.checked_add(15)?, Grain::Day)),
+        Grain::Year => Some(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)),
         _ => None,
     }
 }

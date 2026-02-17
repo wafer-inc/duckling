@@ -36,7 +36,7 @@ pub fn rules() -> Vec<Rule> {
                     let mut result = s.to_string();
                     // Replace all whitespace-dot-whitespace patterns
                     while let Some(pos) = result.to_lowercase().find(" dot ") {
-                        let end = pos + 5;
+                        let end = pos.saturating_add(5);
                         // Find actual boundaries (could have multiple spaces)
                         result = format!("{}.{}", &result[..pos], &result[end..]);
                     }

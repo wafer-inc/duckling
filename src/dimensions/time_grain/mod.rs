@@ -108,22 +108,31 @@ impl Grain {
 
     /// Number of seconds in `n` units of this grain.
     /// Matches Haskell Duckling's `inSeconds`.
-    pub fn in_seconds(&self, n: i64) -> i64 {
+    pub fn in_seconds(&self, n: i64) -> Option<i64> {
         match self {
-            Grain::Second => n,
-            Grain::Minute => n * 60,
-            Grain::Hour => n * 3600,
-            Grain::Day => n * 86400,
-            Grain::Week => n * 604800,
-            Grain::Month => n * 2592000,   // 30 days
-            Grain::Quarter => n * 7776000, // 90 days
-            Grain::Year => n * 31536000,   // 365 days
+            Grain::Second => Some(n),
+            Grain::Minute => n.checked_mul(60),
+            Grain::Hour => n.checked_mul(3600),
+            Grain::Day => n.checked_mul(86400),
+            Grain::Week => n.checked_mul(604800),
+            Grain::Month => n.checked_mul(2592000),   // 30 days
+            Grain::Quarter => n.checked_mul(7776000), // 90 days
+            Grain::Year => n.checked_mul(31536000),   // 365 days
         }
     }
 
     /// Number of seconds in one unit of this grain, as f64.
     pub fn one_in_seconds_f64(&self) -> f64 {
-        self.in_seconds(1) as f64
+        match self {
+            Grain::Second => 1.0,
+            Grain::Minute => 60.0,
+            Grain::Hour => 3600.0,
+            Grain::Day => 86400.0,
+            Grain::Week => 604800.0,
+            Grain::Month => 2592000.0,
+            Grain::Quarter => 7776000.0,
+            Grain::Year => 31536000.0,
+        }
     }
 }
 

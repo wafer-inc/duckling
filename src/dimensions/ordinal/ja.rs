@@ -11,34 +11,34 @@ fn parse_ja_numeral(s: &str) -> Option<i64> {
     let mut current = 0i64;
     for ch in s.chars() {
         match ch {
-            '一' => current += 1,
-            '二' => current += 2,
-            '三' => current += 3,
-            '四' => current += 4,
-            '五' => current += 5,
-            '六' => current += 6,
-            '七' => current += 7,
-            '八' => current += 8,
-            '九' => current += 9,
+            '一' => current = current.checked_add(1)?,
+            '二' => current = current.checked_add(2)?,
+            '三' => current = current.checked_add(3)?,
+            '四' => current = current.checked_add(4)?,
+            '五' => current = current.checked_add(5)?,
+            '六' => current = current.checked_add(6)?,
+            '七' => current = current.checked_add(7)?,
+            '八' => current = current.checked_add(8)?,
+            '九' => current = current.checked_add(9)?,
             '十' => {
                 let lhs = if current == 0 { 1 } else { current };
-                total += lhs * 10;
+                total = total.checked_add(lhs.checked_mul(10)?)?;
                 current = 0;
             }
             '百' => {
                 let lhs = if current == 0 { 1 } else { current };
-                total += lhs * 100;
+                total = total.checked_add(lhs.checked_mul(100)?)?;
                 current = 0;
             }
             '千' => {
                 let lhs = if current == 0 { 1 } else { current };
-                total += lhs * 1000;
+                total = total.checked_add(lhs.checked_mul(1000)?)?;
                 current = 0;
             }
             _ => return None,
         }
     }
-    Some(total + current)
+    Some(total.checked_add(current)?)
 }
 
 pub fn rules() -> Vec<Rule> {

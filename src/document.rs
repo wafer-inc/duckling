@@ -17,7 +17,7 @@ impl Document {
 
         // Precompute first_non_adjacent: for each byte position, the index of the
         // first non-whitespace character at or after that position.
-        let mut first_non_adjacent = vec![byte_len; byte_len + 1];
+        let mut first_non_adjacent = vec![byte_len; byte_len.saturating_add(1)];
         let mut next_non_ws = byte_len;
         for (byte_pos, ch) in text.char_indices().rev() {
             if !ch.is_whitespace() {

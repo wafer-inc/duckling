@@ -47,8 +47,8 @@ fn decode_escaped_arabic_indic_digits(s: &str) -> String {
                 let g = std::str::from_utf8(group).ok().and_then(|x| x.parse::<u32>().ok());
                 match g {
                     Some(cp @ 1632..=1641) => {
-                        let d = (cp - 1632) as u8 + b'0';
-                        out.push(d as char);
+                        let d = (cp.saturating_sub(1632)) as u8;
+                        out.push((d.saturating_add(b'0')) as char);
                     }
                     _ => {
                         ok = false;

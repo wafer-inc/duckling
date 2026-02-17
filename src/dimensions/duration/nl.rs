@@ -24,7 +24,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(is_natural), regex("kwartier")],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(15 * v, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(15_i64.checked_mul(v)?, Grain::Minute)))
             }),
         },
         Rule {
@@ -45,7 +45,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= dd.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(dd)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(dd)?))
             }),
         },
         Rule {
@@ -65,7 +65,7 @@ pub fn rules() -> Vec<Rule> {
                 if g <= dd.grain {
                     return None;
                 }
-                Some(TokenData::Duration(DurationData::new(v, g).combine(dd)))
+                Some(TokenData::Duration(DurationData::new(v, g).combine(dd)?))
             }),
         },
         Rule {
@@ -90,7 +90,7 @@ pub fn rules() -> Vec<Rule> {
                 let frac_str = m.group(2)?;
                 let frac_num: i64 = frac_str.parse().ok()?;
                 let denom: i64 = 10_i64.pow(frac_str.len() as u32);
-                let total_minutes = 60 * h + (frac_num * 60) / denom;
+                let total_minutes = 60_i64.checked_mul(h)?.checked_add(frac_num.checked_mul(60)?.checked_div(denom)?)?;
                 Some(TokenData::Duration(DurationData::new(
                     total_minutes,
                     Grain::Minute,
@@ -102,7 +102,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(is_natural), regex("en een half (uur|uren)")],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(30 + 60 * v, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
             }),
         },
         Rule {

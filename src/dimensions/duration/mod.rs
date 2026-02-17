@@ -43,7 +43,7 @@ impl DurationData {
         if self.grain == g {
             self.clone()
         } else {
-            let seconds = self.grain.in_seconds(self.value) as f64;
+            let seconds = self.grain.in_seconds(self.value).unwrap_or(0) as f64;
             let v = (seconds / g.one_in_seconds_f64()).round() as i64;
             DurationData::new(v, g)
         }
@@ -51,11 +51,11 @@ impl DurationData {
 
     /// Combine two durations (Haskell Semigroup `<>`).
     /// Converts both to the smaller grain, then adds values.
-    pub fn combine(&self, other: &DurationData) -> DurationData {
+    pub fn combine(&self, other: &DurationData) -> Option<DurationData> {
         let g = std::cmp::min(self.grain, other.grain);
         let v1 = self.with_grain(g).value;
         let v2 = other.with_grain(g).value;
-        DurationData::new(v1 + v2, g)
+        Some(DurationData::new(v1.checked_add(v2)?, g))
     }
 }
 
@@ -63,6 +63,6 @@ pub fn resolve(data: &DurationData) -> DimensionValue {
     DimensionValue::Duration {
         value: data.value,
         grain: data.grain,
-        normalized_seconds: data.grain.in_seconds(data.value),
+        normalized_seconds: data.grain.in_seconds(data.value).unwrap_or(0),
     }
 }

@@ -26,7 +26,7 @@ fn parse_km_number(s: &str) -> Option<i64> {
     if s.chars().all(|c| khmer_digit(c).is_some()) {
         let mut v = 0i64;
         for ch in s.chars() {
-            v = v * 10 + khmer_digit(ch)?;
+            v = v.checked_mul(10)?.checked_add(khmer_digit(ch)?)?;
         }
         return Some(v);
     }

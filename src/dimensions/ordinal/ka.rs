@@ -76,7 +76,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Ordinal(OrdinalData::new(
-                    cardinals_map(tens)? + ordinals_map(units)?,
+                    cardinals_map(tens)?.checked_add(ordinals_map(units)?)?,
                 )))
             }),
         },

@@ -77,11 +77,11 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let dd = match g {
-                    Grain::Minute => DurationData::new(30 + 60 * v, Grain::Second),
-                    Grain::Hour => DurationData::new(30 + 60 * v, Grain::Minute),
-                    Grain::Day => DurationData::new(12 + 24 * v, Grain::Hour),
-                    Grain::Month => DurationData::new(15 + 30 * v, Grain::Day),
-                    Grain::Year => DurationData::new(6 + 12 * v, Grain::Month),
+                    Grain::Minute => DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Second),
+                    Grain::Hour => DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute),
+                    Grain::Day => DurationData::new(24_i64.checked_mul(v)?.checked_add(12)?, Grain::Hour),
+                    Grain::Month => DurationData::new(30_i64.checked_mul(v)?.checked_add(15)?, Grain::Day),
+                    Grain::Year => DurationData::new(12_i64.checked_mul(v)?.checked_add(6)?, Grain::Month),
                     _ => return None,
                 };
                 Some(TokenData::Duration(dd))

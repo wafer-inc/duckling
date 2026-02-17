@@ -54,7 +54,7 @@ fn parse_sino_integer(s: &str) -> Option<f64> {
     if s.chars().all(|c| sino_digit(c).is_some()) {
         let mut n = String::new();
         for c in s.chars() {
-            n.push(char::from(b'0' + sino_digit(c)? as u8));
+            n.push(char::from(b'0'.checked_add(sino_digit(c)? as u8)?));
         }
         return n.parse::<f64>().ok();
     }

@@ -34,7 +34,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(is_natural), regex(r"و ?نصف? ساع[ةه]")],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(30 + 60 * v, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
             }),
         },
         Rule {
