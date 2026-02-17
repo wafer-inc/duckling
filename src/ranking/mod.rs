@@ -6,23 +6,81 @@ use crate::dimensions::time::TimeForm;
 use crate::dimensions::time_grain::Grain;
 use crate::locale::{Lang, Locale};
 use crate::types::{DimensionKind, Entity, Node, TokenData};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-type Feature = String;
-type BagOfFeatures = HashMap<Feature, i32>;
+#[cfg(feature = "train")]
+pub(crate) mod train;
 
-#[derive(Debug, Clone)]
+pub(crate) type Feature = String;
+pub(crate) type BagOfFeatures = HashMap<Feature, i32>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClassData {
+    #[serde(
+        serialize_with = "serialize_f64_with_inf",
+        deserialize_with = "deserialize_f64_with_inf"
+    )]
     pub prior: f64,
+    #[serde(
+        serialize_with = "serialize_f64_with_inf",
+        deserialize_with = "deserialize_f64_with_inf"
+    )]
     pub unseen: f64,
     pub likelihoods: HashMap<Feature, f64>,
+    pub n: i32,
 }
 
-#[derive(Debug, Clone)]
+fn serialize_f64_with_inf<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
+    if v.is_infinite() {
+        if v.is_sign_negative() {
+            s.serialize_str("-Infinity")
+        } else {
+            s.serialize_str("Infinity")
+        }
+    } else {
+        s.serialize_f64(*v)
+    }
+}
+
+fn deserialize_f64_with_inf<'de, D: serde::Deserializer<'de>>(d: D) -> Result<f64, D::Error> {
+    use serde::de;
+
+    struct F64Visitor;
+    impl<'de> de::Visitor<'de> for F64Visitor {
+        type Value = f64;
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("f64 or infinity string")
+        }
+        fn visit_f64<E: de::Error>(self, v: f64) -> Result<f64, E> {
+            Ok(v)
+        }
+        fn visit_i64<E: de::Error>(self, v: i64) -> Result<f64, E> {
+            Ok(v as f64)
+        }
+        fn visit_u64<E: de::Error>(self, v: u64) -> Result<f64, E> {
+            Ok(v as f64)
+        }
+        fn visit_str<E: de::Error>(self, v: &str) -> Result<f64, E> {
+            match v {
+                "-Infinity" => Ok(f64::NEG_INFINITY),
+                "Infinity" => Ok(f64::INFINITY),
+                _ => Err(de::Error::custom(format!("unexpected string: {}", v))),
+            }
+        }
+        fn visit_unit<E: de::Error>(self) -> Result<f64, E> {
+            Ok(f64::NEG_INFINITY)
+        }
+    }
+    d.deserialize_any(F64Visitor)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Classifier {
     pub ok_data: ClassData,
+    pub ko_data: ClassData,
 }
 
+/// Map from rule name to its trained Naive Bayes classifier.
 pub type Classifiers = HashMap<String, Classifier>;
 
 #[derive(Debug, Deserialize)]
@@ -30,6 +88,15 @@ struct JsonClassData {
     prior: f64,
     unseen: f64,
     likelihoods: HashMap<String, f64>,
+    #[serde(default)]
+    n: i32,
+}
+
+#[derive(Debug, Deserialize)]
+struct JsonClassifier {
+    ok_data: JsonClassData,
+    #[serde(default)]
+    ko_data: Option<JsonClassData>,
 }
 
 #[derive(Clone)]
@@ -79,7 +146,7 @@ fn time_form_grain(form: &TimeForm) -> Option<Grain> {
     }
 }
 
-fn extract_features(node: &Node) -> BagOfFeatures {
+pub(crate) fn extract_features(node: &Node) -> BagOfFeatures {
     let feat_rules = node
         .children
         .iter()
@@ -200,41 +267,52 @@ fn classifiers_for_locale(locale: &Locale) -> Classifiers {
     static TR_XX: OnceLock<Classifiers> = OnceLock::new();
 
     fn load(json: &str) -> Classifiers {
-        let raw: HashMap<String, JsonClassData> = serde_json::from_str(json).unwrap_or_default();
+        let raw: HashMap<String, JsonClassifier> = serde_json::from_str(json).unwrap_or_default();
         raw.into_iter()
-            .map(|(rule, ok)| {
-                (
-                    rule,
-                    Classifier {
-                        ok_data: ClassData {
-                            prior: ok.prior,
-                            unseen: ok.unseen,
-                            likelihoods: ok.likelihoods,
-                        },
+            .map(|(rule, jc)| {
+                let ok_data = ClassData {
+                    prior: jc.ok_data.prior,
+                    unseen: jc.ok_data.unseen,
+                    likelihoods: jc.ok_data.likelihoods,
+                    n: jc.ok_data.n,
+                };
+                let ko_data = match jc.ko_data {
+                    Some(ko) => ClassData {
+                        prior: ko.prior,
+                        unseen: ko.unseen,
+                        likelihoods: ko.likelihoods,
+                        n: ko.n,
                     },
-                )
+                    None => ClassData {
+                        prior: f64::NEG_INFINITY,
+                        unseen: f64::NEG_INFINITY,
+                        likelihoods: HashMap::new(),
+                        n: 0,
+                    },
+                };
+                (rule, Classifier { ok_data, ko_data })
             })
             .collect()
     }
 
     match locale.lang {
         Lang::EN => EN_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/en_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/en_xx.json")))
             .clone(),
         Lang::AR => AR_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/ar_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/ar_xx.json")))
             .clone(),
         Lang::EL => EL_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/el_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/el_xx.json")))
             .clone(),
         Lang::ES => ES_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/es_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/es_xx.json")))
             .clone(),
         Lang::PT => PT_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/pt_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/pt_xx.json")))
             .clone(),
         Lang::TR => TR_XX
-            .get_or_init(|| load(include_str!("ranking_classifiers/tr_xx.json")))
+            .get_or_init(|| load(include_str!("../ranking_classifiers/tr_xx.json")))
             .clone(),
         _ => HashMap::new(),
     }

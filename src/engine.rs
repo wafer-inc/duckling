@@ -42,6 +42,36 @@ pub fn parse_and_resolve(
     entities
 }
 
+/// Parse text and resolve all entities, returning (Node, Entity) pairs.
+/// Used by the training pipeline to access both the parse tree and resolved value.
+#[cfg(feature = "train")]
+pub fn parse_and_resolve_with_nodes(
+    text: &str,
+    rules: &[Rule],
+    context: &Context,
+    options: &Options,
+    dims: &[DimensionKind],
+) -> Vec<(Node, Entity)> {
+    let stash = parse_string(text, rules);
+    let doc_text = text;
+
+    let mut results: Vec<(Node, Entity)> = Vec::new();
+    for node in stash.all_nodes() {
+        if let Some(dk) = node.token_data.dimension_kind() {
+            if !dims.is_empty() && !dims.contains(&dk) {
+                continue;
+            }
+        } else {
+            continue;
+        }
+        if let Some(entity) = crate::resolve::resolve(node, context, options, doc_text) {
+            results.push((node.clone(), entity));
+        }
+    }
+
+    results
+}
+
 /// Run the saturation-based parsing loop.
 pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let doc = Document::new(text);

@@ -442,8 +442,10 @@ pub fn rules() -> Vec<Rule> {
                 let hour: u32 = m.group(1)?.parse().ok()?;
                 let minute: u32 = m.group(2)?.parse().ok()?;
                 if hour < 24 && minute < 60 {
+                    // Haskell: hourMinute (h /= 0 && h < 12) h m
+                    let is_12h = hour != 0 && hour < 12;
                     Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(
-                        hour, minute, true,
+                        hour, minute, is_12h,
                     ))))
                 } else {
                     None
@@ -517,8 +519,9 @@ pub fn rules() -> Vec<Rule> {
                 if (1900..=2099).contains(&full_num) {
                     return None;
                 }
+                // Haskell: mkLatent $ hourMinute (h < 12) h m
                 Some(TokenData::Time(TimeData::latent(TimeForm::HourMinute(
-                    hour, minute, false,
+                    hour, minute, hour < 12,
                 ))))
             }),
         },
@@ -4468,7 +4471,7 @@ pub fn rules() -> Vec<Rule> {
                     "morning" => PartOfDay::Morning,
                     "evening" => PartOfDay::Evening,
                     "night" => PartOfDay::Night,
-                    "lunch" | "at lunch" => PartOfDay::Afternoon,
+                    "lunch" | "at lunch" => PartOfDay::Lunch,
                     _ => PartOfDay::Afternoon,
                 };
                 Some(TokenData::Time(TimeData::latent(TimeForm::PartOfDay(pod))))
@@ -4559,10 +4562,26 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "end of month".to_string(),
             pattern: vec![regex(r"\b(by (the )?|(at )?the )?(EOM|end of (the )?month)\b")],
-            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::BeginEnd {
-                begin: false,
-                target: Box::new(TimeForm::GrainOffset { grain: Grain::Month, offset: 0 }),
-            })))),
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let has_by = m.group(0)?.to_lowercase().starts_with("by");
+                let end_form = TimeForm::BeginEnd {
+                    begin: false,
+                    target: Box::new(TimeForm::GrainOffset { grain: Grain::Month, offset: 0 }),
+                };
+                if has_by {
+                    Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                        Box::new(TimeData::new(TimeForm::Now)),
+                        Box::new(TimeData::new(end_form)),
+                        false,
+                    ))))
+                } else {
+                    Some(TokenData::Time(TimeData::new(end_form)))
+                }
+            }),
         },
         Rule {
             name: "beginning of year".to_string(),
@@ -4575,10 +4594,26 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "end of year".to_string(),
             pattern: vec![regex(r"\b(by (the )?|(at )?the )?(EOY|end of (the )?year)\b")],
-            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::BeginEnd {
-                begin: false,
-                target: Box::new(TimeForm::GrainOffset { grain: Grain::Year, offset: 0 }),
-            })))),
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let has_by = m.group(0)?.to_lowercase().starts_with("by");
+                let end_form = TimeForm::BeginEnd {
+                    begin: false,
+                    target: Box::new(TimeForm::GrainOffset { grain: Grain::Year, offset: 0 }),
+                };
+                if has_by {
+                    Some(TokenData::Time(TimeData::new(TimeForm::Interval(
+                        Box::new(TimeData::new(TimeForm::Now)),
+                        Box::new(TimeData::new(end_form)),
+                        false,
+                    ))))
+                } else {
+                    Some(TokenData::Time(TimeData::new(end_form)))
+                }
+            }),
         },
         Rule {
             name: "<hour-of-day> zero <integer>".to_string(),

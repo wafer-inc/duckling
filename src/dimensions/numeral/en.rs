@@ -275,21 +275,20 @@ pub fn rules() -> Vec<Rule> {
         // Number suffixes: 100K, 1.2M, .0012G
         Rule {
             name: "number suffixes (K, M, G)".to_string(),
-            pattern: vec![regex(r#"(\d*\.?\d+)\s*(k|m|g|b)"#)],
+            pattern: vec![dim(DimensionKind::Numeral), regex(r"(k|m|g|b)\b")],
             production: Box::new(|nodes| {
-                let m = match &nodes[0].token_data {
-                    TokenData::RegexMatch(m) => m,
+                let v = numeral_data(&nodes[0].token_data)?.value;
+                let s = match &nodes[1].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
                     _ => return None,
                 };
-                let num: f64 = m.group(1)?.parse().ok()?;
-                let suffix = m.group(2)?.to_lowercase();
-                let multiplier = match suffix.as_str() {
+                let mult = match s.as_str() {
                     "k" => 1_000.0,
                     "m" => 1_000_000.0,
                     "g" | "b" => 1_000_000_000.0,
                     _ => return None,
                 };
-                Some(TokenData::Numeral(NumeralData::new(num * multiplier)))
+                Some(TokenData::Numeral(NumeralData::new(v * mult)))
             }),
         },
         // Negative numbers

@@ -671,6 +671,37 @@ fn try_resolve_as_interval(
                 is_clock_time(&td.form)
                     || matches!(&td.form, TimeForm::Composed(a, b) if has_clock_time(a) || has_clock_time(b))
             }
+            // Helper: disambiguate hour based on PartOfDay context
+            fn disambiguate_hour(h: u32, is_12h: bool, pod: Option<&PartOfDay>) -> u32 {
+                if !is_12h {
+                    return h;
+                }
+                if h == 12 {
+                    return match pod {
+                        Some(_) => 0,
+                        None => h,
+                    };
+                }
+                match pod {
+                    Some(PartOfDay::Afternoon)
+                    | Some(PartOfDay::Evening)
+                    | Some(PartOfDay::Night) => {
+                        if h < 12 {
+                            h.saturating_add(12)
+                        } else {
+                            h
+                        }
+                    }
+                    Some(PartOfDay::Morning) => {
+                        if h == 12 {
+                            0
+                        } else {
+                            h
+                        }
+                    }
+                    _ => h,
+                }
+            }
 
             // Composed forms where secondary is PartOfDay → interval
             // BUT only if there's no clock time that should disambiguate instead
@@ -719,6 +750,57 @@ fn try_resolve_as_interval(
                         return Some(make_interval(from, to, "hour"));
                     }
                 }
+                // Handle Composed(ClockTime, PartOfDay) in secondary — use POD
+                // for AM/PM disambiguation on a date primary.
+                // e.g., Composed(DayOfWeek(Sat), Composed(Hour(9), PartOfDay(Morning)))
+                let clock_pod: Option<(&TimeData, &PartOfDay)> = if is_clock_time(&sub_a.form) {
+                    if let TimeForm::PartOfDay(pod) = &sub_b.form {
+                        Some((sub_a, pod))
+                    } else {
+                        None
+                    }
+                } else if is_clock_time(&sub_b.form) {
+                    if let TimeForm::PartOfDay(pod) = &sub_a.form {
+                        Some((sub_b, pod))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+                if let Some((clock, pod)) = clock_pod {
+                    let (date_dt, _) =
+                        resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
+                    match &clock.form {
+                        TimeForm::Hour(h, is_12h) => {
+                            let hour = disambiguate_hour(*h, *is_12h, Some(pod));
+                            let mut dt = date_dt.date_naive().and_hms_opt(hour, 0, 0)?.and_utc();
+                            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                                dt = Duration::try_days(1)
+                                    .and_then(|d| dt.checked_add_signed(d))
+                                    .unwrap_or(dt);
+                            }
+                            return Some(TimeValue::Single(TimePoint::Naive {
+                                value: dt.naive_utc(),
+                                grain: Grain::Hour,
+                            }));
+                        }
+                        TimeForm::HourMinute(h, m, is_12h) => {
+                            let hour = disambiguate_hour(*h, *is_12h, Some(pod));
+                            let mut dt = date_dt.date_naive().and_hms_opt(hour, *m, 0)?.and_utc();
+                            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                                dt = Duration::try_days(1)
+                                    .and_then(|d| dt.checked_add_signed(d))
+                                    .unwrap_or(dt);
+                            }
+                            return Some(TimeValue::Single(TimePoint::Naive {
+                                value: dt.naive_utc(),
+                                grain: Grain::Minute,
+                            }));
+                        }
+                        _ => {}
+                    }
+                }
             }
             if let TimeForm::Composed(sub_a, sub_b) = &primary.form {
                 if let TimeForm::PartOfDay(pod) = &sub_a.form {
@@ -740,6 +822,57 @@ fn try_resolve_as_interval(
                         let (from, to) =
                             pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
                         return Some(make_interval(from, to, "hour"));
+                    }
+                }
+                // Handle Composed(ClockTime, PartOfDay) in primary — use POD
+                // for AM/PM disambiguation on a date secondary.
+                // e.g., Composed(Composed(Hour(9), PartOfDay(Morning)), DayOfWeek(Sat))
+                let clock_pod: Option<(&TimeData, &PartOfDay)> = if is_clock_time(&sub_a.form) {
+                    if let TimeForm::PartOfDay(pod) = &sub_b.form {
+                        Some((sub_a, pod))
+                    } else {
+                        None
+                    }
+                } else if is_clock_time(&sub_b.form) {
+                    if let TimeForm::PartOfDay(pod) = &sub_a.form {
+                        Some((sub_b, pod))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+                if let Some((clock, pod)) = clock_pod {
+                    let (date_dt, _) =
+                        resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
+                    match &clock.form {
+                        TimeForm::Hour(h, is_12h) => {
+                            let hour = disambiguate_hour(*h, *is_12h, Some(pod));
+                            let mut dt = date_dt.date_naive().and_hms_opt(hour, 0, 0)?.and_utc();
+                            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                                dt = Duration::try_days(1)
+                                    .and_then(|d| dt.checked_add_signed(d))
+                                    .unwrap_or(dt);
+                            }
+                            return Some(TimeValue::Single(TimePoint::Naive {
+                                value: dt.naive_utc(),
+                                grain: Grain::Hour,
+                            }));
+                        }
+                        TimeForm::HourMinute(h, m, is_12h) => {
+                            let hour = disambiguate_hour(*h, *is_12h, Some(pod));
+                            let mut dt = date_dt.date_naive().and_hms_opt(hour, *m, 0)?.and_utc();
+                            if dt <= ref_time && date_dt.date_naive() == ref_time.date_naive() {
+                                dt = Duration::try_days(1)
+                                    .and_then(|d| dt.checked_add_signed(d))
+                                    .unwrap_or(dt);
+                            }
+                            return Some(TimeValue::Single(TimePoint::Naive {
+                                value: dt.naive_utc(),
+                                grain: Grain::Minute,
+                            }));
+                        }
+                        _ => {}
                     }
                 }
             }

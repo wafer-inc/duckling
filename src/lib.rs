@@ -15,6 +15,10 @@ pub(crate) mod stash;
 pub(crate) mod testing;
 pub(crate) mod types;
 
+/// Corpus examples for training classifiers.
+#[cfg(feature = "train")]
+pub mod corpus;
+
 // Re-exports for convenience
 pub use dimensions::time_grain::Grain;
 pub use locale::{Lang, Locale, Region};
@@ -22,6 +26,23 @@ pub use resolve::{Context, Options};
 pub use types::{
     DimensionKind, DimensionValue, Entity, MeasurementPoint, MeasurementValue, TimePoint, TimeValue,
 };
+
+#[cfg(feature = "train")]
+pub use ranking::train::TrainingCorpus;
+#[cfg(feature = "train")]
+pub use ranking::Classifiers;
+
+/// Train classifiers for a locale from a corpus.
+/// This wraps the internal training pipeline, hiding the `Rule` type.
+#[cfg(feature = "train")]
+pub fn train_classifiers(
+    locale: &Locale,
+    corpus: &ranking::train::TrainingCorpus,
+    dims: &[DimensionKind],
+) -> Classifiers {
+    let rules = lang::rules_for(*locale, dims);
+    ranking::train::make_classifiers(rules, corpus, dims)
+}
 
 /// Parse natural language text and return structured entities.
 ///

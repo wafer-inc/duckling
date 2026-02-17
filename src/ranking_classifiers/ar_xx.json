@@ -1,1 +1,2386 @@
-{"<time> timezone":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"at <time-of-day>":-0.6931471805599453,"hour":-0.6931471805599453}},"Thursday":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"":0.0}},"integer (numeric)":{"prior":-0.3184537311185346,"unseen":-4.189654742026425,"likelihoods":{"":0.0}},"ordinals (twelveth)":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"<day-of-week> next":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"day":-0.8109302162163288,"about|exactly <time-of-day>":-1.5040773967762742,"Tuesday":-1.0986122886681098}},"<hour-of-day> third":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"at <time-of-day>":-1.252762968495368,"hour":-0.8472978603872037,"time-of-day integer (latent)":-1.252762968495368}},"<cycle> after|before <time>":{"prior":-0.40546510810816444,"unseen":-2.3025850929940455,"likelihoods":{"day (grain)tomorrow":-1.5040773967762742,"dayday":-1.0986122886681098,"day (grain)yesterday":-1.5040773967762742}},"integer (20..90)":{"prior":-0.5108256237659907,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"mm/yyyy":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"<day-of-month> (ordinal or number) <named-month>":{"prior":-0.2411620568168881,"unseen":-3.4339872044851463,"likelihoods":{"ordinals (first..tenth)February":-2.70805020110221,"integer (numeric)in <named-month>":-2.70805020110221,"integer (numeric)April":-2.70805020110221,"integer (numeric)August":-2.70805020110221,"integer (numeric)February":-1.791759469228055,"month":-0.916290731874155,"integer (numeric)July":-2.3025850929940455,"integer (numeric)March":-2.70805020110221}},"<time> <part-of-day>":{"prior":-0.41616039722491244,"unseen":-5.488937726156687,"likelihoods":{"intersect by \",\", \"of\", \"from\", \"'s\"part of days":-4.386184644822546,"<hour-of-day> till thirdafter part of days":-4.386184644822546,"time-of-day integer (latent)after part of days":-4.386184644822546,"at <time-of-day>before part of days":-4.098502572370764,"hh:mmbefore part of days":-4.791649752930709,"<datetime> - <datetime> (interval)part of days":-4.098502572370764,"<time-of-day> - <time-of-day> (interval)part of days":-4.386184644822546,"time-of-day ordinal (latent)part of days":-4.098502572370764,"<hour-of-day> halfpart of days":-4.386184644822546,"time-of-day integer (latent)part of days":-3.5388867844353418,"<hour-of-day> till quarterthis <part-of-day>":-4.386184644822546,"hourhour":-1.8738790208464304,"hh:mmpart of days":-3.8753590210565547,"<hour-of-day> and integer minutespart of days":-2.651583589434439,"<hour-of-day> quarterafter part of days":-4.791649752930709,"minutehour":-1.4243539229442357,"at <time-of-day>part of days":-2.393754480132339,"intersectpart of days":-4.791649752930709,"from <datetime> - <datetime> (interval)part of days":-4.386184644822546,"<hour-of-day> and integer minutesafter part of days":-4.386184644822546,"at <time-of-day>after part of days":-3.6930374642626003,"<hour-of-day> quarterpart of days":-4.386184644822546,"<hour-of-day> thirdpart of days":-4.386184644822546,"from <datetime> - <datetime> (interval)after part of days":-4.791649752930709,"time-of-day ordinal (latent)tonight":-4.791649752930709,"<datetime> - <datetime> (interval)after part of days":-4.791649752930709,"<hour-of-day> till quarterbefore part of days":-4.386184644822546,"<time-of-day> - <time-of-day> (interval)after part of days":-4.791649752930709,"at <time-of-day>this <part-of-day>":-4.791649752930709,"<hour-of-day> till thirdbefore part of days":-4.386184644822546}},"dd/mm":{"prior":-0.6931471805599453,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"numbers prefix with -, minus":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"today":{"prior":-1.8718021769015913,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"at <time-of-day>":{"prior":-0.08269171584511341,"unseen":-4.852030263919617,"likelihoods":{"<hour-of-day> third":-4.151039905898646,"<hour-of-day> and integer minutes":-2.5416019934645457,"<hour-of-day> quarter":-4.151039905898646,"<hour-of-day> till quarter":-3.7455747977904816,"time-of-day ordinal (latent)":-1.8997481072921507,"<hour-of-day> half":-4.151039905898646,"hh:mm":-3.2347491740244907,"hour":-1.180625440328945,"minute":-1.7996646487351682,"<hour-of-day> till third":-3.7455747977904816,"time-of-day integer (latent)":-1.7996646487351682}},"absorption of , after named day":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"Wednesday":-0.6931471805599453,"day":-0.6931471805599453}},"September":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"tonight":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"on <date>":{"prior":-0.6131044728864089,"unseen":-3.7612001156935624,"likelihoods":{"<day-of-month> (ordinal or number) <named-month>":-2.639057329615259,"September":-3.044522437723423,"second":-3.044522437723423,"<day-of-month> (ordinal or number) of <named-month>":-3.044522437723423,"day":-1.4350845252893227,"year":-2.639057329615259,"part of <named-month>":-2.128231705849268,"month":-3.044522437723423,"year (integer)":-2.639057329615259,"this|last the <cycle>":-2.639057329615259,"day of <named-month>":-3.044522437723423}},"<hour-of-day> and integer minutes":{"prior":-0.15415067982725836,"unseen":-3.912023005428146,"likelihoods":{"at <time-of-day>integer (13..19)":-2.505525936990736,"at <time-of-day>integer 21..99":-2.793208009442517,"time-of-day integer (latent)integer (numeric)":-2.793208009442517,"at <time-of-day>integer (20..90)":-3.1986731175506815,"time-of-day integer (latent)integer (13..19)":-3.1986731175506815,"hour":-0.9473813189441862,"time-of-day ordinal (latent)integer (20..90)":-3.1986731175506815,"time-of-day ordinal (latent)integer (numeric)":-3.1986731175506815,"at <time-of-day>integer (numeric)":-2.505525936990736,"time-of-day ordinal (latent)integer 21..99":-2.793208009442517,"time-of-day ordinal (latent)integer (13..19)":-2.793208009442517}},"this|last <cycle>":{"prior":-1e+100,"unseen":-1.9459101490553135,"likelihoods":{}},"October":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"":0.0}},"month (grain)":{"prior":-2.0149030205422647,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"in|within|after <duration>":{"prior":-1.3862943611198906,"unseen":-1.9459101490553135,"likelihoods":{"week":-1.0986122886681098,"dual <unit-of-duration>":-1.0986122886681098}},"Wednesday":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"July":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"":0.0}},"hour (grain)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"intersect":{"prior":-0.5458224658030868,"unseen":-5.5134287461649825,"likelihoods":{"Tuesdayon <date>":-4.816241156068032,"in <named-month>year":-4.816241156068032,"<hour-of-day> till thirdafter part of days":-4.410776047959867,"dayhour":-3.899950424193877,"daymonth":-4.816241156068032,"in <named-month>on <date>":-4.816241156068032,"monthyear":-3.312163759291758,"Mondayon <date>":-4.816241156068032,"Christmasyear":-4.816241156068032,"Monday<day-of-month> (ordinal or number) <named-month>":-4.816241156068032,"month (integer)year (integer)":-4.410776047959867,"\r93q0\r83 o5p4p5q0p4o5\r83year":-4.816241156068032,"<day-of-week> the last of <time><cycle> this|last|next":-4.816241156068032,"at <time-of-day>before part of days":-4.123093975508087,"hh:mmbefore part of days":-4.816241156068032,"intersect by \",\", \"of\", \"from\", \"'s\"year":-4.816241156068032,"intersect<time> <part-of-day>":-4.410776047959867,"month (ordinal)year (integer)":-4.816241156068032,"\r93q0\r83 o5p4p1\r89\r81year":-4.816241156068032,"dd/mm<time> <part-of-day>":-4.816241156068032,"Thursday<time> timezone":-4.410776047959867,"<hour-of-day> till quarterthis <part-of-day>":-4.410776047959867,"dayday":-3.024481686839977,"absorption of , after named day<day-of-month> (ordinal or number) <named-month>":-4.816241156068032,"hourhour":-3.717628867399922,"month (integer)year":-4.816241156068032,"\r93q0\r83 o5p4p1\r91\r85year":-4.816241156068032,"Thursday<day-of-month> (ordinal or number) <named-month>":-4.816241156068032,"dayyear":-2.9444389791664407,"Thursday<time> <part-of-day>":-4.816241156068032,"<cycle> last of <time>year (integer)":-4.410776047959867,"last <cycle> of <time>year (integer)":-4.816241156068032,"<hour-of-day> quarterafter part of days":-4.816241156068032,"minutehour":-2.513656063073986,"Thursdayfrom <datetime> - <datetime> (interval)":-4.816241156068032,"\r85o1\r87 o5p4\r87p6o7 o5p4p7\r80\r85q0o7year":-4.816241156068032,"Monday<cycle> this|last|next":-4.816241156068032,"<day-of-month> (ordinal or number) of <named-month>year":-4.816241156068032,"<cycle> <ordinal> day? of <time>year":-4.816241156068032,"\r93q0\r83 o5p4o1\r90\r81p9year":-4.816241156068032,"on a <named-day>dd/mm":-4.816241156068032,"on a <named-day>on <date>":-4.816241156068032,"on a <named-day><day-of-month> (ordinal or number) <named-month>":-4.816241156068032,"Tuesday<cycle> this|last|next":-4.816241156068032,"dayminute":-3.563478187572664,"dd/mmintersect":-4.816241156068032,"in <named-month><cycle> this|last|next":-4.816241156068032,"<hour-of-day> and integer minutesafter part of days":-4.410776047959867,"Saturdaydd/mm":-4.816241156068032,"\r85p5\r90o5p6year":-4.816241156068032,"the <cycle> the <ordinal> of <time>year":-4.816241156068032,"at <time-of-day>after part of days":-3.717628867399922,"<ordinal> <cycle> of <time>year":-4.816241156068032,"Sunday<cycle> this|last|next":-4.816241156068032,"Tuesday<day-of-month> (ordinal or number) of <named-month>":-4.410776047959867,"Septemberon <date>":-4.816241156068032,"from <datetime> - <datetime> (interval)after part of days":-4.816241156068032,"intersectintersect":-4.410776047959867,"dayweek":-4.123093975508087,"weekyear":-3.899950424193877,"<datetime> - <datetime> (interval)after part of days":-4.816241156068032,"Friday<day-of-month> (ordinal or number) <named-month>":-4.816241156068032,"<hour-of-day> till quarterbefore part of days":-4.410776047959867,"<time-of-day> - <time-of-day> (interval)after part of days":-4.816241156068032,"at <time-of-day>this <part-of-day>":-4.816241156068032,"<hour-of-day> till thirdbefore part of days":-4.410776047959867}},"\r85p5\r90o5p6":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"the <cycle> the <ordinal> of <time>":{"prior":0.0,"unseen":-2.833213344056216,"likelihoods":{"day (grain)ordinals (first..tenth)October":-2.0794415416798357,"daymonth":-1.3862943611198906,"week (grain)ordinals (first..tenth)month (integer)":-2.0794415416798357,"weekmonth":-1.6739764335716716,"week (grain)ordinals (first..tenth)intersect":-2.0794415416798357,"day (grain)ordinals (first..tenth)month (integer)":-1.6739764335716716}},"in <number> (implicit minutes)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"<ordinal> <cycle> of <time>":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"daymonth":-1.7047480922384253,"ordinals (first..tenth)week (grain)in <named-month>":-1.7047480922384253,"weekmonth":-1.2992829841302609,"ordinals (first..tenth)week (grain)intersect":-1.7047480922384253,"ordinals (first..tenth)day (grain)month (integer)":-1.7047480922384253}},"year (grain)":{"prior":-1.2237754316221157,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"from <datetime> - <datetime> (interval)":{"prior":0.0,"unseen":-2.5649493574615367,"likelihoods":{"dayday":-1.791759469228055,"at <time-of-day>at <time-of-day>":-1.0986122886681098,"hourhour":-1.0986122886681098,"<day-of-month> (ordinal or number) <named-month><day-of-month> (ordinal or number) <named-month>":-1.791759469228055}},"<time> last":{"prior":0.0,"unseen":-2.5649493574615367,"likelihoods":{"day":-0.8754687373538999,"Sunday":-1.791759469228055,"on a <named-day>":-1.791759469228055,"Tuesday":-1.3862943611198906}},"Saturday":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"integer 21..99":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"integer 5integer (20..90)":-0.6931471805599453,"integer 3integer (20..90)":-0.6931471805599453}},"this <day-of-week>":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"Monday":-0.6931471805599453,"day":-0.6931471805599453}},"integer (13..19)":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"integer 5integer 10":-0.916290731874155,"integer 8integer 10":-0.5108256237659907}},"<time> for <duration>":{"prior":-1e+100,"unseen":-2.3025850929940455,"likelihoods":{}},"from <day-of-month> (ordinal or number) to <day-of-month> (ordinal or number) in <named-month> (interval)":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"integer (numeric)integer (numeric)month (ordinal)":-1.252762968495368,"month":-0.8472978603872037,"ordinals (composite, e.g., eighty-seven)ordinals (composite, e.g., eighty-seven)in <named-month>":-1.252762968495368}},"ordinals (first..tenth)":{"prior":-0.21825356602001794,"unseen":-3.7612001156935624,"likelihoods":{"":0.0}},"Monday":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"yesterday":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"hh:mm:ss":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"\r93q0\r83 o5p4o1\r90\r81p9":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"ordinals (twenty, thirty..ninety)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"<hour-of-day> <integer>":{"prior":-1e+100,"unseen":-1.0986122886681098,"likelihoods":{}},"<time> nth of <time>":{"prior":-0.40546510810816444,"unseen":-2.70805020110221,"likelihoods":{"daymonth":-1.0296194171811581,"Wednesdayordinals (first..tenth)intersect":-1.9459101490553135,"Tuesdayordinals (first..tenth)intersect by \",\", \"of\", \"from\", \"'s\"":-1.9459101490553135,"Tuesdayordinals (first..tenth)in <named-month>":-1.9459101490553135,"Tuesdayordinals (first..tenth)October":-1.9459101490553135}},"nth <time> of <time>":{"prior":-0.6931471805599453,"unseen":-3.4965075614664802,"likelihoods":{"daymonth":-1.6739764335716716,"ordinals (first..tenth)intersect by \",\", \"of\", \"from\", \"'s\"year (integer)":-2.367123614131617,"ordinals (first..tenth)on a <named-day>intersect by \",\", \"of\", \"from\", \"'s\"":-2.772588722239781,"dayyear":-2.0794415416798357,"ordinals (first..tenth)Tuesdaymonth (integer)":-2.772588722239781,"ordinals (first..tenth)Wednesdayintersect by \",\", \"of\", \"from\", \"'s\"":-2.367123614131617,"ordinals (first..tenth)intersectyear (integer)":-2.772588722239781,"ordinals (first..tenth)Tuesdayintersect":-2.772588722239781}},"<hour-of-day> quarter":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"at <time-of-day>":-1.5040773967762742,"time-of-day ordinal (latent)":-1.0986122886681098,"hour":-0.8109302162163288}},"\r85o1\r87 o5p4\r87p6o7 o5p4p7\r80\r85q0o7":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"April":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"<hour-of-day> till quarter":{"prior":-0.2231435513142097,"unseen":-2.5649493574615367,"likelihoods":{"at <time-of-day>":-1.3862943611198906,"time-of-day ordinal (latent)":-1.791759469228055,"hour":-0.8754687373538999,"time-of-day integer (latent)":-1.791759469228055}},"week (grain)":{"prior":0.0,"unseen":-3.1780538303479458,"likelihoods":{"":0.0}},"past year (latent)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"integer 8":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"now":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"<day-of-month> (ordinal or number) of <named-month>":{"prior":-0.570544858467613,"unseen":-3.713572066704308,"likelihoods":{"ordinals (thirtieth..nineteenth)February":-2.5902671654458267,"ordinals (first..tenth)October":-2.5902671654458267,"ordinals (first..tenth)April":-2.5902671654458267,"ordinals (first..tenth)February":-2.995732273553991,"ordinals (first..tenth)month (integer)":-2.5902671654458267,"ordinals (first..tenth)March":-2.5902671654458267,"month":-1.0498221244986778,"ordinals (first..tenth)in <named-month>":-2.5902671654458267}},"this <part-of-day>":{"prior":-1.0986122886681098,"unseen":-1.6094379124341003,"likelihoods":{"hour":-0.6931471805599453,"part of days":-0.6931471805599453}},"<cycle> <ordinal> day? of <time>":{"prior":0.0,"unseen":-2.833213344056216,"likelihoods":{"day (grain)ordinals (first..tenth)October":-2.0794415416798357,"daymonth":-1.3862943611198906,"week (grain)ordinals (first..tenth)month (integer)":-2.0794415416798357,"weekmonth":-1.6739764335716716,"week (grain)ordinals (first..tenth)intersect":-2.0794415416798357,"day (grain)ordinals (first..tenth)month (integer)":-1.6739764335716716}},"Friday":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"tomorrow":{"prior":0.0,"unseen":-2.1972245773362196,"likelihoods":{"":0.0}},"<cycle> this|last|next":{"prior":0.0,"unseen":-3.970291913552122,"likelihoods":{"week":-1.3862943611198906,"month (grain)":-2.5649493574615367,"year (grain)":-2.341805806147327,"week (grain)":-1.3862943611198906,"day":-2.5649493574615367,"year":-2.341805806147327,"month":-2.5649493574615367,"day (grain)":-2.5649493574615367}},"time-of-day ordinal (latent)":{"prior":-0.13976194237515874,"unseen":-3.1780538303479458,"likelihoods":{"ordinals (twelveth)":-2.03688192726104,"ordinals (first..tenth)":-0.3022808718729337,"ordinals (eleventh)":-2.03688192726104}},"ordinals (eleventh)":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"integer 2":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"by <time>":{"prior":-1.252762968495368,"unseen":-2.4849066497880004,"likelihoods":{"at <time-of-day>":-1.2992829841302609,"hour":-1.7047480922384253,"minute":-1.7047480922384253}},"fractional number":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"Sunday":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"February":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"":0.0}},"\r93q0\r83 o5p4p1\r91\r85":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"minute (grain)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"<hour-of-day> half":{"prior":-0.40546510810816444,"unseen":-2.1972245773362196,"likelihoods":{"at <time-of-day>":-1.3862943611198906,"time-of-day ordinal (latent)":-1.3862943611198906,"hour":-0.9808292530117262}},"month (integer)":{"prior":0.0,"unseen":-2.639057329615259,"likelihoods":{"integer (numeric)":-1.8718021769015913,"integer 10":-0.6190392084062235,"integer 3":-1.1786549963416462}},"year":{"prior":-0.7419373447293773,"unseen":-2.4849066497880004,"likelihoods":{"integer (numeric)":0.0}},"last <day-of-week> of <time>":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"daymonth":-0.8472978603872037,"Monday<cycle> this|last|next":-1.252762968495368,"Mondayin <named-month>":-1.252762968495368}},"<integer> <unit-of-duration>":{"prior":-1e+100,"unseen":-2.3978952727983707,"likelihoods":{}},"dual <unit-of-duration>":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"week":-0.6931471805599453,"week (grain)":-0.6931471805599453}},"integer 10":{"prior":-0.6931471805599453,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"from <day-of-month> (ordinal or number) to <day-of-month> (ordinal or number) <named-month> (interval)":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"integer (numeric)integer (numeric)July":-1.252762968495368,"month":-0.8472978603872037,"integer (numeric)integer (numeric)in <named-month>":-1.252762968495368}},"part of <named-month>":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"March":-1.2992829841302609,"month":-0.7884573603642702,"in <named-month>":-1.2992829841302609}},"hh:mm":{"prior":-0.10536051565782628,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"<hour-of-day> and integer":{"prior":-1.252762968495368,"unseen":-2.833213344056216,"likelihoods":{"at <time-of-day>integer (13..19)":-2.0794415416798357,"at <time-of-day>integer 21..99":-1.6739764335716716,"hour":-1.1631508098056809,"at <time-of-day>integer (numeric)":-2.0794415416798357}},"month (ordinal)":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"ordinals (first..tenth)":0.0}},"second (grain) ":{"prior":-1.6094379124341003,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"\r93q0\r83 o5p4p1\r89\r81":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"the <cycle> after|before <time>":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"day (grain)tomorrow":-1.2992829841302609,"dayday":-0.7884573603642702,"day (grain)yesterday":-1.2992829841302609}},"about|exactly <time-of-day>":{"prior":0.0,"unseen":-2.639057329615259,"likelihoods":{"<day-of-week> next":-1.8718021769015913,"at <time-of-day>":-1.466337068793427,"day":-1.466337068793427,"hour":-1.466337068793427,"Tuesday":-1.8718021769015913}},"before <duration>":{"prior":-2.2512917986064953,"unseen":-2.1972245773362196,"likelihoods":{"week":-0.9808292530117262,"single <unit-of-duration>":-0.9808292530117262}},"intersect by \",\", \"of\", \"from\", \"'s\"":{"prior":-0.5533852381847867,"unseen":-4.430816798843313,"likelihoods":{"dayhour":-2.627081138568543,"daymonth":-2.472930458741285,"monthyear":-2.627081138568543,"Wednesdayintersect":-3.7256934272366524,"<named-month>|<named-day> <day-of-month> (ordinal)October":-3.7256934272366524,"Wednesday<day-of-month> (ordinal or number) <named-month>":-3.7256934272366524,"dayday":-2.8094026953624978,"Thursday<day-of-month> (ordinal or number) <named-month>":-3.7256934272366524,"in <named-month>year (integer)":-3.3202283191284883,"Thursdayat <time-of-day>":-3.7256934272366524,"Thursday<time> <part-of-day>":-3.3202283191284883,"<named-month>|<named-day> <day-of-month> (ordinal)this|last the <cycle>":-3.7256934272366524,"last <cycle> of <time>year (integer)":-3.7256934272366524,"Tuesdaymonth (integer)":-3.7256934272366524,"Wednesday<day-of-month> (ordinal or number) of <named-month>":-3.7256934272366524,"Thursday<datetime> - <datetime> (interval)":-3.7256934272366524,"Septemberyear (integer)":-3.3202283191284883,"Thursday<time-of-day> - <time-of-day> (interval)":-3.7256934272366524,"on a <named-day>September":-3.7256934272366524,"Octoberyear (integer)":-3.7256934272366524,"Sunday<cycle> this|last|next":-3.7256934272366524,"dayweek":-3.3202283191284883,"weekyear":-3.7256934272366524,"Mondaythis|last the <cycle>":-3.7256934272366524,"<named-month>|<named-day> <day-of-month> (ordinal)in <named-month>":-3.7256934272366524,"Wednesdayin <named-month>":-3.7256934272366524}},"integer 3":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"":0.0}},"last <time>":{"prior":-1e+100,"unseen":-1.791759469228055,"likelihoods":{}},"March":{"prior":0.0,"unseen":-2.5649493574615367,"likelihoods":{"":0.0}},"<named-month>|<named-day> <day-of-month> (ordinal)":{"prior":-0.6931471805599453,"unseen":-2.9444389791664407,"likelihoods":{"Sundayordinals (thirtieth..nineteenth)":-2.1972245773362196,"Tuesdayordinals (first..tenth)":-1.791759469228055,"Tuesdayordinals (thirtieth..nineteenth)":-2.1972245773362196,"day":-1.0986122886681098,"Saturdayordinals (thirtieth..nineteenth)":-2.1972245773362196}},"after part of days":{"prior":0.0,"unseen":-2.1972245773362196,"likelihoods":{"":0.0}},"<day-of-month> (ordinal)":{"prior":-1e+100,"unseen":-1.3862943611198906,"likelihoods":{}},"Christmas":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"until <time-of-day>":{"prior":-1e+100,"unseen":-2.4849066497880004,"likelihoods":{}},"on a <named-day>":{"prior":0.0,"unseen":-2.772588722239781,"likelihoods":{"Saturday":-2.0149030205422647,"Monday":-2.0149030205422647,"Friday":-2.0149030205422647,"day":-0.916290731874155,"Tuesday":-1.6094379124341003}},"<duration> after|before|from <time>":{"prior":-1.252762968495368,"unseen":-2.772588722239781,"likelihoods":{"dayday":-1.6094379124341003,"single <unit-of-duration>yesterday":-2.0149030205422647,"single <unit-of-duration>tomorrow":-2.0149030205422647}},"\r93q0\r83 o5p4p5q0p4o5\r83":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"before part of days":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"ordinals (thirtieth..nineteenth)":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"year (integer)":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"integer (numeric)":0.0}},"<cycle> n next":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"week":-0.6931471805599453,"week (grain)integer 3":-0.6931471805599453}},"integer 5":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"<datetime> - <datetime> (interval)":{"prior":-0.1823215567939546,"unseen":-2.890371757896165,"likelihoods":{"dayday":-2.1400661634962708,"at <time-of-day>at <time-of-day>":-1.4469189829363254,"hourhour":-1.2237754316221157,"<day-of-month> (ordinal or number) <named-month><day-of-month> (ordinal or number) <named-month>":-2.1400661634962708,"intersect by \",\", \"of\", \"from\", \"'s\"at <time-of-day>":-2.1400661634962708}},"Tuesday":{"prior":0.0,"unseen":-2.833213344056216,"likelihoods":{"":0.0}},"New Year's Day":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"this|last the <cycle>":{"prior":0.0,"unseen":-3.1354942159291497,"likelihoods":{"week":-1.9924301646902063,"month (grain)":-2.3978952727983707,"year (grain)":-2.3978952727983707,"second":-2.3978952727983707,"week (grain)":-1.9924301646902063,"day":-2.3978952727983707,"year":-2.3978952727983707,"second (grain) ":-2.3978952727983707,"month":-2.3978952727983707,"day (grain)":-2.3978952727983707}},"in <named-month>":{"prior":0.0,"unseen":-3.5263605246161616,"likelihoods":{"September":-2.3978952727983707,"October":-1.7047480922384253,"February":-2.3978952727983707,"March":-1.7047480922384253,"month":-0.7884573603642702}},"<time-of-day> - <time-of-day> (interval)":{"prior":-0.6931471805599453,"unseen":-2.3978952727983707,"likelihoods":{"at <time-of-day>at <time-of-day>":-0.916290731874155,"hourhour":-0.916290731874155}},"nth <time> after <time>":{"prior":-0.6931471805599453,"unseen":-1.791759469228055,"likelihoods":{"dayday":-0.916290731874155,"ordinals (first..tenth)Tuesdayintersect":-0.916290731874155}},"<named-month> <day-of-month> (non ordinal)":{"prior":-1e+100,"unseen":-1.3862943611198906,"likelihoods":{}},"last <cycle> of <time>":{"prior":-0.40546510810816444,"unseen":-2.833213344056216,"likelihoods":{"daymonth":-1.6739764335716716,"week (grain)intersect by \",\", \"of\", \"from\", \"'s\"":-2.0794415416798357,"day (grain)intersect":-2.0794415416798357,"weekmonth":-1.6739764335716716,"week (grain)September":-2.0794415416798357,"day (grain)month (integer)":-2.0794415416798357}},"ordinals (composite, e.g., eighty-seven)":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"<cycle> last of <time>":{"prior":0.0,"unseen":-2.70805020110221,"likelihoods":{"week (grain)month (ordinal)":-1.9459101490553135,"daymonth":-1.540445040947149,"day (grain)intersect":-1.9459101490553135,"weekmonth":-1.540445040947149,"week (grain)intersect":-1.9459101490553135,"day (grain)month (integer)":-1.9459101490553135}},"after <time-of-day>":{"prior":-1e+100,"unseen":-1.9459101490553135,"likelihoods":{}},"day (grain)":{"prior":-0.3629054936893685,"unseen":-2.890371757896165,"likelihoods":{"":0.0}},"right now":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"<day-of-week> the last of <time>":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"daymonth":-0.916290731874155,"Tuesdayin <named-month>":-1.6094379124341003,"Mondaymonth (integer)":-1.6094379124341003,"Tuesdayintersect":-1.6094379124341003}},"day of <named-month>":{"prior":-0.40546510810816444,"unseen":-2.5649493574615367,"likelihoods":{"month (integer)":-1.3862943611198906,"March":-1.791759469228055,"month":-0.8754687373538999,"in <named-month>":-1.791759469228055}},"<day-of-week> last":{"prior":0.0,"unseen":-2.5649493574615367,"likelihoods":{"day":-0.8754687373538999,"Sunday":-1.791759469228055,"on a <named-day>":-1.791759469228055,"Tuesday":-1.3862943611198906}},"<month> dd-dd (interval)":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"Julyinteger (numeric)integer (numeric)":-1.0986122886681098,"month":-0.8109302162163288,"Augustinteger (numeric)integer (numeric)":-1.5040773967762742}},"part of days":{"prior":-0.2876820724517809,"unseen":-3.367295829986474,"likelihoods":{"":0.0}},"<hour-of-day> till third":{"prior":0.0,"unseen":-2.5649493574615367,"likelihoods":{"at <time-of-day>":-1.3862943611198906,"time-of-day ordinal (latent)":-1.791759469228055,"hour":-0.8754687373538999,"time-of-day integer (latent)":-1.791759469228055}},"time-of-day integer (latent)":{"prior":-0.5306282510621704,"unseen":-3.2188758248682006,"likelihoods":{"integer (numeric)":-0.3448404862917295,"integer 3":-1.791759469228055,"integer 5":-2.4849066497880004}},"single <unit-of-duration>":{"prior":-3.590439381300684,"unseen":-3.1354942159291497,"likelihoods":{"week":-1.9924301646902063,"week (grain)":-1.9924301646902063,"day":-1.9924301646902063,"day (grain)":-1.9924301646902063}},"dd-dd <month> (interval)":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"integer (numeric)integer (numeric)July":-1.0986122886681098,"month":-0.8109302162163288,"integer (numeric)integer (numeric)in <named-month>":-1.5040773967762742}},"this <time>":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"Monday":-0.6931471805599453,"day":-0.6931471805599453}},"August":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}}}
+{
+  "<time> timezone": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "at <time-of-day>": -0.6931471805599453,
+        "hour": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Thursday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (numeric)": {
+    "ok_data": {
+      "prior": -0.3184537311185346,
+      "unseen": -4.189654742026425,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (twelveth)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-week> next": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "day": -0.8109302162163288,
+        "about|exactly <time-of-day>": -1.5040773967762742,
+        "Tuesday": -1.0986122886681098
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> third": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "at <time-of-day>": -1.252762968495368,
+        "hour": -0.8472978603872037,
+        "time-of-day integer (latent)": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<cycle> after|before <time>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "day (grain)tomorrow": -1.5040773967762742,
+        "dayday": -1.0986122886681098,
+        "day (grain)yesterday": -1.5040773967762742
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (20..90)": {
+    "ok_data": {
+      "prior": -0.5108256237659907,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "mm/yyyy": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-month> (ordinal or number) <named-month>": {
+    "ok_data": {
+      "prior": -0.2411620568168881,
+      "unseen": -3.4339872044851463,
+      "likelihoods": {
+        "ordinals (first..tenth)February": -2.70805020110221,
+        "integer (numeric)in <named-month>": -2.70805020110221,
+        "integer (numeric)April": -2.70805020110221,
+        "integer (numeric)August": -2.70805020110221,
+        "integer (numeric)February": -1.791759469228055,
+        "month": -0.916290731874155,
+        "integer (numeric)July": -2.3025850929940455,
+        "integer (numeric)March": -2.70805020110221
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time> <part-of-day>": {
+    "ok_data": {
+      "prior": -0.41616039722491244,
+      "unseen": -5.488937726156687,
+      "likelihoods": {
+        "intersect by \",\", \"of\", \"from\", \"'s\"part of days": -4.386184644822546,
+        "<hour-of-day> till thirdafter part of days": -4.386184644822546,
+        "time-of-day integer (latent)after part of days": -4.386184644822546,
+        "at <time-of-day>before part of days": -4.098502572370764,
+        "hh:mmbefore part of days": -4.791649752930709,
+        "<datetime> - <datetime> (interval)part of days": -4.098502572370764,
+        "<time-of-day> - <time-of-day> (interval)part of days": -4.386184644822546,
+        "time-of-day ordinal (latent)part of days": -4.098502572370764,
+        "<hour-of-day> halfpart of days": -4.386184644822546,
+        "time-of-day integer (latent)part of days": -3.5388867844353418,
+        "<hour-of-day> till quarterthis <part-of-day>": -4.386184644822546,
+        "hourhour": -1.8738790208464304,
+        "hh:mmpart of days": -3.8753590210565547,
+        "<hour-of-day> and integer minutespart of days": -2.651583589434439,
+        "<hour-of-day> quarterafter part of days": -4.791649752930709,
+        "minutehour": -1.4243539229442357,
+        "at <time-of-day>part of days": -2.393754480132339,
+        "intersectpart of days": -4.791649752930709,
+        "from <datetime> - <datetime> (interval)part of days": -4.386184644822546,
+        "<hour-of-day> and integer minutesafter part of days": -4.386184644822546,
+        "at <time-of-day>after part of days": -3.6930374642626003,
+        "<hour-of-day> quarterpart of days": -4.386184644822546,
+        "<hour-of-day> thirdpart of days": -4.386184644822546,
+        "from <datetime> - <datetime> (interval)after part of days": -4.791649752930709,
+        "time-of-day ordinal (latent)tonight": -4.791649752930709,
+        "<datetime> - <datetime> (interval)after part of days": -4.791649752930709,
+        "<hour-of-day> till quarterbefore part of days": -4.386184644822546,
+        "<time-of-day> - <time-of-day> (interval)after part of days": -4.791649752930709,
+        "at <time-of-day>this <part-of-day>": -4.791649752930709,
+        "<hour-of-day> till thirdbefore part of days": -4.386184644822546
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "dd/mm": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "numbers prefix with -, minus": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "today": {
+    "ok_data": {
+      "prior": -1.8718021769015913,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "at <time-of-day>": {
+    "ok_data": {
+      "prior": -0.08269171584511341,
+      "unseen": -4.852030263919617,
+      "likelihoods": {
+        "<hour-of-day> third": -4.151039905898646,
+        "<hour-of-day> and integer minutes": -2.5416019934645457,
+        "<hour-of-day> quarter": -4.151039905898646,
+        "<hour-of-day> till quarter": -3.7455747977904816,
+        "time-of-day ordinal (latent)": -1.8997481072921507,
+        "<hour-of-day> half": -4.151039905898646,
+        "hh:mm": -3.2347491740244907,
+        "hour": -1.180625440328945,
+        "minute": -1.7996646487351682,
+        "<hour-of-day> till third": -3.7455747977904816,
+        "time-of-day integer (latent)": -1.7996646487351682
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "absorption of , after named day": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "Wednesday": -0.6931471805599453,
+        "day": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "September": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "tonight": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "on <date>": {
+    "ok_data": {
+      "prior": -0.6131044728864089,
+      "unseen": -3.7612001156935624,
+      "likelihoods": {
+        "<day-of-month> (ordinal or number) <named-month>": -2.639057329615259,
+        "September": -3.044522437723423,
+        "second": -3.044522437723423,
+        "<day-of-month> (ordinal or number) of <named-month>": -3.044522437723423,
+        "day": -1.4350845252893227,
+        "year": -2.639057329615259,
+        "part of <named-month>": -2.128231705849268,
+        "month": -3.044522437723423,
+        "year (integer)": -2.639057329615259,
+        "this|last the <cycle>": -2.639057329615259,
+        "day of <named-month>": -3.044522437723423
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> and integer minutes": {
+    "ok_data": {
+      "prior": -0.15415067982725836,
+      "unseen": -3.912023005428146,
+      "likelihoods": {
+        "at <time-of-day>integer (13..19)": -2.505525936990736,
+        "at <time-of-day>integer 21..99": -2.793208009442517,
+        "time-of-day integer (latent)integer (numeric)": -2.793208009442517,
+        "at <time-of-day>integer (20..90)": -3.1986731175506815,
+        "time-of-day integer (latent)integer (13..19)": -3.1986731175506815,
+        "hour": -0.9473813189441862,
+        "time-of-day ordinal (latent)integer (20..90)": -3.1986731175506815,
+        "time-of-day ordinal (latent)integer (numeric)": -3.1986731175506815,
+        "at <time-of-day>integer (numeric)": -2.505525936990736,
+        "time-of-day ordinal (latent)integer 21..99": -2.793208009442517,
+        "time-of-day ordinal (latent)integer (13..19)": -2.793208009442517
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this|last <cycle>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "October": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "month (grain)": {
+    "ok_data": {
+      "prior": -2.0149030205422647,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "in|within|after <duration>": {
+    "ok_data": {
+      "prior": -1.3862943611198906,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "week": -1.0986122886681098,
+        "dual <unit-of-duration>": -1.0986122886681098
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Wednesday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "July": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "hour (grain)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "intersect": {
+    "ok_data": {
+      "prior": -0.5458224658030868,
+      "unseen": -5.5134287461649825,
+      "likelihoods": {
+        "Tuesdayon <date>": -4.816241156068032,
+        "in <named-month>year": -4.816241156068032,
+        "<hour-of-day> till thirdafter part of days": -4.410776047959867,
+        "dayhour": -3.899950424193877,
+        "daymonth": -4.816241156068032,
+        "in <named-month>on <date>": -4.816241156068032,
+        "monthyear": -3.312163759291758,
+        "Mondayon <date>": -4.816241156068032,
+        "Christmasyear": -4.816241156068032,
+        "Monday<day-of-month> (ordinal or number) <named-month>": -4.816241156068032,
+        "month (integer)year (integer)": -4.410776047959867,
+        "\r93q0\r83 o5p4p5q0p4o5\r83year": -4.816241156068032,
+        "<day-of-week> the last of <time><cycle> this|last|next": -4.816241156068032,
+        "at <time-of-day>before part of days": -4.123093975508087,
+        "hh:mmbefore part of days": -4.816241156068032,
+        "intersect by \",\", \"of\", \"from\", \"'s\"year": -4.816241156068032,
+        "intersect<time> <part-of-day>": -4.410776047959867,
+        "month (ordinal)year (integer)": -4.816241156068032,
+        "\r93q0\r83 o5p4p1\r89\r81year": -4.816241156068032,
+        "dd/mm<time> <part-of-day>": -4.816241156068032,
+        "Thursday<time> timezone": -4.410776047959867,
+        "<hour-of-day> till quarterthis <part-of-day>": -4.410776047959867,
+        "dayday": -3.024481686839977,
+        "absorption of , after named day<day-of-month> (ordinal or number) <named-month>": -4.816241156068032,
+        "hourhour": -3.717628867399922,
+        "month (integer)year": -4.816241156068032,
+        "\r93q0\r83 o5p4p1\r91\r85year": -4.816241156068032,
+        "Thursday<day-of-month> (ordinal or number) <named-month>": -4.816241156068032,
+        "dayyear": -2.9444389791664407,
+        "Thursday<time> <part-of-day>": -4.816241156068032,
+        "<cycle> last of <time>year (integer)": -4.410776047959867,
+        "last <cycle> of <time>year (integer)": -4.816241156068032,
+        "<hour-of-day> quarterafter part of days": -4.816241156068032,
+        "minutehour": -2.513656063073986,
+        "Thursdayfrom <datetime> - <datetime> (interval)": -4.816241156068032,
+        "\r85o1\r87 o5p4\r87p6o7 o5p4p7\r80\r85q0o7year": -4.816241156068032,
+        "Monday<cycle> this|last|next": -4.816241156068032,
+        "<day-of-month> (ordinal or number) of <named-month>year": -4.816241156068032,
+        "<cycle> <ordinal> day? of <time>year": -4.816241156068032,
+        "\r93q0\r83 o5p4o1\r90\r81p9year": -4.816241156068032,
+        "on a <named-day>dd/mm": -4.816241156068032,
+        "on a <named-day>on <date>": -4.816241156068032,
+        "on a <named-day><day-of-month> (ordinal or number) <named-month>": -4.816241156068032,
+        "Tuesday<cycle> this|last|next": -4.816241156068032,
+        "dayminute": -3.563478187572664,
+        "dd/mmintersect": -4.816241156068032,
+        "in <named-month><cycle> this|last|next": -4.816241156068032,
+        "<hour-of-day> and integer minutesafter part of days": -4.410776047959867,
+        "Saturdaydd/mm": -4.816241156068032,
+        "\r85p5\r90o5p6year": -4.816241156068032,
+        "the <cycle> the <ordinal> of <time>year": -4.816241156068032,
+        "at <time-of-day>after part of days": -3.717628867399922,
+        "<ordinal> <cycle> of <time>year": -4.816241156068032,
+        "Sunday<cycle> this|last|next": -4.816241156068032,
+        "Tuesday<day-of-month> (ordinal or number) of <named-month>": -4.410776047959867,
+        "Septemberon <date>": -4.816241156068032,
+        "from <datetime> - <datetime> (interval)after part of days": -4.816241156068032,
+        "intersectintersect": -4.410776047959867,
+        "dayweek": -4.123093975508087,
+        "weekyear": -3.899950424193877,
+        "<datetime> - <datetime> (interval)after part of days": -4.816241156068032,
+        "Friday<day-of-month> (ordinal or number) <named-month>": -4.816241156068032,
+        "<hour-of-day> till quarterbefore part of days": -4.410776047959867,
+        "<time-of-day> - <time-of-day> (interval)after part of days": -4.816241156068032,
+        "at <time-of-day>this <part-of-day>": -4.816241156068032,
+        "<hour-of-day> till thirdbefore part of days": -4.410776047959867
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r85p5\r90o5p6": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "the <cycle> the <ordinal> of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "day (grain)ordinals (first..tenth)October": -2.0794415416798357,
+        "daymonth": -1.3862943611198906,
+        "week (grain)ordinals (first..tenth)month (integer)": -2.0794415416798357,
+        "weekmonth": -1.6739764335716716,
+        "week (grain)ordinals (first..tenth)intersect": -2.0794415416798357,
+        "day (grain)ordinals (first..tenth)month (integer)": -1.6739764335716716
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "in <number> (implicit minutes)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<ordinal> <cycle> of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "daymonth": -1.7047480922384253,
+        "ordinals (first..tenth)week (grain)in <named-month>": -1.7047480922384253,
+        "weekmonth": -1.2992829841302609,
+        "ordinals (first..tenth)week (grain)intersect": -1.7047480922384253,
+        "ordinals (first..tenth)day (grain)month (integer)": -1.7047480922384253
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "year (grain)": {
+    "ok_data": {
+      "prior": -1.2237754316221157,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "from <datetime> - <datetime> (interval)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "dayday": -1.791759469228055,
+        "at <time-of-day>at <time-of-day>": -1.0986122886681098,
+        "hourhour": -1.0986122886681098,
+        "<day-of-month> (ordinal or number) <named-month><day-of-month> (ordinal or number) <named-month>": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time> last": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "day": -0.8754687373538999,
+        "Sunday": -1.791759469228055,
+        "on a <named-day>": -1.791759469228055,
+        "Tuesday": -1.3862943611198906
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Saturday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 21..99": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "integer 5integer (20..90)": -0.6931471805599453,
+        "integer 3integer (20..90)": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <day-of-week>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "Monday": -0.6931471805599453,
+        "day": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (13..19)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "integer 5integer 10": -0.916290731874155,
+        "integer 8integer 10": -0.5108256237659907
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time> for <duration>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "from <day-of-month> (ordinal or number) to <day-of-month> (ordinal or number) in <named-month> (interval)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "integer (numeric)integer (numeric)month (ordinal)": -1.252762968495368,
+        "month": -0.8472978603872037,
+        "ordinals (composite, e.g., eighty-seven)ordinals (composite, e.g., eighty-seven)in <named-month>": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (first..tenth)": {
+    "ok_data": {
+      "prior": -0.21825356602001794,
+      "unseen": -3.7612001156935624,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Monday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "yesterday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "hh:mm:ss": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r93q0\r83 o5p4o1\r90\r81p9": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (twenty, thirty..ninety)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> <integer>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time> nth of <time>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.70805020110221,
+      "likelihoods": {
+        "daymonth": -1.0296194171811581,
+        "Wednesdayordinals (first..tenth)intersect": -1.9459101490553135,
+        "Tuesdayordinals (first..tenth)intersect by \",\", \"of\", \"from\", \"'s\"": -1.9459101490553135,
+        "Tuesdayordinals (first..tenth)in <named-month>": -1.9459101490553135,
+        "Tuesdayordinals (first..tenth)October": -1.9459101490553135
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "nth <time> of <time>": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -3.4965075614664802,
+      "likelihoods": {
+        "daymonth": -1.6739764335716716,
+        "ordinals (first..tenth)intersect by \",\", \"of\", \"from\", \"'s\"year (integer)": -2.367123614131617,
+        "ordinals (first..tenth)on a <named-day>intersect by \",\", \"of\", \"from\", \"'s\"": -2.772588722239781,
+        "dayyear": -2.0794415416798357,
+        "ordinals (first..tenth)Tuesdaymonth (integer)": -2.772588722239781,
+        "ordinals (first..tenth)Wednesdayintersect by \",\", \"of\", \"from\", \"'s\"": -2.367123614131617,
+        "ordinals (first..tenth)intersectyear (integer)": -2.772588722239781,
+        "ordinals (first..tenth)Tuesdayintersect": -2.772588722239781
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> quarter": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "at <time-of-day>": -1.5040773967762742,
+        "time-of-day ordinal (latent)": -1.0986122886681098,
+        "hour": -0.8109302162163288
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r85o1\r87 o5p4\r87p6o7 o5p4p7\r80\r85q0o7": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "April": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> till quarter": {
+    "ok_data": {
+      "prior": -0.2231435513142097,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "at <time-of-day>": -1.3862943611198906,
+        "time-of-day ordinal (latent)": -1.791759469228055,
+        "hour": -0.8754687373538999,
+        "time-of-day integer (latent)": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "week (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.1780538303479458,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "past year (latent)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 8": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "now": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-month> (ordinal or number) of <named-month>": {
+    "ok_data": {
+      "prior": -0.570544858467613,
+      "unseen": -3.713572066704308,
+      "likelihoods": {
+        "ordinals (thirtieth..nineteenth)February": -2.5902671654458267,
+        "ordinals (first..tenth)October": -2.5902671654458267,
+        "ordinals (first..tenth)April": -2.5902671654458267,
+        "ordinals (first..tenth)February": -2.995732273553991,
+        "ordinals (first..tenth)month (integer)": -2.5902671654458267,
+        "ordinals (first..tenth)March": -2.5902671654458267,
+        "month": -1.0498221244986778,
+        "ordinals (first..tenth)in <named-month>": -2.5902671654458267
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <part-of-day>": {
+    "ok_data": {
+      "prior": -1.0986122886681098,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "hour": -0.6931471805599453,
+        "part of days": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<cycle> <ordinal> day? of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "day (grain)ordinals (first..tenth)October": -2.0794415416798357,
+        "daymonth": -1.3862943611198906,
+        "week (grain)ordinals (first..tenth)month (integer)": -2.0794415416798357,
+        "weekmonth": -1.6739764335716716,
+        "week (grain)ordinals (first..tenth)intersect": -2.0794415416798357,
+        "day (grain)ordinals (first..tenth)month (integer)": -1.6739764335716716
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Friday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "tomorrow": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<cycle> this|last|next": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.970291913552122,
+      "likelihoods": {
+        "week": -1.3862943611198906,
+        "month (grain)": -2.5649493574615367,
+        "year (grain)": -2.341805806147327,
+        "week (grain)": -1.3862943611198906,
+        "day": -2.5649493574615367,
+        "year": -2.341805806147327,
+        "month": -2.5649493574615367,
+        "day (grain)": -2.5649493574615367
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "time-of-day ordinal (latent)": {
+    "ok_data": {
+      "prior": -0.13976194237515874,
+      "unseen": -3.1780538303479458,
+      "likelihoods": {
+        "ordinals (twelveth)": -2.03688192726104,
+        "ordinals (first..tenth)": -0.3022808718729337,
+        "ordinals (eleventh)": -2.03688192726104
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (eleventh)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 2": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "by <time>": {
+    "ok_data": {
+      "prior": -1.252762968495368,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "at <time-of-day>": -1.2992829841302609,
+        "hour": -1.7047480922384253,
+        "minute": -1.7047480922384253
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "fractional number": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Sunday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "February": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r93q0\r83 o5p4p1\r91\r85": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "minute (grain)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> half": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "at <time-of-day>": -1.3862943611198906,
+        "time-of-day ordinal (latent)": -1.3862943611198906,
+        "hour": -0.9808292530117262
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "month (integer)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.639057329615259,
+      "likelihoods": {
+        "integer (numeric)": -1.8718021769015913,
+        "integer 10": -0.6190392084062235,
+        "integer 3": -1.1786549963416462
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "year": {
+    "ok_data": {
+      "prior": -0.7419373447293773,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "integer (numeric)": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last <day-of-week> of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "daymonth": -0.8472978603872037,
+        "Monday<cycle> this|last|next": -1.252762968495368,
+        "Mondayin <named-month>": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<integer> <unit-of-duration>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "dual <unit-of-duration>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "week": -0.6931471805599453,
+        "week (grain)": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 10": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "from <day-of-month> (ordinal or number) to <day-of-month> (ordinal or number) <named-month> (interval)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "integer (numeric)integer (numeric)July": -1.252762968495368,
+        "month": -0.8472978603872037,
+        "integer (numeric)integer (numeric)in <named-month>": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "part of <named-month>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "March": -1.2992829841302609,
+        "month": -0.7884573603642702,
+        "in <named-month>": -1.2992829841302609
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "hh:mm": {
+    "ok_data": {
+      "prior": -0.10536051565782628,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> and integer": {
+    "ok_data": {
+      "prior": -1.252762968495368,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "at <time-of-day>integer (13..19)": -2.0794415416798357,
+        "at <time-of-day>integer 21..99": -1.6739764335716716,
+        "hour": -1.1631508098056809,
+        "at <time-of-day>integer (numeric)": -2.0794415416798357
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "month (ordinal)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "ordinals (first..tenth)": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "second (grain) ": {
+    "ok_data": {
+      "prior": -1.6094379124341003,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r93q0\r83 o5p4p1\r89\r81": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "the <cycle> after|before <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "day (grain)tomorrow": -1.2992829841302609,
+        "dayday": -0.7884573603642702,
+        "day (grain)yesterday": -1.2992829841302609
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "about|exactly <time-of-day>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.639057329615259,
+      "likelihoods": {
+        "<day-of-week> next": -1.8718021769015913,
+        "at <time-of-day>": -1.466337068793427,
+        "day": -1.466337068793427,
+        "hour": -1.466337068793427,
+        "Tuesday": -1.8718021769015913
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "before <duration>": {
+    "ok_data": {
+      "prior": -2.2512917986064953,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "week": -0.9808292530117262,
+        "single <unit-of-duration>": -0.9808292530117262
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "intersect by \",\", \"of\", \"from\", \"'s\"": {
+    "ok_data": {
+      "prior": -0.5533852381847867,
+      "unseen": -4.430816798843313,
+      "likelihoods": {
+        "dayhour": -2.627081138568543,
+        "daymonth": -2.472930458741285,
+        "monthyear": -2.627081138568543,
+        "Wednesdayintersect": -3.7256934272366524,
+        "<named-month>|<named-day> <day-of-month> (ordinal)October": -3.7256934272366524,
+        "Wednesday<day-of-month> (ordinal or number) <named-month>": -3.7256934272366524,
+        "dayday": -2.8094026953624978,
+        "Thursday<day-of-month> (ordinal or number) <named-month>": -3.7256934272366524,
+        "in <named-month>year (integer)": -3.3202283191284883,
+        "Thursdayat <time-of-day>": -3.7256934272366524,
+        "Thursday<time> <part-of-day>": -3.3202283191284883,
+        "<named-month>|<named-day> <day-of-month> (ordinal)this|last the <cycle>": -3.7256934272366524,
+        "last <cycle> of <time>year (integer)": -3.7256934272366524,
+        "Tuesdaymonth (integer)": -3.7256934272366524,
+        "Wednesday<day-of-month> (ordinal or number) of <named-month>": -3.7256934272366524,
+        "Thursday<datetime> - <datetime> (interval)": -3.7256934272366524,
+        "Septemberyear (integer)": -3.3202283191284883,
+        "Thursday<time-of-day> - <time-of-day> (interval)": -3.7256934272366524,
+        "on a <named-day>September": -3.7256934272366524,
+        "Octoberyear (integer)": -3.7256934272366524,
+        "Sunday<cycle> this|last|next": -3.7256934272366524,
+        "dayweek": -3.3202283191284883,
+        "weekyear": -3.7256934272366524,
+        "Mondaythis|last the <cycle>": -3.7256934272366524,
+        "<named-month>|<named-day> <day-of-month> (ordinal)in <named-month>": -3.7256934272366524,
+        "Wednesdayin <named-month>": -3.7256934272366524
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 3": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last <time>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.791759469228055,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "March": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<named-month>|<named-day> <day-of-month> (ordinal)": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -2.9444389791664407,
+      "likelihoods": {
+        "Sundayordinals (thirtieth..nineteenth)": -2.1972245773362196,
+        "Tuesdayordinals (first..tenth)": -1.791759469228055,
+        "Tuesdayordinals (thirtieth..nineteenth)": -2.1972245773362196,
+        "day": -1.0986122886681098,
+        "Saturdayordinals (thirtieth..nineteenth)": -2.1972245773362196
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "after part of days": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-month> (ordinal)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Christmas": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "until <time-of-day>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "on a <named-day>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.772588722239781,
+      "likelihoods": {
+        "Saturday": -2.0149030205422647,
+        "Monday": -2.0149030205422647,
+        "Friday": -2.0149030205422647,
+        "day": -0.916290731874155,
+        "Tuesday": -1.6094379124341003
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<duration> after|before|from <time>": {
+    "ok_data": {
+      "prior": -1.252762968495368,
+      "unseen": -2.772588722239781,
+      "likelihoods": {
+        "dayday": -1.6094379124341003,
+        "single <unit-of-duration>yesterday": -2.0149030205422647,
+        "single <unit-of-duration>tomorrow": -2.0149030205422647
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\r93q0\r83 o5p4p5q0p4o5\r83": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "before part of days": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (thirtieth..nineteenth)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "year (integer)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "integer (numeric)": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<cycle> n next": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "week": -0.6931471805599453,
+        "week (grain)integer 3": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<datetime> - <datetime> (interval)": {
+    "ok_data": {
+      "prior": -0.1823215567939546,
+      "unseen": -2.890371757896165,
+      "likelihoods": {
+        "dayday": -2.1400661634962708,
+        "at <time-of-day>at <time-of-day>": -1.4469189829363254,
+        "hourhour": -1.2237754316221157,
+        "<day-of-month> (ordinal or number) <named-month><day-of-month> (ordinal or number) <named-month>": -2.1400661634962708,
+        "intersect by \",\", \"of\", \"from\", \"'s\"at <time-of-day>": -2.1400661634962708
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Tuesday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "New Year's Day": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this|last the <cycle>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.1354942159291497,
+      "likelihoods": {
+        "week": -1.9924301646902063,
+        "month (grain)": -2.3978952727983707,
+        "year (grain)": -2.3978952727983707,
+        "second": -2.3978952727983707,
+        "week (grain)": -1.9924301646902063,
+        "day": -2.3978952727983707,
+        "year": -2.3978952727983707,
+        "second (grain) ": -2.3978952727983707,
+        "month": -2.3978952727983707,
+        "day (grain)": -2.3978952727983707
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "in <named-month>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.5263605246161616,
+      "likelihoods": {
+        "September": -2.3978952727983707,
+        "October": -1.7047480922384253,
+        "February": -2.3978952727983707,
+        "March": -1.7047480922384253,
+        "month": -0.7884573603642702
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time-of-day> - <time-of-day> (interval)": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "at <time-of-day>at <time-of-day>": -0.916290731874155,
+        "hourhour": -0.916290731874155
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "nth <time> after <time>": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "dayday": -0.916290731874155,
+        "ordinals (first..tenth)Tuesdayintersect": -0.916290731874155
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<named-month> <day-of-month> (non ordinal)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last <cycle> of <time>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "daymonth": -1.6739764335716716,
+        "week (grain)intersect by \",\", \"of\", \"from\", \"'s\"": -2.0794415416798357,
+        "day (grain)intersect": -2.0794415416798357,
+        "weekmonth": -1.6739764335716716,
+        "week (grain)September": -2.0794415416798357,
+        "day (grain)month (integer)": -2.0794415416798357
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (composite, e.g., eighty-seven)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<cycle> last of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.70805020110221,
+      "likelihoods": {
+        "week (grain)month (ordinal)": -1.9459101490553135,
+        "daymonth": -1.540445040947149,
+        "day (grain)intersect": -1.9459101490553135,
+        "weekmonth": -1.540445040947149,
+        "week (grain)intersect": -1.9459101490553135,
+        "day (grain)month (integer)": -1.9459101490553135
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "after <time-of-day>": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "day (grain)": {
+    "ok_data": {
+      "prior": -0.3629054936893685,
+      "unseen": -2.890371757896165,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "right now": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-week> the last of <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "daymonth": -0.916290731874155,
+        "Tuesdayin <named-month>": -1.6094379124341003,
+        "Mondaymonth (integer)": -1.6094379124341003,
+        "Tuesdayintersect": -1.6094379124341003
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "day of <named-month>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "month (integer)": -1.3862943611198906,
+        "March": -1.791759469228055,
+        "month": -0.8754687373538999,
+        "in <named-month>": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-week> last": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "day": -0.8754687373538999,
+        "Sunday": -1.791759469228055,
+        "on a <named-day>": -1.791759469228055,
+        "Tuesday": -1.3862943611198906
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<month> dd-dd (interval)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "Julyinteger (numeric)integer (numeric)": -1.0986122886681098,
+        "month": -0.8109302162163288,
+        "Augustinteger (numeric)integer (numeric)": -1.5040773967762742
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "part of days": {
+    "ok_data": {
+      "prior": -0.2876820724517809,
+      "unseen": -3.367295829986474,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> till third": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "at <time-of-day>": -1.3862943611198906,
+        "time-of-day ordinal (latent)": -1.791759469228055,
+        "hour": -0.8754687373538999,
+        "time-of-day integer (latent)": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "time-of-day integer (latent)": {
+    "ok_data": {
+      "prior": -0.5306282510621704,
+      "unseen": -3.2188758248682006,
+      "likelihoods": {
+        "integer (numeric)": -0.3448404862917295,
+        "integer 3": -1.791759469228055,
+        "integer 5": -2.4849066497880004
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "single <unit-of-duration>": {
+    "ok_data": {
+      "prior": -3.590439381300684,
+      "unseen": -3.1354942159291497,
+      "likelihoods": {
+        "week": -1.9924301646902063,
+        "week (grain)": -1.9924301646902063,
+        "day": -1.9924301646902063,
+        "day (grain)": -1.9924301646902063
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "dd-dd <month> (interval)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "integer (numeric)integer (numeric)July": -1.0986122886681098,
+        "month": -0.8109302162163288,
+        "integer (numeric)integer (numeric)in <named-month>": -1.5040773967762742
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "Monday": -0.6931471805599453,
+        "day": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "August": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  }
+}

@@ -1,1 +1,1773 @@
-{"week":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"integer (numeric)":{"prior":-0.4302451371066514,"unseen":-4.553876891600541,"likelihoods":{"":0.0}},"SalÅ":{"prior":0.0,"unseen":-2.639057329615259,"likelihoods":{"":0.0}},"lunch":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"Ramazan BayramÅ":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"":0.0}},"<time> <part-of-day>":{"prior":-0.10536051565782628,"unseen":-3.4011973816621555,"likelihoods":{"dayhour":-1.0647107369924282,"tomorrowevening":-2.6741486494265287,"<day-of-month> (non ordinal) <named-month>part of days":-2.6741486494265287,"Pazartesipart of days":-2.6741486494265287,"Cumartesipart of days":-2.6741486494265287,"tomorrowlunch":-2.6741486494265287,"tomorrowpart of days":-2.268683541318364,"yesterdayevening":-2.6741486494265287,"yesterdaypart of days":-2.6741486494265287}},"today":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"at <time-of-day>":{"prior":-0.40546510810816444,"unseen":-4.060443010546419,"likelihoods":{"time-of-day (latent)":-1.4039939382192916,"hh:mm":-1.55814461804655,"about|exactly <time-of-day>":-2.9444389791664407,"hour":-1.4039939382192916,"minute":-1.4039939382192916}},"the ides of <named-month>":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"Mart":-1.252762968495368,"month":-0.8472978603872037,"èubat":-1.252762968495368}},"gªn (grain)":{"prior":-0.3101549283038396,"unseen":-2.5649493574615367,"likelihoods":{"":0.0}},"Ekim":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"yaz":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"<integer> + '\"":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"Cuma":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"<ordinal> quarter":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"quarter":-0.6931471805599453,"ordinals (first..31st)eyrek yÅl (grain)":-0.6931471805599453}},"Emek ve DayanÅéma Gªnª":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"intersect":{"prior":-0.5049259016388025,"unseen":-5.673323267171493,"likelihoods":{"<named-month> <day-of-month> (non ordinal)Cuma":-4.976733742420574,"Cuma<named-month> <day-of-month> (non ordinal)":-4.976733742420574,"Cumartesiat <time-of-day>":-4.57126863431241,"dayhour":-3.590439381300684,"<day-of-month> (non ordinal) <named-month>Cuma":-4.57126863431241,"monthday":-3.367295829986474,"monthyear":-4.57126863431241,"yearhour":-4.976733742420574,"intersectCuma":-3.7239707739252066,"Ekimintersect":-3.8781214537524646,"Peréembe<datetime> - <datetime> (interval)":-4.976733742420574,"Peréembe<time-of-day> - <time-of-day> (interval)":-4.283586561860629,"year<day-of-month> (ordinal)":-4.976733742420574,"intersectat <time-of-day>":-3.8781214537524646,"yearintersect":-4.57126863431241,"next <cycle>at <time-of-day>":-4.976733742420574,"intersectSalÅ":-4.57126863431241,"Cumaat <time-of-day>":-4.57126863431241,"<day-of-month> (non ordinal) <named-month>Cumartesi":-4.976733742420574,"<named-month> <day-of-month> (non ordinal)Pazartesi":-4.976733742420574,"Cumartesi<part-of-day> of <time>":-4.976733742420574,"<day-of-month> (non ordinal) <named-month>Pazartesi":-4.976733742420574,"yearKurban BayramÅ":-4.060443010546419,"dayday":-2.578838469622204,"<time> <part-of-day>at <time-of-day>":-4.976733742420574,"last <cycle>Pazar":-4.976733742420574,"hourhour":-4.976733742420574,"yearRamazan BayramÅ":-3.590439381300684,"dayyear":-3.367295829986474,"<day-of-month> (non ordinal) <named-month>intersect":-3.7239707739252066,"EOM|End of dayat <time-of-day>":-4.976733742420574,"<day-of-month> (non ordinal) <named-month>SalÅ":-4.976733742420574,"<day-of-month> (ordinal)\u000199aréamba":-4.976733742420574,"before yesterdayat <time-of-day>":-4.976733742420574,"Pazar<day-of-month> (non ordinal) <named-month>":-4.976733742420574,"YÅlbaéÅat <time-of-day>":-4.976733742420574,"at <time-of-day><day-of-month> (non ordinal) <named-month>":-4.976733742420574,"hh:mm<day-of-month> (non ordinal) <named-month>":-4.976733742420574,"hh:mmintersect":-4.283586561860629,"Ekim<day-of-month> (ordinal)":-4.57126863431241,"at <time-of-day>intersect":-4.283586561860629,"dayminute":-2.7254419438140793,"intersectyear":-4.57126863431241,"minuteday":-2.9618307218783095,"yearCuma":-4.57126863431241,"Ekimyear":-4.57126863431241,"<day-of-month> (ordinal)SalÅ":-4.57126863431241,"intersect<day-of-month> (ordinal)":-4.976733742420574,"intersectintersect":-4.060443010546419,"weekday":-4.57126863431241,"yearday":-2.8972922007407385,"Ramazan BayramÅyear":-4.976733742420574,"next <cycle>\u000199aréamba":-4.976733742420574,"tomorrowat <time-of-day>":-4.976733742420574,"<duration> henceat <time-of-day>":-4.976733742420574,"Peréembehh:mm":-4.976733742420574,"intersect\u000199aréamba":-4.283586561860629,"<named-month> <day-of-month> (non ordinal)year":-4.283586561860629,"minuteyear":-4.57126863431241,"<day-of-month> (non ordinal) <named-month>year":-3.8781214537524646,"yearminute":-4.976733742420574}},"yÅl (grain)":{"prior":0.0,"unseen":-2.639057329615259,"likelihoods":{"":0.0}},"after tomorrow":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"next <cycle>":{"prior":-0.1431008436406733,"unseen":-3.6109179126442243,"likelihoods":{"week":-1.791759469228055,"gªn (grain)":-2.890371757896165,"yÅl (grain)":-2.890371757896165,"hafta (grain)":-1.791759469228055,"day":-2.890371757896165,"quarter":-2.890371757896165,"year":-2.890371757896165,"eyrek yÅl (grain)":-2.890371757896165,"ay (grain)":-1.791759469228055,"month":-1.791759469228055}},"yyyy-mm-dd":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"year (latent)":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"mm/dd/yyyy":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"yesterday":{"prior":-0.40546510810816444,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"hafta (grain)":{"prior":-0.07696104113612832,"unseen":-3.295836866004329,"likelihoods":{"":0.0}},"Pazartesi":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"Nisan":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"nth <time> of <time>":{"prior":-0.6931471805599453,"unseen":-2.9444389791664407,"likelihoods":{"intersectordinals (first..31st)\u000199aréamba":-2.1972245773362196,"<day-of-month> (ordinal)ordinal (digits)year":-2.1972245773362196,"monthday":-1.5040773967762742,"dayyear":-2.1972245773362196,"Ekimordinals (first..31st)SalÅ":-1.791759469228055}},"saniye (grain)":{"prior":0.0,"unseen":-2.3025850929940455,"likelihoods":{"":0.0}},"Cumartesi":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"ordinals (first..31st)":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"Temmuz":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"<part-of-day> of <time>":{"prior":-0.40546510810816444,"unseen":-2.5649493574615367,"likelihoods":{"hourhour":-1.3862943611198906,"hourminute":-1.3862943611198906,"part of daysat <time-of-day>":-1.0986122886681098,"eveningat <time-of-day>":-1.791759469228055}},"EOY|End of year":{"prior":-1.6094379124341003,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"now":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"this <part-of-day>":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"hour":-0.8472978603872037,"evening":-1.252762968495368,"part of days":-1.252762968495368}},"<duration> hence":{"prior":-0.2411620568168881,"unseen":-3.4011973816621555,"likelihoods":{"week":-1.575536360758419,"day":-1.9810014688665833,"year":-2.268683541318364,"<integer> <unit-of-duration>":-0.8823891801984737,"month":-2.6741486494265287}},"numbers prefix with -, negative or minus":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"tomorrow":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"Zafer BayramÅ":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"Peréembe":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"by <time>":{"prior":0.0,"unseen":-2.1972245773362196,"likelihoods":{"day":-1.3862943611198906,"EOM|End of month":-1.3862943611198906,"month":-1.3862943611198906,"EOM|End of day":-1.3862943611198906}},"fractional number":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"<duration> from now":{"prior":-1e+100,"unseen":-1.791759469228055,"likelihoods":{}},"quarter":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"this <cycle>":{"prior":-0.2876820724517809,"unseen":-2.5649493574615367,"likelihoods":{"week":-1.791759469228055,"yÅl (grain)":-1.791759469228055,"hafta (grain)":-1.791759469228055,"quarter":-1.791759469228055,"year":-1.791759469228055,"eyrek yÅl (grain)":-1.791759469228055}},"dakika (grain)":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"time-of-day (latent)":{"prior":-0.6061358035703156,"unseen":-3.044522437723423,"likelihoods":{"integer (numeric)":-0.10536051565782628,"integer (0..9)":-2.3025850929940455}},"A\u000287ustos":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"year":{"prior":-0.08004270767353637,"unseen":-3.258096538021482,"likelihoods":{"integer (numeric)":0.0}},"<integer> <unit-of-duration>":{"prior":-0.456758402495715,"unseen":-4.584967478670572,"likelihoods":{"week":-2.0898043287153825,"integer (numeric)hafta (grain)":-2.782951509275328,"integer (numeric)saniye (grain)":-3.4760986898352733,"integer (0..9)saniye (grain)":-3.4760986898352733,"second":-2.9652730660692823,"integer (numeric)gªn (grain)":-2.495269436823547,"integer (0..9)gªn (grain)":-3.8815637979434374,"integer (numeric)yÅl (grain)":-3.8815637979434374,"day":-2.3774864011671633,"integer (0..9)ay (grain)":-3.4760986898352733,"year":-2.782951509275328,"integer (0..9)yÅl (grain)":-2.9652730660692823,"hour":-3.8815637979434374,"month":-3.4760986898352733,"integer (numeric)dakika (grain)":-2.782951509275328,"integer (0..9)saat (grain)":-3.8815637979434374,"integer (0..9)hafta (grain)":-2.62880082944807,"minute":-2.495269436823547,"integer (0..9)dakika (grain)":-3.4760986898352733}},"AralÅk":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"\u000199aréamba":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"<duration> after <time>":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"dayyear":-1.2039728043259361,"hourminute":-1.6094379124341003,"at <time-of-day><integer> <unit-of-duration>":-1.6094379124341003,"YÅlbaéÅ<integer> <unit-of-duration>":-1.2039728043259361}},"integer (10..90)":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"Kurban BayramÅ":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"eyrek yÅl (grain)":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"hh:mm":{"prior":0.0,"unseen":-3.1780538303479458,"likelihoods":{"":0.0}},"ay (grain)":{"prior":0.0,"unseen":-2.639057329615259,"likelihoods":{"":0.0}},"Mart":{"prior":0.0,"unseen":-2.4849066497880004,"likelihoods":{"":0.0}},"about|exactly <time-of-day>":{"prior":-0.4700036292457356,"unseen":-2.890371757896165,"likelihoods":{"at <time-of-day>":-1.7346010553881064,"hh:mm":-1.4469189829363254,"minute":-1.041453874828161}},"kÅé":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"<duration> ago":{"prior":-0.11778303565638351,"unseen":-3.1354942159291497,"likelihoods":{"week":-1.4816045409242156,"day":-1.9924301646902063,"year":-2.3978952727983707,"<integer> <unit-of-duration>":-0.8938178760220964,"month":-2.3978952727983707}},"last <time>":{"prior":0.0,"unseen":-2.833213344056216,"likelihoods":{"SalÅ":-2.0794415416798357,"day":-1.1631508098056809,"kÅé":-1.6739764335716716,"hour":-2.0794415416798357,"Pazar":-2.0794415416798357,"week-end":-2.0794415416798357}},"EOM|End of month":{"prior":-0.40546510810816444,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"saat (grain)":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}},"<day-of-month> (ordinal)":{"prior":-2.6026896854443837,"unseen":-1.9459101490553135,"likelihoods":{"ordinals (first..31st)":-0.40546510810816444,"ordinal (digits)":-1.0986122886681098}},"Atatªrk\\8217ª Anma, Genlik ve Spor BayramÅ":{"prior":0.0,"unseen":-1.6094379124341003,"likelihoods":{"":0.0}},"noon":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"evening":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"next <time>":{"prior":0.0,"unseen":-3.295836866004329,"likelihoods":{"SalÅ":-1.466337068793427,"Cuma":-2.5649493574615367,"day":-1.1786549963416462,"Mart":-1.8718021769015913,"month":-1.8718021769015913,"ilkbahar":-2.5649493574615367}},"Eylªl":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"last <cycle>":{"prior":-0.3184537311185346,"unseen":-3.2188758248682006,"likelihoods":{"week":-1.5686159179138452,"yÅl (grain)":-2.4849066497880004,"hafta (grain)":-1.5686159179138452,"year":-2.4849066497880004,"ay (grain)":-1.791759469228055,"month":-1.791759469228055}},"Pazar":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"Cumhuriyet BayramÅ":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"next n <cycle>":{"prior":0.0,"unseen":-3.332204510175204,"likelihoods":{"week":-2.1972245773362196,"integer (numeric)saniye (grain)":-2.6026896854443837,"integer (0..9)saniye (grain)":-2.6026896854443837,"second":-2.1972245773362196,"integer (numeric)yÅl (grain)":-2.6026896854443837,"year":-2.1972245773362196,"integer (0..9)yÅl (grain)":-2.6026896854443837,"hour":-2.1972245773362196,"integer (0..9)saat (grain)":-2.6026896854443837,"integer (0..9)hafta (grain)":-2.1972245773362196,"integer (numeric)saat (grain)":-2.6026896854443837}},"in <duration>":{"prior":0.0,"unseen":-3.5553480614894135,"likelihoods":{"week":-2.4277482359480516,"second":-1.916922612182061,"day":-2.833213344056216,"<integer> <unit-of-duration>":-0.8183103235139514,"hour":-2.833213344056216,"minute":-1.580450375560848}},"<datetime> - <datetime> (interval)":{"prior":-1.252762968495368,"unseen":-3.4339872044851463,"likelihoods":{"intersecthh:mm":-2.70805020110221,"at <time-of-day>hh:mm":-2.70805020110221,"minuteminute":-1.6094379124341003,"hh:mmhh:mm":-2.0149030205422647,"dayday":-2.70805020110221,"<day-of-month> (non ordinal) <named-month><day-of-month> (non ordinal) <named-month>":-2.70805020110221}},"fortnight":{"prior":-1e+100,"unseen":-0.6931471805599453,"likelihoods":{}},"èubat":{"prior":0.0,"unseen":-2.0794415416798357,"likelihoods":{"":0.0}},"<time-of-day> - <time-of-day> (interval)":{"prior":-0.1823215567939546,"unseen":-3.332204510175204,"likelihoods":{"hh:mmtime-of-day (latent)":-1.9095425048844386,"at <time-of-day>hh:mm":-2.6026896854443837,"minuteminute":-1.6863989535702288,"hh:mmhh:mm":-1.9095425048844386,"hourhour":-2.1972245773362196,"minutehour":-1.6863989535702288,"at <time-of-day>time-of-day (latent)":-1.9095425048844386}},"last n <cycle>":{"prior":0.0,"unseen":-3.891820298110627,"likelihoods":{"week":-2.772588722239781,"integer (numeric)saniye (grain)":-3.1780538303479458,"integer (0..9)saniye (grain)":-3.1780538303479458,"second":-2.772588722239781,"integer (numeric)gªn (grain)":-3.1780538303479458,"integer (numeric)ay (grain)":-3.1780538303479458,"integer (0..9)gªn (grain)":-3.1780538303479458,"integer (numeric)yÅl (grain)":-3.1780538303479458,"day":-2.772588722239781,"integer (0..9)ay (grain)":-3.1780538303479458,"year":-2.772588722239781,"integer (0..9)yÅl (grain)":-3.1780538303479458,"hour":-2.772588722239781,"month":-2.772588722239781,"integer (numeric)dakika (grain)":-3.1780538303479458,"integer (0..9)saat (grain)":-3.1780538303479458,"integer (0..9)hafta (grain)":-2.772588722239781,"minute":-2.772588722239781,"integer (numeric)saat (grain)":-3.1780538303479458,"integer (0..9)dakika (grain)":-3.1780538303479458}},"<named-month> <day-of-month> (non ordinal)":{"prior":0.0,"unseen":-3.258096538021482,"likelihoods":{"èubatinteger (numeric)":-2.5257286443082556,"A\u000287ustosinteger (numeric)":-2.120263536200091,"Martinteger (numeric)":-2.5257286443082556,"Martinteger (0..9)":-2.120263536200091,"Nisaninteger (numeric)":-2.5257286443082556,"Temmuzinteger (numeric)":-2.120263536200091,"month":-0.916290731874155}},"ilkbahar":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"":0.0}},"<day-of-month> (non ordinal) <named-month>":{"prior":0.0,"unseen":-3.784189633918261,"likelihoods":{"integer (numeric)èubat":-2.151762203259462,"integer (numeric)Nisan":-3.068052935133617,"integer (numeric)A\u000287ustos":-2.662587827025453,"integer (numeric)Mart":-2.662587827025453,"integer (numeric)Eylªl":-2.662587827025453,"integer (0..9)Mart":-3.068052935133617,"integer (numeric)Temmuz":-2.374905754573672,"month":-0.8708283577973976,"integer (numeric)AralÅk":-2.662587827025453}},"this|next <day-of-week>":{"prior":0.0,"unseen":-2.70805020110221,"likelihoods":{"SalÅ":-1.252762968495368,"Cuma":-1.9459101490553135,"Pazartesi":-1.9459101490553135,"day":-0.8472978603872037}},"ordinal (digits)":{"prior":-3.5115454388310208,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"integer (0..9)":{"prior":0.0,"unseen":-3.6375861597263857,"likelihoods":{"":0.0}},"week-end":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"YÅlbaéÅ":{"prior":0.0,"unseen":-1.791759469228055,"likelihoods":{"":0.0}},"integer 11..99":{"prior":0.0,"unseen":-1.0986122886681098,"likelihoods":{"integer (10..90)integer (0..9)":0.0}},"for <duration> from <time>":{"prior":-0.6931471805599453,"unseen":-2.1972245773362196,"likelihoods":{"dayday":-0.9808292530117262,"<day-of-month> (non ordinal) <named-month><integer> <unit-of-duration>":-0.9808292530117262}},"part of days":{"prior":0.0,"unseen":-2.3978952727983707,"likelihoods":{"":0.0}},"Ulusal Egemenlik ve \u000199ocuk BayramÅ":{"prior":0.0,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"<hour-of-day> <integer> (as relative minutes)":{"prior":-0.40546510810816444,"unseen":-2.1972245773362196,"likelihoods":{"at <time-of-day>integer 11..99":-1.3862943611198906,"hour":-0.9808292530117262,"at <time-of-day>integer (numeric)":-1.3862943611198906}},"EOM|End of day":{"prior":-1.7047480922384253,"unseen":-1.3862943611198906,"likelihoods":{"":0.0}},"this <time>":{"prior":-0.2231435513142097,"unseen":-2.772588722239781,"likelihoods":{"yaz":-2.0149030205422647,"Pazartesi":-2.0149030205422647,"day":-1.3217558399823195,"kÅé":-2.0149030205422647,"hour":-2.0149030205422647,"week-end":-2.0149030205422647}},"before yesterday":{"prior":0.0,"unseen":-1.9459101490553135,"likelihoods":{"":0.0}}}
+{
+  "week": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (numeric)": {
+    "ok_data": {
+      "prior": -0.4302451371066514,
+      "unseen": -4.553876891600541,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Sal\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.639057329615259,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "lunch": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Ramazan Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time> <part-of-day>": {
+    "ok_data": {
+      "prior": -0.10536051565782628,
+      "unseen": -3.4011973816621555,
+      "likelihoods": {
+        "dayhour": -1.0647107369924282,
+        "tomorrowevening": -2.6741486494265287,
+        "<day-of-month> (non ordinal) <named-month>part of days": -2.6741486494265287,
+        "Pazartesipart of days": -2.6741486494265287,
+        "Cumartesipart of days": -2.6741486494265287,
+        "tomorrowlunch": -2.6741486494265287,
+        "tomorrowpart of days": -2.268683541318364,
+        "yesterdayevening": -2.6741486494265287,
+        "yesterdaypart of days": -2.6741486494265287
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "today": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "at <time-of-day>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -4.060443010546419,
+      "likelihoods": {
+        "time-of-day (latent)": -1.4039939382192916,
+        "hh:mm": -1.55814461804655,
+        "about|exactly <time-of-day>": -2.9444389791664407,
+        "hour": -1.4039939382192916,
+        "minute": -1.4039939382192916
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "the ides of <named-month>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "Mart": -1.252762968495368,
+        "month": -0.8472978603872037,
+        "\u00e8ubat": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "g\u00aan (grain)": {
+    "ok_data": {
+      "prior": -0.3101549283038396,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Ekim": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "yaz": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<integer> + '\"": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Cuma": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<ordinal> quarter": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "quarter": -0.6931471805599453,
+        "ordinals (first..31st)\u0099eyrek y\u00c5l (grain)": -0.6931471805599453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Emek ve Dayan\u00c5\u00e9ma G\u00aan\u00aa": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "intersect": {
+    "ok_data": {
+      "prior": -0.5049259016388025,
+      "unseen": -5.673323267171493,
+      "likelihoods": {
+        "<named-month> <day-of-month> (non ordinal)Cuma": -4.976733742420574,
+        "Cuma<named-month> <day-of-month> (non ordinal)": -4.976733742420574,
+        "Cumartesiat <time-of-day>": -4.57126863431241,
+        "dayhour": -3.590439381300684,
+        "<day-of-month> (non ordinal) <named-month>Cuma": -4.57126863431241,
+        "monthday": -3.367295829986474,
+        "monthyear": -4.57126863431241,
+        "yearhour": -4.976733742420574,
+        "intersectCuma": -3.7239707739252066,
+        "Ekimintersect": -3.8781214537524646,
+        "Per\u00e9embe<datetime> - <datetime> (interval)": -4.976733742420574,
+        "Per\u00e9embe<time-of-day> - <time-of-day> (interval)": -4.283586561860629,
+        "year<day-of-month> (ordinal)": -4.976733742420574,
+        "intersectat <time-of-day>": -3.8781214537524646,
+        "yearintersect": -4.57126863431241,
+        "next <cycle>at <time-of-day>": -4.976733742420574,
+        "intersectSal\u00c5": -4.57126863431241,
+        "Cumaat <time-of-day>": -4.57126863431241,
+        "<day-of-month> (non ordinal) <named-month>Cumartesi": -4.976733742420574,
+        "<named-month> <day-of-month> (non ordinal)Pazartesi": -4.976733742420574,
+        "Cumartesi<part-of-day> of <time>": -4.976733742420574,
+        "<day-of-month> (non ordinal) <named-month>Pazartesi": -4.976733742420574,
+        "yearKurban Bayram\u00c5": -4.060443010546419,
+        "dayday": -2.578838469622204,
+        "<time> <part-of-day>at <time-of-day>": -4.976733742420574,
+        "last <cycle>Pazar": -4.976733742420574,
+        "hourhour": -4.976733742420574,
+        "yearRamazan Bayram\u00c5": -3.590439381300684,
+        "dayyear": -3.367295829986474,
+        "<day-of-month> (non ordinal) <named-month>intersect": -3.7239707739252066,
+        "EOM|End of dayat <time-of-day>": -4.976733742420574,
+        "<day-of-month> (non ordinal) <named-month>Sal\u00c5": -4.976733742420574,
+        "<day-of-month> (ordinal)\u000199ar\u00e9amba": -4.976733742420574,
+        "before yesterdayat <time-of-day>": -4.976733742420574,
+        "Pazar<day-of-month> (non ordinal) <named-month>": -4.976733742420574,
+        "Y\u00c5lba\u00e9\u00c5at <time-of-day>": -4.976733742420574,
+        "at <time-of-day><day-of-month> (non ordinal) <named-month>": -4.976733742420574,
+        "hh:mm<day-of-month> (non ordinal) <named-month>": -4.976733742420574,
+        "hh:mmintersect": -4.283586561860629,
+        "Ekim<day-of-month> (ordinal)": -4.57126863431241,
+        "at <time-of-day>intersect": -4.283586561860629,
+        "dayminute": -2.7254419438140793,
+        "intersectyear": -4.57126863431241,
+        "minuteday": -2.9618307218783095,
+        "yearCuma": -4.57126863431241,
+        "Ekimyear": -4.57126863431241,
+        "<day-of-month> (ordinal)Sal\u00c5": -4.57126863431241,
+        "intersect<day-of-month> (ordinal)": -4.976733742420574,
+        "intersectintersect": -4.060443010546419,
+        "weekday": -4.57126863431241,
+        "yearday": -2.8972922007407385,
+        "Ramazan Bayram\u00c5year": -4.976733742420574,
+        "next <cycle>\u000199ar\u00e9amba": -4.976733742420574,
+        "tomorrowat <time-of-day>": -4.976733742420574,
+        "<duration> henceat <time-of-day>": -4.976733742420574,
+        "Per\u00e9embehh:mm": -4.976733742420574,
+        "intersect\u000199ar\u00e9amba": -4.283586561860629,
+        "<named-month> <day-of-month> (non ordinal)year": -4.283586561860629,
+        "minuteyear": -4.57126863431241,
+        "<day-of-month> (non ordinal) <named-month>year": -3.8781214537524646,
+        "yearminute": -4.976733742420574
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "y\u00c5l (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.639057329615259,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "after tomorrow": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "next <cycle>": {
+    "ok_data": {
+      "prior": -0.1431008436406733,
+      "unseen": -3.6109179126442243,
+      "likelihoods": {
+        "week": -1.791759469228055,
+        "g\u00aan (grain)": -2.890371757896165,
+        "y\u00c5l (grain)": -2.890371757896165,
+        "hafta (grain)": -1.791759469228055,
+        "day": -2.890371757896165,
+        "quarter": -2.890371757896165,
+        "year": -2.890371757896165,
+        "\u0099eyrek y\u00c5l (grain)": -2.890371757896165,
+        "ay (grain)": -1.791759469228055,
+        "month": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "yyyy-mm-dd": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "year (latent)": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "mm/dd/yyyy": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "yesterday": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "hafta (grain)": {
+    "ok_data": {
+      "prior": -0.07696104113612832,
+      "unseen": -3.295836866004329,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Pazartesi": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Nisan": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "nth <time> of <time>": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -2.9444389791664407,
+      "likelihoods": {
+        "intersectordinals (first..31st)\u000199ar\u00e9amba": -2.1972245773362196,
+        "<day-of-month> (ordinal)ordinal (digits)year": -2.1972245773362196,
+        "monthday": -1.5040773967762742,
+        "dayyear": -2.1972245773362196,
+        "Ekimordinals (first..31st)Sal\u00c5": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "saniye (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3025850929940455,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Cumartesi": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinals (first..31st)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Temmuz": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<part-of-day> of <time>": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "hourhour": -1.3862943611198906,
+        "hourminute": -1.3862943611198906,
+        "part of daysat <time-of-day>": -1.0986122886681098,
+        "eveningat <time-of-day>": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "EOY|End of year": {
+    "ok_data": {
+      "prior": -1.6094379124341003,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "now": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <part-of-day>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "hour": -0.8472978603872037,
+        "evening": -1.252762968495368,
+        "part of days": -1.252762968495368
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<duration> hence": {
+    "ok_data": {
+      "prior": -0.2411620568168881,
+      "unseen": -3.4011973816621555,
+      "likelihoods": {
+        "week": -1.575536360758419,
+        "day": -1.9810014688665833,
+        "year": -2.268683541318364,
+        "<integer> <unit-of-duration>": -0.8823891801984737,
+        "month": -2.6741486494265287
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "numbers prefix with -, negative or minus": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "tomorrow": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Zafer Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Per\u00e9embe": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "by <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "day": -1.3862943611198906,
+        "EOM|End of month": -1.3862943611198906,
+        "month": -1.3862943611198906,
+        "EOM|End of day": -1.3862943611198906
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "fractional number": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<duration> from now": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -1.791759469228055,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "quarter": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <cycle>": {
+    "ok_data": {
+      "prior": -0.2876820724517809,
+      "unseen": -2.5649493574615367,
+      "likelihoods": {
+        "week": -1.791759469228055,
+        "y\u00c5l (grain)": -1.791759469228055,
+        "hafta (grain)": -1.791759469228055,
+        "quarter": -1.791759469228055,
+        "year": -1.791759469228055,
+        "\u0099eyrek y\u00c5l (grain)": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "dakika (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "time-of-day (latent)": {
+    "ok_data": {
+      "prior": -0.6061358035703156,
+      "unseen": -3.044522437723423,
+      "likelihoods": {
+        "integer (numeric)": -0.10536051565782628,
+        "integer (0..9)": -2.3025850929940455
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "A\u000287ustos": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "year": {
+    "ok_data": {
+      "prior": -0.08004270767353637,
+      "unseen": -3.258096538021482,
+      "likelihoods": {
+        "integer (numeric)": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<integer> <unit-of-duration>": {
+    "ok_data": {
+      "prior": -0.456758402495715,
+      "unseen": -4.584967478670572,
+      "likelihoods": {
+        "week": -2.0898043287153825,
+        "integer (numeric)hafta (grain)": -2.782951509275328,
+        "integer (numeric)saniye (grain)": -3.4760986898352733,
+        "integer (0..9)saniye (grain)": -3.4760986898352733,
+        "second": -2.9652730660692823,
+        "integer (numeric)g\u00aan (grain)": -2.495269436823547,
+        "integer (0..9)g\u00aan (grain)": -3.8815637979434374,
+        "integer (numeric)y\u00c5l (grain)": -3.8815637979434374,
+        "day": -2.3774864011671633,
+        "integer (0..9)ay (grain)": -3.4760986898352733,
+        "year": -2.782951509275328,
+        "integer (0..9)y\u00c5l (grain)": -2.9652730660692823,
+        "hour": -3.8815637979434374,
+        "month": -3.4760986898352733,
+        "integer (numeric)dakika (grain)": -2.782951509275328,
+        "integer (0..9)saat (grain)": -3.8815637979434374,
+        "integer (0..9)hafta (grain)": -2.62880082944807,
+        "minute": -2.495269436823547,
+        "integer (0..9)dakika (grain)": -3.4760986898352733
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Aral\u00c5k": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\u000199ar\u00e9amba": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<duration> after <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "dayyear": -1.2039728043259361,
+        "hourminute": -1.6094379124341003,
+        "at <time-of-day><integer> <unit-of-duration>": -1.6094379124341003,
+        "Y\u00c5lba\u00e9\u00c5<integer> <unit-of-duration>": -1.2039728043259361
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (10..90)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Kurban Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\u0099eyrek y\u00c5l (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "hh:mm": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.1780538303479458,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ay (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.639057329615259,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Mart": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.4849066497880004,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "about|exactly <time-of-day>": {
+    "ok_data": {
+      "prior": -0.4700036292457356,
+      "unseen": -2.890371757896165,
+      "likelihoods": {
+        "at <time-of-day>": -1.7346010553881064,
+        "hh:mm": -1.4469189829363254,
+        "minute": -1.041453874828161
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "k\u00c5\u00e9": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<duration> ago": {
+    "ok_data": {
+      "prior": -0.11778303565638351,
+      "unseen": -3.1354942159291497,
+      "likelihoods": {
+        "week": -1.4816045409242156,
+        "day": -1.9924301646902063,
+        "year": -2.3978952727983707,
+        "<integer> <unit-of-duration>": -0.8938178760220964,
+        "month": -2.3978952727983707
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.833213344056216,
+      "likelihoods": {
+        "Sal\u00c5": -2.0794415416798357,
+        "day": -1.1631508098056809,
+        "k\u00c5\u00e9": -1.6739764335716716,
+        "hour": -2.0794415416798357,
+        "Pazar": -2.0794415416798357,
+        "week-end": -2.0794415416798357
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "EOM|End of month": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "saat (grain)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-month> (ordinal)": {
+    "ok_data": {
+      "prior": -2.6026896854443837,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "ordinals (first..31st)": -0.40546510810816444,
+        "ordinal (digits)": -1.0986122886681098
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Atat\u00aark\\8217\u00aa Anma, Gen\u0099lik ve Spor Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.6094379124341003,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "noon": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "evening": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "next <time>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.295836866004329,
+      "likelihoods": {
+        "Sal\u00c5": -1.466337068793427,
+        "Cuma": -2.5649493574615367,
+        "day": -1.1786549963416462,
+        "Mart": -1.8718021769015913,
+        "month": -1.8718021769015913,
+        "ilkbahar": -2.5649493574615367
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Eyl\u00aal": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last <cycle>": {
+    "ok_data": {
+      "prior": -0.3184537311185346,
+      "unseen": -3.2188758248682006,
+      "likelihoods": {
+        "week": -1.5686159179138452,
+        "y\u00c5l (grain)": -2.4849066497880004,
+        "hafta (grain)": -1.5686159179138452,
+        "year": -2.4849066497880004,
+        "ay (grain)": -1.791759469228055,
+        "month": -1.791759469228055
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Pazar": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Cumhuriyet Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "next n <cycle>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.332204510175204,
+      "likelihoods": {
+        "week": -2.1972245773362196,
+        "integer (numeric)saniye (grain)": -2.6026896854443837,
+        "integer (0..9)saniye (grain)": -2.6026896854443837,
+        "second": -2.1972245773362196,
+        "integer (numeric)y\u00c5l (grain)": -2.6026896854443837,
+        "year": -2.1972245773362196,
+        "integer (0..9)y\u00c5l (grain)": -2.6026896854443837,
+        "hour": -2.1972245773362196,
+        "integer (0..9)saat (grain)": -2.6026896854443837,
+        "integer (0..9)hafta (grain)": -2.1972245773362196,
+        "integer (numeric)saat (grain)": -2.6026896854443837
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "in <duration>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.5553480614894135,
+      "likelihoods": {
+        "week": -2.4277482359480516,
+        "second": -1.916922612182061,
+        "day": -2.833213344056216,
+        "<integer> <unit-of-duration>": -0.8183103235139514,
+        "hour": -2.833213344056216,
+        "minute": -1.580450375560848
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<datetime> - <datetime> (interval)": {
+    "ok_data": {
+      "prior": -1.252762968495368,
+      "unseen": -3.4339872044851463,
+      "likelihoods": {
+        "intersecthh:mm": -2.70805020110221,
+        "at <time-of-day>hh:mm": -2.70805020110221,
+        "minuteminute": -1.6094379124341003,
+        "hh:mmhh:mm": -2.0149030205422647,
+        "dayday": -2.70805020110221,
+        "<day-of-month> (non ordinal) <named-month><day-of-month> (non ordinal) <named-month>": -2.70805020110221
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "fortnight": {
+    "ok_data": {
+      "prior": -1e+100,
+      "unseen": -0.6931471805599453,
+      "likelihoods": {},
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "\u00e8ubat": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.0794415416798357,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<time-of-day> - <time-of-day> (interval)": {
+    "ok_data": {
+      "prior": -0.1823215567939546,
+      "unseen": -3.332204510175204,
+      "likelihoods": {
+        "hh:mmtime-of-day (latent)": -1.9095425048844386,
+        "at <time-of-day>hh:mm": -2.6026896854443837,
+        "minuteminute": -1.6863989535702288,
+        "hh:mmhh:mm": -1.9095425048844386,
+        "hourhour": -2.1972245773362196,
+        "minutehour": -1.6863989535702288,
+        "at <time-of-day>time-of-day (latent)": -1.9095425048844386
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "last n <cycle>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.891820298110627,
+      "likelihoods": {
+        "week": -2.772588722239781,
+        "integer (numeric)saniye (grain)": -3.1780538303479458,
+        "integer (0..9)saniye (grain)": -3.1780538303479458,
+        "second": -2.772588722239781,
+        "integer (numeric)g\u00aan (grain)": -3.1780538303479458,
+        "integer (numeric)ay (grain)": -3.1780538303479458,
+        "integer (0..9)g\u00aan (grain)": -3.1780538303479458,
+        "integer (numeric)y\u00c5l (grain)": -3.1780538303479458,
+        "day": -2.772588722239781,
+        "integer (0..9)ay (grain)": -3.1780538303479458,
+        "year": -2.772588722239781,
+        "integer (0..9)y\u00c5l (grain)": -3.1780538303479458,
+        "hour": -2.772588722239781,
+        "month": -2.772588722239781,
+        "integer (numeric)dakika (grain)": -3.1780538303479458,
+        "integer (0..9)saat (grain)": -3.1780538303479458,
+        "integer (0..9)hafta (grain)": -2.772588722239781,
+        "minute": -2.772588722239781,
+        "integer (numeric)saat (grain)": -3.1780538303479458,
+        "integer (0..9)dakika (grain)": -3.1780538303479458
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<named-month> <day-of-month> (non ordinal)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.258096538021482,
+      "likelihoods": {
+        "\u00e8ubatinteger (numeric)": -2.5257286443082556,
+        "A\u000287ustosinteger (numeric)": -2.120263536200091,
+        "Martinteger (numeric)": -2.5257286443082556,
+        "Martinteger (0..9)": -2.120263536200091,
+        "Nisaninteger (numeric)": -2.5257286443082556,
+        "Temmuzinteger (numeric)": -2.120263536200091,
+        "month": -0.916290731874155
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ilkbahar": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<day-of-month> (non ordinal) <named-month>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.784189633918261,
+      "likelihoods": {
+        "integer (numeric)\u00e8ubat": -2.151762203259462,
+        "integer (numeric)Nisan": -3.068052935133617,
+        "integer (numeric)A\u000287ustos": -2.662587827025453,
+        "integer (numeric)Mart": -2.662587827025453,
+        "integer (numeric)Eyl\u00aal": -2.662587827025453,
+        "integer (0..9)Mart": -3.068052935133617,
+        "integer (numeric)Temmuz": -2.374905754573672,
+        "month": -0.8708283577973976,
+        "integer (numeric)Aral\u00c5k": -2.662587827025453
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this|next <day-of-week>": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.70805020110221,
+      "likelihoods": {
+        "Sal\u00c5": -1.252762968495368,
+        "Cuma": -1.9459101490553135,
+        "Pazartesi": -1.9459101490553135,
+        "day": -0.8472978603872037
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "ordinal (digits)": {
+    "ok_data": {
+      "prior": -3.5115454388310208,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer (0..9)": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -3.6375861597263857,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "week-end": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Y\u00c5lba\u00e9\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.791759469228055,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "integer 11..99": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.0986122886681098,
+      "likelihoods": {
+        "integer (10..90)integer (0..9)": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "for <duration> from <time>": {
+    "ok_data": {
+      "prior": -0.6931471805599453,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "dayday": -0.9808292530117262,
+        "<day-of-month> (non ordinal) <named-month><integer> <unit-of-duration>": -0.9808292530117262
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "part of days": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -2.3978952727983707,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "Ulusal Egemenlik ve \u000199ocuk Bayram\u00c5": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "<hour-of-day> <integer> (as relative minutes)": {
+    "ok_data": {
+      "prior": -0.40546510810816444,
+      "unseen": -2.1972245773362196,
+      "likelihoods": {
+        "at <time-of-day>integer 11..99": -1.3862943611198906,
+        "hour": -0.9808292530117262,
+        "at <time-of-day>integer (numeric)": -1.3862943611198906
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "EOM|End of day": {
+    "ok_data": {
+      "prior": -1.7047480922384253,
+      "unseen": -1.3862943611198906,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "this <time>": {
+    "ok_data": {
+      "prior": -0.2231435513142097,
+      "unseen": -2.772588722239781,
+      "likelihoods": {
+        "yaz": -2.0149030205422647,
+        "Pazartesi": -2.0149030205422647,
+        "day": -1.3217558399823195,
+        "k\u00c5\u00e9": -2.0149030205422647,
+        "hour": -2.0149030205422647,
+        "week-end": -2.0149030205422647
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  },
+  "before yesterday": {
+    "ok_data": {
+      "prior": 0.0,
+      "unseen": -1.9459101490553135,
+      "likelihoods": {
+        "": 0.0
+      },
+      "n": 0
+    },
+    "ko_data": {
+      "prior": "-Infinity",
+      "unseen": "-Infinity",
+      "likelihoods": {},
+      "n": 0
+    }
+  }
+}
