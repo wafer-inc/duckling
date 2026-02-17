@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 // Ported from Duckling/AmountOfMoney/EN/Corpus.hs
 use duckling::{parse_en, DimensionKind, DimensionValue, MeasurementPoint, MeasurementValue};
 

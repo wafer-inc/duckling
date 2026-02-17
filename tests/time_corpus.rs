@@ -3114,6 +3114,7 @@ fn test_iso_datetime_no_spurious_interval() {
 }
 
 #[test]
+#[ignore = "debug helper that intentionally panics"]
 fn test_debug_issues() {
     let r1 = parse_time("Apr 1 2018");
     eprintln!("'Apr 1 2018': {:?}", r1);
