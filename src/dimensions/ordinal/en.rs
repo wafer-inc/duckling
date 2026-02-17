@@ -102,7 +102,9 @@ pub fn rules() -> Vec<Rule> {
                     "ninth" => 9,
                     _ => return None,
                 };
-                Some(TokenData::Ordinal(OrdinalData::new(tens.checked_add(units)?)))
+                Some(TokenData::Ordinal(OrdinalData::new(
+                    tens.checked_add(units)?,
+                )))
             }),
         },
         // Numeric ordinals: 1st, 2nd, 3rd, 4th, 21st, etc.

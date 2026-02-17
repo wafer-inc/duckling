@@ -66,7 +66,9 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "number (0..10)".to_string(),
-            pattern: vec![regex(r"(nul|geen|niks|zero|tien|een|twee|drie|vier|vyf|ses|sewe|agt?|nege)")],
+            pattern: vec![regex(
+                r"(nul|geen|niks|zero|tien|een|twee|drie|vier|vyf|ses|sewe|agt?|nege)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -80,7 +82,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("dosyn")],
             production: Box::new(|_| {
                 Some(TokenData::Numeral(
-                    NumeralData::new(12.0).with_multipliable(true).with_quantifier(),
+                    NumeralData::new(12.0)
+                        .with_multipliable(true)
+                        .with_quantifier(),
                 ))
             }),
         },
@@ -107,10 +111,14 @@ pub fn rules() -> Vec<Rule> {
                 };
                 match s.as_str() {
                     "honderd" => Some(TokenData::Numeral(
-                        NumeralData::new(100.0).with_grain(2).with_multipliable(true),
+                        NumeralData::new(100.0)
+                            .with_grain(2)
+                            .with_multipliable(true),
                     )),
                     "duisend" => Some(TokenData::Numeral(
-                        NumeralData::new(1000.0).with_grain(3).with_multipliable(true),
+                        NumeralData::new(1000.0)
+                            .with_grain(3)
+                            .with_multipliable(true),
                     )),
                     _ => None,
                 }
@@ -118,7 +126,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (11..19)".to_string(),
-            pattern: vec![regex(r"(elf|twaalf|dertien|veertien|vyftien|sestien|sewentien|agtien|neg?entien)")],
+            pattern: vec![regex(
+                r"(elf|twaalf|dertien|veertien|vyftien|sestien|sewentien|agtien|neg?entien)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -140,7 +150,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer ([2-9][1-9])".to_string(),
-            pattern: vec![predicate(number_between(1.0, 10.0)), regex("en"), predicate(one_of(&[20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0]))],
+            pattern: vec![
+                predicate(number_between(1.0, 10.0)),
+                regex("en"),
+                predicate(one_of(&[20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])),
+            ],
             production: Box::new(|nodes| {
                 let units = numeral_data(&nodes[0].token_data)?.value;
                 let tens = numeral_data(&nodes[2].token_data)?.value;
@@ -149,7 +163,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect 2 numbers".to_string(),
-            pattern: vec![predicate(|td| has_grain(td) && is_positive(td)), predicate(|td| !is_multipliable(td) && is_positive(td))],
+            pattern: vec![
+                predicate(|td| has_grain(td) && is_positive(td)),
+                predicate(|td| !is_multipliable(td) && is_positive(td)),
+            ],
             production: Box::new(|nodes| {
                 let n1 = numeral_data(&nodes[0].token_data)?;
                 let n2 = numeral_data(&nodes[1].token_data)?;
@@ -163,7 +180,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "compose by multiplication".to_string(),
-            pattern: vec![predicate(|td| matches!(td, TokenData::Numeral(_))), predicate(is_multipliable)],
+            pattern: vec![
+                predicate(|td| matches!(td, TokenData::Numeral(_))),
+                predicate(is_multipliable),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?;
                 let b = numeral_data(&nodes[1].token_data)?;

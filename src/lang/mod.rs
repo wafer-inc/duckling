@@ -332,9 +332,7 @@ fn common_rules(needed: &[DimensionKind]) -> Vec<Rule> {
     let mut rules = Vec::new();
     for dim in needed {
         match dim {
-            DimensionKind::Numeral => {
-                rules.extend(crate::dimensions::numeral::en::common_rules())
-            }
+            DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::en::common_rules()),
             DimensionKind::Distance => {
                 rules.extend(crate::dimensions::distance::en::common_rules())
             }
@@ -449,16 +447,22 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::es::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::es::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::es::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::es::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::es::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::es::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::es::rules())
                     }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::es::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::es::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::es::rules())
+                    }
                     DimensionKind::Time => rules.extend(crate::dimensions::time::es::rules()),
                     DimensionKind::Volume => rules.extend(crate::dimensions::volume::es::rules()),
                     _ => {}
@@ -474,8 +478,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::bg::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::bg::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::bg::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::bg::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::bg::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::bg::rules()),
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::bg::rules())
@@ -503,8 +511,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ca::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::ca::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ca::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::ca::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ca::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ca::rules()),
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::ca::rules())
@@ -523,7 +535,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
             for dim in needed {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::cs::rules()),
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::cs::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::cs::rules())
+                    }
                     _ => {}
                 }
             }
@@ -534,8 +548,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
             for dim in needed {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::de::rules()),
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::de::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::de::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::de::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::de::rules())
+                    }
                     DimensionKind::Email => rules.extend(crate::dimensions::email::de::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::de::rules()),
                     DimensionKind::TimeGrain => {
@@ -628,7 +646,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::hi::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::hi::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::hi::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::hi::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::hi::rules())
                     }
@@ -660,7 +680,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::ja::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ja::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ja::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ja::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::ja::rules())
                     }
@@ -681,7 +703,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ka::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ka::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ka::rules())
+                    }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::ka::rules())
                     }
@@ -728,7 +752,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ko::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ko::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ko::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ko::rules()),
                     DimensionKind::Distance => {
                         rules.extend(crate::dimensions::distance::ko::rules())
@@ -779,7 +805,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::zh::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::zh::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::zh::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::zh::rules()),
                     DimensionKind::Distance => {
                         rules.extend(crate::dimensions::distance::zh::rules())
@@ -807,8 +835,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ga::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::ga::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ga::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::ga::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ga::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ga::rules()),
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::ga::rules())
@@ -830,9 +862,13 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::hr::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::hr::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::hr::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::hr::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::hr::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::hr::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::hr::rules())
                     }
@@ -850,10 +886,16 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::mn::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::mn::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::mn::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::mn::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::mn::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::mn::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::mn::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::mn::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::mn::rules())
                     }
@@ -882,7 +924,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::nb::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::nb::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::nb::rules())
+                    }
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::nb::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::nb::rules()),
                     DimensionKind::TimeGrain => {
@@ -910,11 +954,17 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::fr::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::fr::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::fr::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::fr::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::fr::rules())
+                    }
                     DimensionKind::Email => rules.extend(crate::dimensions::email::fr::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::fr::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::fr::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::fr::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::fr::rules())
                     }
@@ -935,7 +985,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::it::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::it::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::it::rules())
+                    }
                     DimensionKind::Email => rules.extend(crate::dimensions::email::it::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::it::rules()),
                     DimensionKind::Temperature => {
@@ -966,10 +1018,16 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::nl::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::nl::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::nl::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::nl::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::nl::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::nl::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::nl::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::nl::rules())
+                    }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::nl::rules())
                     }
@@ -987,9 +1045,13 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::pt::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::pt::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::pt::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::pt::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::pt::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::pt::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::pt::rules())
                     }
@@ -1010,10 +1072,16 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ro::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::ro::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ro::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::ro::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ro::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ro::rules()),
-                    DimensionKind::Quantity => rules.extend(crate::dimensions::quantity::ro::rules()),
+                    DimensionKind::Quantity => {
+                        rules.extend(crate::dimensions::quantity::ro::rules())
+                    }
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::ro::rules())
                     }
@@ -1034,7 +1102,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::ru::rules())
                     }
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::ru::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::ru::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::ru::rules()),
                     DimensionKind::Distance => {
                         rules.extend(crate::dimensions::distance::ru::rules())
@@ -1059,8 +1129,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::sv::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::sv::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::sv::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::sv::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::sv::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::sv::rules()),
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::sv::rules())
@@ -1094,7 +1168,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::hu::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::hu::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::hu::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::hu::rules())
+                    }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::hu::rules())
                     }
@@ -1120,7 +1196,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::pl::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::pl::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::pl::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::pl::rules())
+                    }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::pl::rules())
                     }
@@ -1164,7 +1242,9 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                 match dim {
                     DimensionKind::Numeral => rules.extend(crate::dimensions::numeral::uk::rules()),
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::uk::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::uk::rules()),
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::uk::rules())
+                    }
                     DimensionKind::TimeGrain => {
                         rules.extend(crate::dimensions::time_grain::uk::rules())
                     }
@@ -1181,8 +1261,12 @@ fn lang_rules(lang: Lang, needed: &[DimensionKind]) -> Vec<Rule> {
                     DimensionKind::AmountOfMoney => {
                         rules.extend(crate::dimensions::amount_of_money::tr::rules())
                     }
-                    DimensionKind::Distance => rules.extend(crate::dimensions::distance::tr::rules()),
-                    DimensionKind::Duration => rules.extend(crate::dimensions::duration::tr::rules()),
+                    DimensionKind::Distance => {
+                        rules.extend(crate::dimensions::distance::tr::rules())
+                    }
+                    DimensionKind::Duration => {
+                        rules.extend(crate::dimensions::duration::tr::rules())
+                    }
                     DimensionKind::Ordinal => rules.extend(crate::dimensions::ordinal::tr::rules()),
                     DimensionKind::Temperature => {
                         rules.extend(crate::dimensions::temperature::tr::rules())

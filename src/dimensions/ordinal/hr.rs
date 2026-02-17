@@ -7,7 +7,8 @@ fn lookup_ordinal(s: &str) -> Option<i64> {
     match s.to_lowercase().as_str() {
         "trece" | "treći" | "treća" | "treće" | "trećeg" => Some(3),
         "cetvrti" | "četvrti" | "cetvrta" | "četvrta" | "cetvrto" | "četvrto" => Some(4),
-        "sesti" | "šesti" | "sesta" | "šesta" | "sesto" | "šesto" | "sestog" | "šestog" | "sestoga" | "šestoga" => Some(6),
+        "sesti" | "šesti" | "sesta" | "šesta" | "sesto" | "šesto" | "sestog" | "šestog"
+        | "sestoga" | "šestoga" => Some(6),
         _ => None,
     }
 }
@@ -27,7 +28,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "ordinals (first..19th subset)".to_string(),
-            pattern: vec![regex("(tre(c|ć)(e|i|a|eg)|(č|c)etvrt(i|a|o)|([sš])est(i|a|o(g|ga)?))")],
+            pattern: vec![regex(
+                "(tre(c|ć)(e|i|a|eg)|(č|c)etvrt(i|a|o)|([sš])est(i|a|o(g|ga)?))",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

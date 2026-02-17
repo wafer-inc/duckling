@@ -42,7 +42,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "year (grain)".to_string(),
-            pattern: vec![regex("წლით|წელიწადი?(ით|ი|ში|ის|ს)?|წე?ლი?(ით|ის|ში|ს|იდან)?")],
+            pattern: vec![regex(
+                "წლით|წელიწადი?(ით|ი|ში|ის|ს)?|წე?ლი?(ით|ის|ში|ს|იდან)?",
+            )],
             production: Box::new(|_| Some(TokenData::TimeGrain(Grain::Year))),
         },
     ]

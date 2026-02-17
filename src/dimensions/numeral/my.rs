@@ -52,7 +52,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "basic numerals".to_string(),
-            pattern: vec![regex("(သုံည|မရှိ|တစ်|ပထမ|နှစ်|ဒုတိယ|သုံး|တတိယ|လေး|ငါး|ခြောက်|ခုနှစ်|ရှစ်|ကိုး)")],
+            pattern: vec![regex(
+                "(သုံည|မရှိ|တစ်|ပထမ|နှစ်|ဒုတိယ|သုံး|တတိယ|လေး|ငါး|ခြောက်|ခုနှစ်|ရှစ်|ကိုး)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

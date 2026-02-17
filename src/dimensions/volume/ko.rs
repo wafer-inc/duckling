@@ -70,27 +70,37 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("(l|리터)")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("gal(l?ons?)?|갤(런|론)")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
         Rule {
             name: "corpus 이리터".to_string(),
             pattern: vec![regex("이리터")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "corpus 반 리터".to_string(),
             pattern: vec![regex("반 리터")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "corpus 삼 갤론".to_string(),
             pattern: vec![regex("삼 ?갤론")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(3.0, VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(3.0, VolumeUnit::Gallon)))
+            }),
         },
         Rule {
             name: "corpus 삼 헥토리터".to_string(),

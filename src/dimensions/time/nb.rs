@@ -1,8 +1,8 @@
-use crate::pattern::regex;
 use super::Direction;
-use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
 use super::{PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
+use crate::pattern::regex;
+use crate::types::{Rule, TokenData};
 
 fn parse_nb_month(s: &str) -> Option<u32> {
     let t = s.to_lowercase();
@@ -590,7 +590,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour_in == 0 || hour_in > 24 {
                     return None;
                 }
-                let hour = if hour_in == 1 { 0 } else { hour_in - 1 };
+                let hour = if hour_in == 1 { 0 } else { hour_in.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 45, false))))
             }),
         },
@@ -684,7 +684,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let n = parse_nb_qty(&n_s)?;
-                let mins = n * 60 + 30;
+                let mins = n.checked_mul(60)?.checked_add(30)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: mins, grain: Grain::Minute })))
             }),
         },
@@ -698,7 +698,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let n = parse_nb_qty(&n_s)?;
                 let grain = parse_nb_grain(&g_s)?;
-                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: -n, grain })))
+                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: n.checked_neg()?, grain })))
             }),
         },
         Rule {

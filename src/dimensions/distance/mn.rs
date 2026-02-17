@@ -17,7 +17,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("км|километр")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Kilometre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Kilometre),
+                ))
             }),
         },
         Rule {
@@ -49,7 +51,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("м(етр(ийн|ээр)?)?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
@@ -57,7 +61,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("см|сантиметр")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Centimetre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Centimetre),
+                ))
             }),
         },
         Rule {
@@ -65,7 +71,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("мм|миллиметр")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Millimetre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Millimetre),
+                ))
             }),
         },
         Rule {

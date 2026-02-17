@@ -55,7 +55,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<temp> Fahrenheit".to_string(),
-            pattern: vec![is_value_only(true), regex("(de )?f(ah?rh?eh?n(h?eit)?)?\\.?")],
+            pattern: vec![
+                is_value_only(true),
+                regex("(de )?f(ah?rh?eh?n(h?eit)?)?\\.?"),
+            ],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
                 Some(TokenData::Temperature(

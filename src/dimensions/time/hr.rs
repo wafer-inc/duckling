@@ -1,8 +1,8 @@
+use super::{Direction, IntervalDirection};
+use super::{PartOfDay, TimeData, TimeForm};
 use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
-use super::{Direction, IntervalDirection};
 use crate::types::{Rule, TokenData};
-use super::{PartOfDay, TimeData, TimeForm};
 
 fn parse_dow_hr(s: &str) -> Option<u32> {
     if s.starts_with("pon") {
@@ -363,7 +363,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -378,7 +378,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour = parse_hr_hour_word(&w)?;
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -397,7 +397,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if (part.contains("poslijepodne") || part.contains("popodne")) && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),
@@ -431,7 +431,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if part.is_some() && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),
@@ -446,7 +446,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour = parse_hr_hour_word(&h)?;
                 if part.is_some() && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 30, false))))
             }),
@@ -463,9 +463,9 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=24).contains(&in_hour) {
                     return None;
                 }
-                let mut out_hour = if in_hour == 1 { 0 } else { in_hour - 1 };
+                let mut out_hour = if in_hour == 1 { 0 } else { in_hour.checked_sub(1)? };
                 if part.is_some() && out_hour < 12 {
-                    out_hour += 12;
+                    out_hour = out_hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 30, false))))
             }),
@@ -481,7 +481,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute = if m_raw.contains("čet") || m_raw.contains("cetv") { 15 } else { parse_hr_small_num(&m_raw)? };
                 if part.is_some() && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),
@@ -539,7 +539,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let n = parse_hr_quantity(&q)?;
                 let grain = parse_hr_grain(&g)?;
-                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: -n, grain })))
+                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: n.checked_neg()?, grain })))
             }),
         },
         Rule {
@@ -804,7 +804,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
                     return None;
                 }
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(1900 + year2) })))
+                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(1900_i32.checked_add(year2)?) })))
             }),
         },
         Rule {
@@ -852,7 +852,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=31).contains(&day) {
                     return None;
                 }
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 4, day, year: Some(2000 + year2) })))
+                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 4, day, year: Some(2000_i32.checked_add(year2)?) })))
             }),
         },
         Rule {

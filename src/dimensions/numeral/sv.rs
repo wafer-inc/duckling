@@ -4,19 +4,59 @@ use crate::types::{Rule, TokenData};
 
 use super::NumeralData;
 
-fn is_positive(td: &TokenData) -> bool { matches!(td, TokenData::Numeral(d) if d.value >= 0.0) }
-fn has_grain(td: &TokenData) -> bool { matches!(td, TokenData::Numeral(d) if d.grain.is_some()) }
-fn is_multipliable(td: &TokenData) -> bool { matches!(td, TokenData::Numeral(d) if d.multipliable) }
-fn number_between(low:f64, up:f64)->impl Fn(&TokenData)->bool{ move |td| matches!(td, TokenData::Numeral(d) if d.value>=low && d.value<up)}
+fn is_positive(td: &TokenData) -> bool {
+    matches!(td, TokenData::Numeral(d) if d.value >= 0.0)
+}
+fn has_grain(td: &TokenData) -> bool {
+    matches!(td, TokenData::Numeral(d) if d.grain.is_some())
+}
+fn is_multipliable(td: &TokenData) -> bool {
+    matches!(td, TokenData::Numeral(d) if d.multipliable)
+}
+fn number_between(low: f64, up: f64) -> impl Fn(&TokenData) -> bool {
+    move |td| matches!(td, TokenData::Numeral(d) if d.value>=low && d.value<up)
+}
 
-fn zero_to_nineteen(s:&str)->Option<f64>{
+fn zero_to_nineteen(s: &str) -> Option<f64> {
     match s {
-        "inget"|"ingen"|"noll"=>Some(0.0),"en"|"ett"=>Some(1.0),"två"=>Some(2.0),"tre"=>Some(3.0),"fyra"=>Some(4.0),"fem"=>Some(5.0),"sex"=>Some(6.0),"sju"=>Some(7.0),"åtta"=>Some(8.0),"nio"=>Some(9.0),"tio"=>Some(10.0),"elva"=>Some(11.0),"tolv"=>Some(12.0),"tretton"=>Some(13.0),"fjorton"=>Some(14.0),"femton"=>Some(15.0),"sexton"=>Some(16.0),"sjutton"=>Some(17.0),"arton"=>Some(18.0),"nitton"=>Some(19.0), _=>None
+        "inget" | "ingen" | "noll" => Some(0.0),
+        "en" | "ett" => Some(1.0),
+        "två" => Some(2.0),
+        "tre" => Some(3.0),
+        "fyra" => Some(4.0),
+        "fem" => Some(5.0),
+        "sex" => Some(6.0),
+        "sju" => Some(7.0),
+        "åtta" => Some(8.0),
+        "nio" => Some(9.0),
+        "tio" => Some(10.0),
+        "elva" => Some(11.0),
+        "tolv" => Some(12.0),
+        "tretton" => Some(13.0),
+        "fjorton" => Some(14.0),
+        "femton" => Some(15.0),
+        "sexton" => Some(16.0),
+        "sjutton" => Some(17.0),
+        "arton" => Some(18.0),
+        "nitton" => Some(19.0),
+        _ => None,
     }
 }
-fn tens(s:&str)->Option<f64>{ match s {"tjugo"=>Some(20.0),"trettio"=>Some(30.0),"fyrtio"=>Some(40.0),"femtio"=>Some(50.0),"sextio"=>Some(60.0),"sjuttio"=>Some(70.0),"åttio"=>Some(80.0),"nittio"=>Some(90.0),_=>None}}
+fn tens(s: &str) -> Option<f64> {
+    match s {
+        "tjugo" => Some(20.0),
+        "trettio" => Some(30.0),
+        "fyrtio" => Some(40.0),
+        "femtio" => Some(50.0),
+        "sextio" => Some(60.0),
+        "sjuttio" => Some(70.0),
+        "åttio" => Some(80.0),
+        "nittio" => Some(90.0),
+        _ => None,
+    }
+}
 
-pub fn rules()->Vec<Rule>{
+pub fn rules() -> Vec<Rule> {
     vec![
         Rule{name:"intersect (with and)".to_string(),pattern:vec![predicate(has_grain),regex("och"),predicate(|td| !is_multipliable(td)&&is_positive(td))],production:Box::new(|n|{let a=numeral_data(&n[0].token_data)?;let b=numeral_data(&n[2].token_data)?;let g=a.grain?;if 10f64.powi(g as i32)>b.value{Some(TokenData::Numeral(NumeralData::new(a.value+b.value)))}else{None}})},
         Rule{name:"numbers prefix with -, negative or minus".to_string(),pattern:vec![regex("-|minus|negativ"),predicate(is_positive)],production:Box::new(|n|{let v=numeral_data(&n[1].token_data)?.value;Some(TokenData::Numeral(NumeralData::new(-v)))})},

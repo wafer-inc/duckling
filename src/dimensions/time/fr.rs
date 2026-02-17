@@ -1,8 +1,8 @@
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 use crate::dimensions::numeral::helpers::numeral_data;
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, regex};
 use crate::types::{DimensionKind, Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();
@@ -474,7 +474,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -d.value,
+                    n: d.value.checked_neg()?,
                     grain: d.grain,
                 })))
             }),

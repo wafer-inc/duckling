@@ -17,17 +17,23 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "half of an hour".to_string(),
             pattern: vec![regex("media horas?")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "quarter of an hour".to_string(),
             pattern: vec![regex("cuartos? de hora")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "three-quarters of an hour".to_string(),
             pattern: vec![regex("tres cuartos? de horas?")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))
+            }),
         },
         Rule {
             name: "composite <duration>".to_string(),

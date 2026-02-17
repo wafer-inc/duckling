@@ -52,22 +52,34 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<latent vol> ml".to_string(),
             pattern: vec![regex("мл|миллилитр")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Millilitre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Millilitre,
+                )))
+            }),
         },
         Rule {
             name: "<vol> hectoliters".to_string(),
             pattern: vec![regex("гл|гектолитр")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Hectolitre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(
+                    VolumeUnit::Hectolitre,
+                )))
+            }),
         },
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("л(итр(ийн|ээр)?)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("галлон")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
     ]
 }

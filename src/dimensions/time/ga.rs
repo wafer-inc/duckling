@@ -1,6 +1,6 @@
+use super::{TimeData, TimeForm};
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::{TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();

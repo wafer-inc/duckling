@@ -1,7 +1,7 @@
+use super::{Direction, PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, predicate, regex};
 use crate::types::{DimensionKind, Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, PartOfDay, TimeData, TimeForm};
 
 fn time_data(td: &TokenData) -> Option<&TimeData> {
     match td {
@@ -335,7 +335,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -351,7 +351,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -367,7 +367,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -383,7 +383,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 30, false))))
             }),
         },
@@ -400,7 +400,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 || minute > 59 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, minute, false))))
             }),
         },
@@ -427,8 +427,8 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 || minus > 59 {
                     return None;
                 }
-                let out_hour = if hour == 1 { 12 } else { hour - 1 };
-                let out_min = 60 - minus;
+                let out_hour = if hour == 1 { 12 } else { hour.checked_sub(1)? };
+                let out_min = 60_u32.checked_sub(minus)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, out_min, false))))
             }),
         },
@@ -491,7 +491,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m_opt.unwrap_or("0").parse().ok()?;
                 if ap.eq_ignore_ascii_case("pm") && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 } else if ap.eq_ignore_ascii_case("am") && hour == 12 {
                     hour = 0;
                 }
@@ -554,7 +554,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 if p.contains("chi") || p.contains("t") {
                     if let TimeForm::HourMinute(h, m, is12h) = t.form {
-                        let hh = if h < 12 { h + 12 } else { h };
+                        let hh = if h < 12 { h.checked_add(12)? } else { h };
                         t.form = TimeForm::HourMinute(hh, m, is12h);
                     }
                 }
@@ -633,7 +633,7 @@ pub fn rules() -> Vec<Rule> {
                 let month: u32 = m.parse().ok()?;
                 let mut year: i32 = y.parse().ok()?;
                 if y.len() == 2 {
-                    year += if year < 50 { 2000 } else { 1900 };
+                    year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                 }
                 if !(1..=31).contains(&day) || !(1..=12).contains(&month) {
                     return None;
@@ -686,7 +686,7 @@ pub fn rules() -> Vec<Rule> {
                 let month: u32 = m.parse().ok()?;
                 let mut year: i32 = y.parse().ok()?;
                 if y.len() == 2 {
-                    year += if year < 50 { 2000 } else { 1900 };
+                    year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(year) })))
             }),
@@ -736,7 +736,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -801,7 +801,7 @@ pub fn rules() -> Vec<Rule> {
                 let n = vi_small_number(ns).or_else(|| ns.parse::<i32>().ok())?;
                 let grain = vi_unit_to_grain(us)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
-                    Box::new(TimeData::new(TimeForm::GrainOffset { grain, offset: -n })),
+                    Box::new(TimeData::new(TimeForm::GrainOffset { grain, offset: n.checked_neg()? })),
                     Box::new(TimeData::new(TimeForm::Now)),
                     false,
                 ))))
@@ -912,7 +912,7 @@ pub fn rules() -> Vec<Rule> {
                 if h == 0 || h > 12 {
                     return None;
                 }
-                let mut t = TimeData::new(TimeForm::HourMinute(if h < 12 { h + 12 } else { 12 }, 0, false));
+                let mut t = TimeData::new(TimeForm::HourMinute(if h < 12 { h.checked_add(12)? } else { 12 }, 0, false));
                 t.timezone = Some("CET".to_string());
                 Some(TokenData::Time(t))
             }),
@@ -929,7 +929,7 @@ pub fn rules() -> Vec<Rule> {
                 if h == 0 || h > 12 {
                     return None;
                 }
-                let hour = if h < 12 { h + 12 } else { 12 };
+                let hour = if h < 12 { h.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
         },
@@ -945,7 +945,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 12 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { 12 };
+                let out = if hour < 12 { hour.checked_add(12)? } else { 12 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -1431,7 +1431,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m.parse().ok()?;
                 if ap.eq_ignore_ascii_case("pm") && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 } else if ap.eq_ignore_ascii_case("am") && hour == 12 {
                     hour = 0;
                 }
@@ -1449,7 +1449,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m.parse().ok()?;
                 if (p == "chiều" || p == "tối") && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),

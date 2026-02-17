@@ -110,7 +110,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (20..90)".to_string(),
-            pattern: vec![regex(r"(veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa)")],
+            pattern: vec![regex(
+                r"(veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa)",
+            )],
             production: Box::new(|nodes| {
                 let text = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -189,7 +191,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "2..999 <multipliable>".to_string(),
-            pattern: vec![predicate(number_between(2.0, 1000.0)), predicate(is_multipliable)],
+            pattern: vec![
+                predicate(number_between(2.0, 1000.0)),
+                predicate(is_multipliable),
+            ],
             production: Box::new(|nodes| {
                 let v1 = numeral_data(&nodes[0].token_data)?.value;
                 let v2 = numeral_data(&nodes[1].token_data)?.value;
@@ -199,7 +204,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<thousands> 0..999".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && d.value < 1_000_000.0 && is_multiple(d.value, 1000.0))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && d.value < 1_000_000.0 && is_multiple(d.value, 1000.0)),
+                ),
                 predicate(number_between(0.0, 999.0)),
             ],
             production: Box::new(|nodes| {
@@ -211,7 +218,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<millions> 0..999999".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && is_multiple(d.value, 1_000_000.0))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && is_multiple(d.value, 1_000_000.0)),
+                ),
                 predicate(number_between(0.0, 999_999.0)),
             ],
             production: Box::new(|nodes| {
@@ -231,7 +240,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<hundreds> 0..99".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && d.value < 1000.0 && is_multiple(d.value, 100.0))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if d.value > 0.0 && d.value < 1000.0 && is_multiple(d.value, 100.0)),
+                ),
                 predicate(number_between(0.0, 100.0)),
             ],
             production: Box::new(|nodes| {
@@ -250,7 +261,9 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let v1 = numeral_data(&nodes[0].token_data)?.value;
                 let v2 = numeral_data(&nodes[2].token_data)?.value;
-                Some(TokenData::Numeral(NumeralData::new(v1 + decimals_to_double(v2))))
+                Some(TokenData::Numeral(NumeralData::new(
+                    v1 + decimals_to_double(v2),
+                )))
             }),
         },
         Rule {

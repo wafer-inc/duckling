@@ -1,7 +1,7 @@
+use super::{TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{TimeData, TimeForm};
 
 fn ar_ordinal_day(s: &str) -> Option<u32> {
     match s {
@@ -103,7 +103,9 @@ fn ar_month_name(s: &str) -> Option<u32> {
         "يوليو" | "تموز" => Some(7),
         "أغسطس" | "اغسطس" | "آب" | "اب" => Some(8),
         "سبتمبر" | "أيلول" | "ايلول" => Some(9),
-        "أكتوبر" | "اكتوبر" | "تشرين الأول" | "تشرين الاول" => Some(10),
+        "أكتوبر" | "اكتوبر" | "تشرين الأول" | "تشرين الاول" => {
+            Some(10)
+        }
         "نوفمبر" | "تشرين الثاني" => Some(11),
         "ديسمبر" | "كانون الأول" | "كانون الاول" => Some(12),
         _ => None,
@@ -112,11 +114,17 @@ fn ar_month_name(s: &str) -> Option<u32> {
 
 fn ar_ones_word(s: &str) -> Option<u32> {
     match s {
-        "واحد" | "واحدة" | "اول" | "أول" | "الاولى" | "الأولى" => Some(1),
-        "اثنين" | "إثنين" | "اثنان" | "اثنتين" | "اثنتان" | "ثان" | "ثاني" | "الثانية" => Some(2),
+        "واحد" | "واحدة" | "اول" | "أول" | "الاولى" | "الأولى" => {
+            Some(1)
+        }
+        "اثنين" | "إثنين" | "اثنان" | "اثنتين" | "اثنتان" | "ثان" | "ثاني" | "الثانية" => {
+            Some(2)
+        }
         "ثلاث" | "ثلاثة" | "ثالث" | "الثالثة" => Some(3),
         "الثلاث" | "الثلاثة" => Some(3),
-        "اربع" | "أربع" | "اربعة" | "أربعة" | "رابع" | "الرابعة" => Some(4),
+        "اربع" | "أربع" | "اربعة" | "أربعة" | "رابع" | "الرابعة" => {
+            Some(4)
+        }
         "الاربع" | "الأربع" | "الاربعة" | "الأربعة" => Some(4),
         "خمس" | "خمسة" | "خامس" | "الخامسة" => Some(5),
         "الخمس" | "الخمسة" => Some(5),
@@ -153,10 +161,12 @@ fn ar_number_0_59(s: &str) -> Option<u32> {
     if let Some(v) = ar_hour_ordinal_feminine(s) {
         return (v <= 59).then_some(v);
     }
-    if s == "احد عشر" || s == "أحد عشر" || s == "الحادية عشر" || s == "الحادية عشرة" {
+    if s == "احد عشر" || s == "أحد عشر" || s == "الحادية عشر" || s == "الحادية عشرة"
+    {
         return Some(11);
     }
-    if s == "اثنا عشر" || s == "اثنى عشر" || s == "الثانية عشر" || s == "الثانية عشرة" {
+    if s == "اثنا عشر" || s == "اثنى عشر" || s == "الثانية عشر" || s == "الثانية عشرة"
+    {
         return Some(12);
     }
     if let Some((a, b)) = s.split_once(" و") {
@@ -164,14 +174,15 @@ fn ar_number_0_59(s: &str) -> Option<u32> {
         let bb = b.trim();
         let ones = ar_ones_word(aa)?;
         let tens = ar_tens_word(bb)?;
-        let v = ones + tens;
+        let v = ones.checked_add(tens)?;
         return (v <= 59).then_some(v);
     }
     if let Some((a, b)) = s.split_once(' ') {
         let aa = a.trim();
         let bb = b.trim();
-        if (bb == "عشر" || bb == "عشرة") && (3..=9).contains(&ar_ones_word(aa).unwrap_or(0)) {
-            let v = 10 + ar_ones_word(aa)?;
+        if (bb == "عشر" || bb == "عشرة") && (3..=9).contains(&ar_ones_word(aa).unwrap_or(0))
+        {
+            let v = ar_ones_word(aa)?.checked_add(10)?;
             return Some(v);
         }
     }
@@ -191,7 +202,16 @@ fn ar_adjust_hour(hour12_or_24: u32, part: &str) -> Option<u32> {
     }
     let is_pm = matches!(
         part,
-        "مساء" | "مساءً" | "عصرا" | "العصر" | "بعد الظهر" | "بعد العصر" | "العشاء" | "هذه الليلة" | "بعد المغرب" | "قبل المغرب"
+        "مساء"
+            | "مساءً"
+            | "عصرا"
+            | "العصر"
+            | "بعد الظهر"
+            | "بعد العصر"
+            | "العشاء"
+            | "هذه الليلة"
+            | "بعد المغرب"
+            | "قبل المغرب"
     );
     let is_noonish = matches!(part, "ظهرا" | "ظهرًا");
     if hour12_or_24 > 12 {
@@ -201,7 +221,7 @@ fn ar_adjust_hour(hour12_or_24: u32, part: &str) -> Option<u32> {
         if hour12_or_24 == 12 {
             Some(12)
         } else {
-            Some(hour12_or_24 + 12)
+            Some(hour12_or_24.checked_add(12)?)
         }
     } else {
         Some(hour12_or_24)
@@ -211,7 +231,9 @@ fn ar_adjust_hour(hour12_or_24: u32, part: &str) -> Option<u32> {
 fn ar_grain_word(s: &str) -> Option<Grain> {
     match s {
         "يوم" | "ايام" | "أيام" | "يومين" => Some(Grain::Day),
-        "اسبوع" | "أسبوع" | "اسابيع" | "أسابيع" | "اسبوعين" | "أسبوعين" => Some(Grain::Week),
+        "اسبوع" | "أسبوع" | "اسابيع" | "أسابيع" | "اسبوعين" | "أسبوعين" => {
+            Some(Grain::Week)
+        }
         "شهر" | "اشهر" | "أشهر" | "شهرين" => Some(Grain::Month),
         "سنة" | "سنين" | "سنوات" | "سنتين" => Some(Grain::Year),
         _ => None,
@@ -801,7 +823,7 @@ pub fn rules() -> Vec<Rule> {
                     "ثلث" | "ثلثا" => 40,
                     _ => return None,
                 };
-                hour_raw = if hour_raw == 1 { 12 } else { hour_raw - 1 };
+                hour_raw = if hour_raw == 1 { 12 } else { hour_raw.checked_sub(1)? };
                 let hour = ar_adjust_hour(hour_raw, part)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),

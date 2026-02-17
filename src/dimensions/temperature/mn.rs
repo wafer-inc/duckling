@@ -42,7 +42,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![is_value_only(false), regex("градус|°|хэм")],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
-                Some(TokenData::Temperature(td.clone().with_unit(TemperatureUnit::Degree)))
+                Some(TokenData::Temperature(
+                    td.clone().with_unit(TemperatureUnit::Degree),
+                ))
             }),
         },
         Rule {
@@ -50,7 +52,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![is_value_only(true), regex("c(el[cs]?(ius)?)?\\.?")],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
-                Some(TokenData::Temperature(td.clone().with_unit(TemperatureUnit::Celsius)))
+                Some(TokenData::Temperature(
+                    td.clone().with_unit(TemperatureUnit::Celsius),
+                ))
             }),
         },
         Rule {
@@ -58,15 +62,22 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![is_value_only(true), regex("c")],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
-                Some(TokenData::Temperature(td.clone().with_unit(TemperatureUnit::Celsius)))
+                Some(TokenData::Temperature(
+                    td.clone().with_unit(TemperatureUnit::Celsius),
+                ))
             }),
         },
         Rule {
             name: "<temp> Fahrenheit".to_string(),
-            pattern: vec![is_value_only(true), regex("((f(ah?rh?eh?n(h?eit)?)?\\.?)|фарангейт)")],
+            pattern: vec![
+                is_value_only(true),
+                regex("((f(ah?rh?eh?n(h?eit)?)?\\.?)|фарангейт)"),
+            ],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
-                Some(TokenData::Temperature(td.clone().with_unit(TemperatureUnit::Fahrenheit)))
+                Some(TokenData::Temperature(
+                    td.clone().with_unit(TemperatureUnit::Fahrenheit),
+                ))
             }),
         },
         Rule {
@@ -83,18 +94,28 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "under/less/lower/no more than <temp>".to_string(),
-            pattern: vec![regex("доогуур|(бага|ихгүй|их биш)"), predicate(is_simple_temperature)],
+            pattern: vec![
+                regex("доогуур|(бага|ихгүй|их биш)"),
+                predicate(is_simple_temperature),
+            ],
             production: Box::new(|nodes| {
                 let d = temperature_data(&nodes[1].token_data)?;
-                Some(TokenData::Temperature(TemperatureData::unit_only(d.unit?).with_max(d.value?)))
+                Some(TokenData::Temperature(
+                    TemperatureData::unit_only(d.unit?).with_max(d.value?),
+                ))
             }),
         },
         Rule {
             name: "over/above/at least/more than <temp>".to_string(),
-            pattern: vec![regex("дээгүүр|их|багадаа"), predicate(is_simple_temperature)],
+            pattern: vec![
+                regex("дээгүүр|их|багадаа"),
+                predicate(is_simple_temperature),
+            ],
             production: Box::new(|nodes| {
                 let d = temperature_data(&nodes[1].token_data)?;
-                Some(TokenData::Temperature(TemperatureData::unit_only(d.unit?).with_min(d.value?)))
+                Some(TokenData::Temperature(
+                    TemperatureData::unit_only(d.unit?).with_min(d.value?),
+                ))
             }),
         },
     ]

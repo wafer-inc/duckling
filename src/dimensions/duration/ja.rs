@@ -20,7 +20,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "one unit".to_string(),
-            pattern: vec![regex(r"一\s*(秒(毎|間)?|分(毎|間)?|時(毎|間)?|曜?日(毎|間)?|週(毎|間)?|月(毎|間)?|年(毎|間)?)")],
+            pattern: vec![regex(
+                r"一\s*(秒(毎|間)?|分(毎|間)?|時(毎|間)?|曜?日(毎|間)?|週(毎|間)?|月(毎|間)?|年(毎|間)?)",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -48,7 +50,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "four minutes".to_string(),
             pattern: vec![regex(r"四\s*分(毎|間)?")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(4, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(4, Grain::Minute)))
+            }),
         },
         Rule {
             name: "one hundred days".to_string(),

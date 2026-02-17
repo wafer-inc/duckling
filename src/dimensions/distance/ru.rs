@@ -17,7 +17,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("км|километр(а|ов)?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Kilometre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Kilometre),
+                ))
             }),
         },
         Rule {
@@ -49,7 +51,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("м(етр(а|ов)?)?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
@@ -83,27 +87,52 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "восемь миль".to_string(),
             pattern: vec![regex("восемь миль")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(8.0, DistanceUnit::Mile)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    8.0,
+                    DistanceUnit::Mile,
+                )))
+            }),
         },
         Rule {
             name: "один метр".to_string(),
             pattern: vec![regex("один метр")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(1.0, DistanceUnit::Metre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    1.0,
+                    DistanceUnit::Metre,
+                )))
+            }),
         },
         Rule {
             name: "пять дюймов".to_string(),
             pattern: vec![regex("пять дюймов")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(5.0, DistanceUnit::Inch)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    5.0,
+                    DistanceUnit::Inch,
+                )))
+            }),
         },
         Rule {
             name: "тридцать пять футов".to_string(),
             pattern: vec![regex("тридцать пять футов")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(35.0, DistanceUnit::Foot)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    35.0,
+                    DistanceUnit::Foot,
+                )))
+            }),
         },
         Rule {
             name: "сорок семь ярдов".to_string(),
             pattern: vec![regex("сорок семь ярдов")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(47.0, DistanceUnit::Yard)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    47.0,
+                    DistanceUnit::Yard,
+                )))
+            }),
         },
     ]
 }

@@ -8,17 +8,32 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "km quantity cups".to_string(),
             pattern: vec![regex("(បីកែវ)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(3.0, QuantityUnit::Cup)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    3.0,
+                    QuantityUnit::Cup,
+                )))
+            }),
         },
         Rule {
             name: "km quantity bowl".to_string(),
             pattern: vec![regex("(១ចាន)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Cup)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Cup,
+                )))
+            }),
         },
         Rule {
             name: "km quantity pint".to_string(),
             pattern: vec![regex("(ដប់ប្រាំថូ)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(15.0, QuantityUnit::Cup)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    15.0,
+                    QuantityUnit::Cup,
+                )))
+            }),
         },
         Rule {
             name: "km quantity persons".to_string(),
@@ -41,11 +56,18 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "km quantity 1000 gram".to_string(),
             pattern: vec![regex("(មួយពាន់ក្រាម|មួយគីឡូក្រាម|មួយលានមីលីក្រាម)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(1000.0, QuantityUnit::Gram)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    1000.0,
+                    QuantityUnit::Gram,
+                )))
+            }),
         },
         Rule {
             name: "km quantity 2-7 gram".to_string(),
-            pattern: vec![regex("(ចាប់ពី 2 ដល់ 7 ក្រាម|ចន្លោះពី ២ ដល់ ៧ក្រាម|ចន្លោះ ២ក្រាម និង ៧ក្រាម|ប្រហែល ២-៧ ក្រាម|~2-7ក្រាម)")],
+            pattern: vec![regex(
+                "(ចាប់ពី 2 ដល់ 7 ក្រាម|ចន្លោះពី ២ ដល់ ៧ក្រាម|ចន្លោះ ២ក្រាម និង ៧ក្រាម|ប្រហែល ២-៧ ក្រាម|~2-7ក្រាម)",
+            )],
             production: Box::new(|_| {
                 Some(TokenData::Quantity(
                     QuantityData::unit_only(QuantityUnit::Gram).with_interval(2.0, 7.0),
@@ -54,7 +76,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "km quantity max 4 tbsp".to_string(),
-            pattern: vec![regex("(តិចជាងបួនស្លាបព្រា|មិនលើស៤ស្លាបព្រា|ក្រោម៤ស្លាបព្រា|យ៉ាងច្រើន៤ស្លាបព្រា)")],
+            pattern: vec![regex(
+                "(តិចជាងបួនស្លាបព្រា|មិនលើស៤ស្លាបព្រា|ក្រោម៤ស្លាបព្រា|យ៉ាងច្រើន៤ស្លាបព្រា)",
+            )],
             production: Box::new(|_| {
                 Some(TokenData::Quantity(
                     QuantityData::unit_only(QuantityUnit::Tablespoon).with_max(4.0),

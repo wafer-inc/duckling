@@ -201,13 +201,19 @@ fn region_from_code(code: &str) -> Option<Region> {
 #[test]
 fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -224,13 +230,18 @@ fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -247,13 +258,18 @@ fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/AR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -270,13 +286,19 @@ fn pending_amountofmoney_ar_amountofmoney_ar_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -293,13 +315,18 @@ fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -316,13 +343,18 @@ fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/BG/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -339,13 +371,19 @@ fn pending_amountofmoney_bg_amountofmoney_bg_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -362,13 +400,18 @@ fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -385,13 +428,18 @@ fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -408,13 +456,19 @@ fn pending_amountofmoney_ca_amountofmoney_ca_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -431,13 +485,18 @@ fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -454,13 +513,18 @@ fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -477,13 +541,19 @@ fn pending_amountofmoney_en_au_amountofmoney_en_au_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -500,13 +570,18 @@ fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -523,13 +598,18 @@ fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -546,13 +626,19 @@ fn pending_amountofmoney_en_bz_amountofmoney_en_bz_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -569,13 +655,18 @@ fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -592,13 +683,18 @@ fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -615,13 +711,19 @@ fn pending_amountofmoney_en_ca_amountofmoney_en_ca_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -638,13 +740,18 @@ fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -661,13 +768,18 @@ fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -684,13 +796,19 @@ fn pending_amountofmoney_en_gb_amountofmoney_en_gb_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -707,13 +825,18 @@ fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -730,13 +853,18 @@ fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -753,13 +881,19 @@ fn pending_amountofmoney_en_ie_amountofmoney_en_ie_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -776,13 +910,18 @@ fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -799,13 +938,18 @@ fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -822,13 +966,19 @@ fn pending_amountofmoney_en_in_amountofmoney_en_in_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -845,13 +995,18 @@ fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -868,13 +1023,18 @@ fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -891,13 +1051,19 @@ fn pending_amountofmoney_en_jm_amountofmoney_en_jm_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -914,13 +1080,18 @@ fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -937,13 +1108,18 @@ fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -960,13 +1136,19 @@ fn pending_amountofmoney_en_nz_amountofmoney_en_nz_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -983,13 +1165,18 @@ fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1006,13 +1193,18 @@ fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1029,13 +1221,19 @@ fn pending_amountofmoney_en_ph_amountofmoney_en_ph_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1052,13 +1250,18 @@ fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1075,13 +1278,18 @@ fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1098,13 +1306,19 @@ fn pending_amountofmoney_en_tt_amountofmoney_en_tt_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1121,13 +1335,18 @@ fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1144,13 +1363,18 @@ fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1167,13 +1391,19 @@ fn pending_amountofmoney_en_us_amountofmoney_en_us_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1190,13 +1420,18 @@ fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1213,13 +1448,18 @@ fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1236,13 +1476,19 @@ fn pending_amountofmoney_en_za_amountofmoney_en_za_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1259,13 +1505,18 @@ fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1282,13 +1533,18 @@ fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ES/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1305,13 +1561,19 @@ fn pending_amountofmoney_es_amountofmoney_es_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1328,13 +1590,18 @@ fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1351,13 +1618,18 @@ fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/FR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1374,13 +1646,19 @@ fn pending_amountofmoney_fr_amountofmoney_fr_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1397,13 +1675,18 @@ fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1420,13 +1703,18 @@ fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/GA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1443,13 +1731,19 @@ fn pending_amountofmoney_ga_amountofmoney_ga_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1466,13 +1760,18 @@ fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1489,13 +1788,18 @@ fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HE/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1512,13 +1816,19 @@ fn pending_amountofmoney_he_amountofmoney_he_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1535,13 +1845,18 @@ fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1558,13 +1873,18 @@ fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/HR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1581,13 +1901,19 @@ fn pending_amountofmoney_hr_amountofmoney_hr_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1604,13 +1930,18 @@ fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1627,13 +1958,18 @@ fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ID/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1650,13 +1986,19 @@ fn pending_amountofmoney_id_amountofmoney_id_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1673,13 +2015,18 @@ fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1696,13 +2043,18 @@ fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/IT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1719,13 +2071,19 @@ fn pending_amountofmoney_it_amountofmoney_it_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1742,13 +2100,18 @@ fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1765,13 +2128,18 @@ fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KA/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1788,13 +2156,19 @@ fn pending_amountofmoney_ka_amountofmoney_ka_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1811,13 +2185,18 @@ fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1834,13 +2213,18 @@ fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/KO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1857,13 +2241,19 @@ fn pending_amountofmoney_ko_amountofmoney_ko_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1880,13 +2270,18 @@ fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1903,13 +2298,18 @@ fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/MN/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1926,13 +2326,19 @@ fn pending_amountofmoney_mn_amountofmoney_mn_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1949,13 +2355,18 @@ fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1972,13 +2383,18 @@ fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NB/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -1995,13 +2411,19 @@ fn pending_amountofmoney_nb_amountofmoney_nb_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2018,13 +2440,18 @@ fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2041,13 +2468,18 @@ fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/NL/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2064,13 +2496,19 @@ fn pending_amountofmoney_nl_amountofmoney_nl_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2087,13 +2525,18 @@ fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2110,13 +2553,18 @@ fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/PT/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2133,13 +2581,19 @@ fn pending_amountofmoney_pt_amountofmoney_pt_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2156,13 +2610,18 @@ fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2179,13 +2638,18 @@ fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RO/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2202,13 +2666,19 @@ fn pending_amountofmoney_ro_amountofmoney_ro_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2225,13 +2695,18 @@ fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2248,13 +2723,18 @@ fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/RU/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2271,13 +2751,19 @@ fn pending_amountofmoney_ru_amountofmoney_ru_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2294,13 +2780,18 @@ fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2317,13 +2808,18 @@ fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/SV/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2340,13 +2836,19 @@ fn pending_amountofmoney_sv_amountofmoney_sv_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2363,13 +2865,18 @@ fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2386,13 +2893,18 @@ fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/TR/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2409,13 +2921,19 @@ fn pending_amountofmoney_tr_amountofmoney_tr_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2432,13 +2950,18 @@ fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2455,13 +2978,18 @@ fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/VI/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2478,13 +3006,19 @@ fn pending_amountofmoney_vi_amountofmoney_vi_corpus_hs_latent() {
 #[test]
 fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2501,13 +3035,18 @@ fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_positive() {
 #[test]
 fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2524,13 +3063,18 @@ fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_negative() {
 #[test]
 fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/AmountOfMoney/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("AmountOfMoney");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2547,13 +3091,19 @@ fn pending_amountofmoney_zh_amountofmoney_zh_corpus_hs_latent() {
 #[test]
 fn pending_distance_bg_distance_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2570,13 +3120,18 @@ fn pending_distance_bg_distance_bg_corpus_hs_positive() {
 #[test]
 fn pending_distance_bg_distance_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2593,13 +3148,18 @@ fn pending_distance_bg_distance_bg_corpus_hs_negative() {
 #[test]
 fn pending_distance_bg_distance_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2616,13 +3176,19 @@ fn pending_distance_bg_distance_bg_corpus_hs_latent() {
 #[test]
 fn pending_distance_ca_distance_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2639,13 +3205,18 @@ fn pending_distance_ca_distance_ca_corpus_hs_positive() {
 #[test]
 fn pending_distance_ca_distance_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2662,13 +3233,18 @@ fn pending_distance_ca_distance_ca_corpus_hs_negative() {
 #[test]
 fn pending_distance_ca_distance_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2685,13 +3261,19 @@ fn pending_distance_ca_distance_ca_corpus_hs_latent() {
 #[test]
 fn pending_distance_cs_distance_cs_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/CS/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/CS/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2708,13 +3290,18 @@ fn pending_distance_cs_distance_cs_corpus_hs_positive() {
 #[test]
 fn pending_distance_cs_distance_cs_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2731,13 +3318,18 @@ fn pending_distance_cs_distance_cs_corpus_hs_negative() {
 #[test]
 fn pending_distance_cs_distance_cs_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2754,13 +3346,19 @@ fn pending_distance_cs_distance_cs_corpus_hs_latent() {
 #[test]
 fn pending_distance_de_distance_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2777,13 +3375,18 @@ fn pending_distance_de_distance_de_corpus_hs_positive() {
 #[test]
 fn pending_distance_de_distance_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2800,13 +3403,18 @@ fn pending_distance_de_distance_de_corpus_hs_negative() {
 #[test]
 fn pending_distance_de_distance_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2823,13 +3431,19 @@ fn pending_distance_de_distance_de_corpus_hs_latent() {
 #[test]
 fn pending_distance_es_distance_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2846,13 +3460,18 @@ fn pending_distance_es_distance_es_corpus_hs_positive() {
 #[test]
 fn pending_distance_es_distance_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2869,13 +3488,18 @@ fn pending_distance_es_distance_es_corpus_hs_negative() {
 #[test]
 fn pending_distance_es_distance_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2892,13 +3516,19 @@ fn pending_distance_es_distance_es_corpus_hs_latent() {
 #[test]
 fn pending_distance_fr_distance_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2915,13 +3545,18 @@ fn pending_distance_fr_distance_fr_corpus_hs_positive() {
 #[test]
 fn pending_distance_fr_distance_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2938,13 +3573,18 @@ fn pending_distance_fr_distance_fr_corpus_hs_negative() {
 #[test]
 fn pending_distance_fr_distance_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2961,13 +3601,19 @@ fn pending_distance_fr_distance_fr_corpus_hs_latent() {
 #[test]
 fn pending_distance_ga_distance_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -2984,13 +3630,18 @@ fn pending_distance_ga_distance_ga_corpus_hs_positive() {
 #[test]
 fn pending_distance_ga_distance_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3007,13 +3658,18 @@ fn pending_distance_ga_distance_ga_corpus_hs_negative() {
 #[test]
 fn pending_distance_ga_distance_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3030,13 +3686,19 @@ fn pending_distance_ga_distance_ga_corpus_hs_latent() {
 #[test]
 fn pending_distance_hr_distance_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3053,13 +3715,18 @@ fn pending_distance_hr_distance_hr_corpus_hs_positive() {
 #[test]
 fn pending_distance_hr_distance_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3076,13 +3743,18 @@ fn pending_distance_hr_distance_hr_corpus_hs_negative() {
 #[test]
 fn pending_distance_hr_distance_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3099,13 +3771,19 @@ fn pending_distance_hr_distance_hr_corpus_hs_latent() {
 #[test]
 fn pending_distance_it_distance_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3122,13 +3800,18 @@ fn pending_distance_it_distance_it_corpus_hs_positive() {
 #[test]
 fn pending_distance_it_distance_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3145,13 +3828,18 @@ fn pending_distance_it_distance_it_corpus_hs_negative() {
 #[test]
 fn pending_distance_it_distance_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3168,13 +3856,19 @@ fn pending_distance_it_distance_it_corpus_hs_latent() {
 #[test]
 fn pending_distance_km_distance_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3191,13 +3885,18 @@ fn pending_distance_km_distance_km_corpus_hs_positive() {
 #[test]
 fn pending_distance_km_distance_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3214,13 +3913,18 @@ fn pending_distance_km_distance_km_corpus_hs_negative() {
 #[test]
 fn pending_distance_km_distance_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3237,13 +3941,19 @@ fn pending_distance_km_distance_km_corpus_hs_latent() {
 #[test]
 fn pending_distance_ko_distance_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3260,13 +3970,18 @@ fn pending_distance_ko_distance_ko_corpus_hs_positive() {
 #[test]
 fn pending_distance_ko_distance_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3283,13 +3998,18 @@ fn pending_distance_ko_distance_ko_corpus_hs_negative() {
 #[test]
 fn pending_distance_ko_distance_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3306,13 +4026,19 @@ fn pending_distance_ko_distance_ko_corpus_hs_latent() {
 #[test]
 fn pending_distance_mn_distance_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3329,13 +4055,18 @@ fn pending_distance_mn_distance_mn_corpus_hs_positive() {
 #[test]
 fn pending_distance_mn_distance_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3352,13 +4083,18 @@ fn pending_distance_mn_distance_mn_corpus_hs_negative() {
 #[test]
 fn pending_distance_mn_distance_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3375,13 +4111,19 @@ fn pending_distance_mn_distance_mn_corpus_hs_latent() {
 #[test]
 fn pending_distance_nl_distance_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3398,13 +4140,18 @@ fn pending_distance_nl_distance_nl_corpus_hs_positive() {
 #[test]
 fn pending_distance_nl_distance_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3421,13 +4168,18 @@ fn pending_distance_nl_distance_nl_corpus_hs_negative() {
 #[test]
 fn pending_distance_nl_distance_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3444,13 +4196,19 @@ fn pending_distance_nl_distance_nl_corpus_hs_latent() {
 #[test]
 fn pending_distance_pt_distance_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3467,13 +4225,18 @@ fn pending_distance_pt_distance_pt_corpus_hs_positive() {
 #[test]
 fn pending_distance_pt_distance_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3490,13 +4253,18 @@ fn pending_distance_pt_distance_pt_corpus_hs_negative() {
 #[test]
 fn pending_distance_pt_distance_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3513,13 +4281,19 @@ fn pending_distance_pt_distance_pt_corpus_hs_latent() {
 #[test]
 fn pending_distance_ro_distance_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3536,13 +4310,18 @@ fn pending_distance_ro_distance_ro_corpus_hs_positive() {
 #[test]
 fn pending_distance_ro_distance_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3559,13 +4338,18 @@ fn pending_distance_ro_distance_ro_corpus_hs_negative() {
 #[test]
 fn pending_distance_ro_distance_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3582,13 +4366,19 @@ fn pending_distance_ro_distance_ro_corpus_hs_latent() {
 #[test]
 fn pending_distance_ru_distance_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3605,13 +4395,18 @@ fn pending_distance_ru_distance_ru_corpus_hs_positive() {
 #[test]
 fn pending_distance_ru_distance_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3628,13 +4423,18 @@ fn pending_distance_ru_distance_ru_corpus_hs_negative() {
 #[test]
 fn pending_distance_ru_distance_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3651,13 +4451,19 @@ fn pending_distance_ru_distance_ru_corpus_hs_latent() {
 #[test]
 fn pending_distance_sv_distance_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3674,13 +4480,18 @@ fn pending_distance_sv_distance_sv_corpus_hs_positive() {
 #[test]
 fn pending_distance_sv_distance_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3697,13 +4508,18 @@ fn pending_distance_sv_distance_sv_corpus_hs_negative() {
 #[test]
 fn pending_distance_sv_distance_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3720,13 +4536,19 @@ fn pending_distance_sv_distance_sv_corpus_hs_latent() {
 #[test]
 fn pending_distance_tr_distance_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3743,13 +4565,18 @@ fn pending_distance_tr_distance_tr_corpus_hs_positive() {
 #[test]
 fn pending_distance_tr_distance_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3766,13 +4593,18 @@ fn pending_distance_tr_distance_tr_corpus_hs_negative() {
 #[test]
 fn pending_distance_tr_distance_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3789,13 +4621,19 @@ fn pending_distance_tr_distance_tr_corpus_hs_latent() {
 #[test]
 fn pending_distance_zh_distance_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Distance/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3812,13 +4650,18 @@ fn pending_distance_zh_distance_zh_corpus_hs_positive() {
 #[test]
 fn pending_distance_zh_distance_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3835,13 +4678,18 @@ fn pending_distance_zh_distance_zh_corpus_hs_negative() {
 #[test]
 fn pending_distance_zh_distance_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Distance/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Distance");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3858,13 +4706,19 @@ fn pending_distance_zh_distance_zh_corpus_hs_latent() {
 #[test]
 fn pending_duration_ar_duration_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3881,13 +4735,18 @@ fn pending_duration_ar_duration_ar_corpus_hs_positive() {
 #[test]
 fn pending_duration_ar_duration_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3904,13 +4763,18 @@ fn pending_duration_ar_duration_ar_corpus_hs_negative() {
 #[test]
 fn pending_duration_ar_duration_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3927,13 +4791,19 @@ fn pending_duration_ar_duration_ar_corpus_hs_latent() {
 #[test]
 fn pending_duration_bg_duration_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3950,13 +4820,18 @@ fn pending_duration_bg_duration_bg_corpus_hs_positive() {
 #[test]
 fn pending_duration_bg_duration_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3973,13 +4848,18 @@ fn pending_duration_bg_duration_bg_corpus_hs_negative() {
 #[test]
 fn pending_duration_bg_duration_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -3996,13 +4876,19 @@ fn pending_duration_bg_duration_bg_corpus_hs_latent() {
 #[test]
 fn pending_duration_ca_duration_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4019,13 +4905,18 @@ fn pending_duration_ca_duration_ca_corpus_hs_positive() {
 #[test]
 fn pending_duration_ca_duration_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4042,13 +4933,18 @@ fn pending_duration_ca_duration_ca_corpus_hs_negative() {
 #[test]
 fn pending_duration_ca_duration_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4065,13 +4961,19 @@ fn pending_duration_ca_duration_ca_corpus_hs_latent() {
 #[test]
 fn pending_duration_de_duration_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4088,13 +4990,18 @@ fn pending_duration_de_duration_de_corpus_hs_positive() {
 #[test]
 fn pending_duration_de_duration_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4111,13 +5018,18 @@ fn pending_duration_de_duration_de_corpus_hs_negative() {
 #[test]
 fn pending_duration_de_duration_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4134,13 +5046,19 @@ fn pending_duration_de_duration_de_corpus_hs_latent() {
 #[test]
 fn pending_duration_el_duration_el_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/EL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/EL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4157,13 +5075,18 @@ fn pending_duration_el_duration_el_corpus_hs_positive() {
 #[test]
 fn pending_duration_el_duration_el_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4180,13 +5103,18 @@ fn pending_duration_el_duration_el_corpus_hs_negative() {
 #[test]
 fn pending_duration_el_duration_el_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4203,13 +5131,19 @@ fn pending_duration_el_duration_el_corpus_hs_latent() {
 #[test]
 fn pending_duration_es_duration_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4226,13 +5160,18 @@ fn pending_duration_es_duration_es_corpus_hs_positive() {
 #[test]
 fn pending_duration_es_duration_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4249,13 +5188,18 @@ fn pending_duration_es_duration_es_corpus_hs_negative() {
 #[test]
 fn pending_duration_es_duration_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4272,13 +5216,19 @@ fn pending_duration_es_duration_es_corpus_hs_latent() {
 #[test]
 fn pending_duration_fr_duration_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4295,13 +5245,18 @@ fn pending_duration_fr_duration_fr_corpus_hs_positive() {
 #[test]
 fn pending_duration_fr_duration_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4318,13 +5273,18 @@ fn pending_duration_fr_duration_fr_corpus_hs_negative() {
 #[test]
 fn pending_duration_fr_duration_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4341,13 +5301,19 @@ fn pending_duration_fr_duration_fr_corpus_hs_latent() {
 #[test]
 fn pending_duration_ga_duration_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4364,13 +5330,18 @@ fn pending_duration_ga_duration_ga_corpus_hs_positive() {
 #[test]
 fn pending_duration_ga_duration_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4387,13 +5358,18 @@ fn pending_duration_ga_duration_ga_corpus_hs_negative() {
 #[test]
 fn pending_duration_ga_duration_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4410,13 +5386,19 @@ fn pending_duration_ga_duration_ga_corpus_hs_latent() {
 #[test]
 fn pending_duration_hi_duration_hi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/HI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/HI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4433,13 +5415,18 @@ fn pending_duration_hi_duration_hi_corpus_hs_positive() {
 #[test]
 fn pending_duration_hi_duration_hi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4456,13 +5443,18 @@ fn pending_duration_hi_duration_hi_corpus_hs_negative() {
 #[test]
 fn pending_duration_hi_duration_hi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4479,13 +5471,19 @@ fn pending_duration_hi_duration_hi_corpus_hs_latent() {
 #[test]
 fn pending_duration_hu_duration_hu_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/HU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/HU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4502,13 +5500,18 @@ fn pending_duration_hu_duration_hu_corpus_hs_positive() {
 #[test]
 fn pending_duration_hu_duration_hu_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4525,13 +5528,18 @@ fn pending_duration_hu_duration_hu_corpus_hs_negative() {
 #[test]
 fn pending_duration_hu_duration_hu_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4548,13 +5556,19 @@ fn pending_duration_hu_duration_hu_corpus_hs_latent() {
 #[test]
 fn pending_duration_ja_duration_ja_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/JA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/JA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4571,13 +5585,18 @@ fn pending_duration_ja_duration_ja_corpus_hs_positive() {
 #[test]
 fn pending_duration_ja_duration_ja_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4594,13 +5613,18 @@ fn pending_duration_ja_duration_ja_corpus_hs_negative() {
 #[test]
 fn pending_duration_ja_duration_ja_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4617,13 +5641,19 @@ fn pending_duration_ja_duration_ja_corpus_hs_latent() {
 #[test]
 fn pending_duration_ka_duration_ka_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/KA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/KA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4640,13 +5670,18 @@ fn pending_duration_ka_duration_ka_corpus_hs_positive() {
 #[test]
 fn pending_duration_ka_duration_ka_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4663,13 +5698,18 @@ fn pending_duration_ka_duration_ka_corpus_hs_negative() {
 #[test]
 fn pending_duration_ka_duration_ka_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4686,13 +5726,19 @@ fn pending_duration_ka_duration_ka_corpus_hs_latent() {
 #[test]
 fn pending_duration_ko_duration_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4709,13 +5755,18 @@ fn pending_duration_ko_duration_ko_corpus_hs_positive() {
 #[test]
 fn pending_duration_ko_duration_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4732,13 +5783,18 @@ fn pending_duration_ko_duration_ko_corpus_hs_negative() {
 #[test]
 fn pending_duration_ko_duration_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4755,13 +5811,19 @@ fn pending_duration_ko_duration_ko_corpus_hs_latent() {
 #[test]
 fn pending_duration_mn_duration_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4778,13 +5840,18 @@ fn pending_duration_mn_duration_mn_corpus_hs_positive() {
 #[test]
 fn pending_duration_mn_duration_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4801,13 +5868,18 @@ fn pending_duration_mn_duration_mn_corpus_hs_negative() {
 #[test]
 fn pending_duration_mn_duration_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4824,13 +5896,19 @@ fn pending_duration_mn_duration_mn_corpus_hs_latent() {
 #[test]
 fn pending_duration_nb_duration_nb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/NB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/NB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4847,13 +5925,18 @@ fn pending_duration_nb_duration_nb_corpus_hs_positive() {
 #[test]
 fn pending_duration_nb_duration_nb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4870,13 +5953,18 @@ fn pending_duration_nb_duration_nb_corpus_hs_negative() {
 #[test]
 fn pending_duration_nb_duration_nb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4893,13 +5981,19 @@ fn pending_duration_nb_duration_nb_corpus_hs_latent() {
 #[test]
 fn pending_duration_nl_duration_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4916,13 +6010,18 @@ fn pending_duration_nl_duration_nl_corpus_hs_positive() {
 #[test]
 fn pending_duration_nl_duration_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4939,13 +6038,18 @@ fn pending_duration_nl_duration_nl_corpus_hs_negative() {
 #[test]
 fn pending_duration_nl_duration_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4962,13 +6066,19 @@ fn pending_duration_nl_duration_nl_corpus_hs_latent() {
 #[test]
 fn pending_duration_pl_duration_pl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/PL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/PL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -4985,13 +6095,18 @@ fn pending_duration_pl_duration_pl_corpus_hs_positive() {
 #[test]
 fn pending_duration_pl_duration_pl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5008,13 +6123,18 @@ fn pending_duration_pl_duration_pl_corpus_hs_negative() {
 #[test]
 fn pending_duration_pl_duration_pl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5031,13 +6151,19 @@ fn pending_duration_pl_duration_pl_corpus_hs_latent() {
 #[test]
 fn pending_duration_pt_duration_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5054,13 +6180,18 @@ fn pending_duration_pt_duration_pt_corpus_hs_positive() {
 #[test]
 fn pending_duration_pt_duration_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5077,13 +6208,18 @@ fn pending_duration_pt_duration_pt_corpus_hs_negative() {
 #[test]
 fn pending_duration_pt_duration_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5100,13 +6236,19 @@ fn pending_duration_pt_duration_pt_corpus_hs_latent() {
 #[test]
 fn pending_duration_ro_duration_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5123,13 +6265,18 @@ fn pending_duration_ro_duration_ro_corpus_hs_positive() {
 #[test]
 fn pending_duration_ro_duration_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5146,13 +6293,18 @@ fn pending_duration_ro_duration_ro_corpus_hs_negative() {
 #[test]
 fn pending_duration_ro_duration_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5169,13 +6321,19 @@ fn pending_duration_ro_duration_ro_corpus_hs_latent() {
 #[test]
 fn pending_duration_ru_duration_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5192,13 +6350,18 @@ fn pending_duration_ru_duration_ru_corpus_hs_positive() {
 #[test]
 fn pending_duration_ru_duration_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5215,13 +6378,18 @@ fn pending_duration_ru_duration_ru_corpus_hs_negative() {
 #[test]
 fn pending_duration_ru_duration_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5238,13 +6406,19 @@ fn pending_duration_ru_duration_ru_corpus_hs_latent() {
 #[test]
 fn pending_duration_sv_duration_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5261,13 +6435,18 @@ fn pending_duration_sv_duration_sv_corpus_hs_positive() {
 #[test]
 fn pending_duration_sv_duration_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5284,13 +6463,18 @@ fn pending_duration_sv_duration_sv_corpus_hs_negative() {
 #[test]
 fn pending_duration_sv_duration_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5307,13 +6491,19 @@ fn pending_duration_sv_duration_sv_corpus_hs_latent() {
 #[test]
 fn pending_duration_tr_duration_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5330,13 +6520,18 @@ fn pending_duration_tr_duration_tr_corpus_hs_positive() {
 #[test]
 fn pending_duration_tr_duration_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5353,13 +6548,18 @@ fn pending_duration_tr_duration_tr_corpus_hs_negative() {
 #[test]
 fn pending_duration_tr_duration_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5376,13 +6576,19 @@ fn pending_duration_tr_duration_tr_corpus_hs_latent() {
 #[test]
 fn pending_duration_uk_duration_uk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/UK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/UK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5399,13 +6605,18 @@ fn pending_duration_uk_duration_uk_corpus_hs_positive() {
 #[test]
 fn pending_duration_uk_duration_uk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5422,13 +6633,18 @@ fn pending_duration_uk_duration_uk_corpus_hs_negative() {
 #[test]
 fn pending_duration_uk_duration_uk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5445,13 +6661,19 @@ fn pending_duration_uk_duration_uk_corpus_hs_latent() {
 #[test]
 fn pending_duration_zh_duration_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Duration/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5468,13 +6690,18 @@ fn pending_duration_zh_duration_zh_corpus_hs_positive() {
 #[test]
 fn pending_duration_zh_duration_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5491,13 +6718,18 @@ fn pending_duration_zh_duration_zh_corpus_hs_negative() {
 #[test]
 fn pending_duration_zh_duration_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Duration/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Duration");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5514,13 +6746,19 @@ fn pending_duration_zh_duration_zh_corpus_hs_latent() {
 #[test]
 fn pending_email_common_email_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Email/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Email/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5537,13 +6775,18 @@ fn pending_email_common_email_corpus_hs_positive() {
 #[test]
 fn pending_email_common_email_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5560,13 +6803,18 @@ fn pending_email_common_email_corpus_hs_negative() {
 #[test]
 fn pending_email_common_email_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5583,13 +6831,19 @@ fn pending_email_common_email_corpus_hs_latent() {
 #[test]
 fn pending_email_de_email_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Email/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Email/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5606,13 +6860,18 @@ fn pending_email_de_email_de_corpus_hs_positive() {
 #[test]
 fn pending_email_de_email_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5629,13 +6888,18 @@ fn pending_email_de_email_de_corpus_hs_negative() {
 #[test]
 fn pending_email_de_email_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5652,13 +6916,19 @@ fn pending_email_de_email_de_corpus_hs_latent() {
 #[test]
 fn pending_email_fr_email_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Email/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Email/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5675,13 +6945,18 @@ fn pending_email_fr_email_fr_corpus_hs_positive() {
 #[test]
 fn pending_email_fr_email_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5698,13 +6973,18 @@ fn pending_email_fr_email_fr_corpus_hs_negative() {
 #[test]
 fn pending_email_fr_email_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5721,13 +7001,19 @@ fn pending_email_fr_email_fr_corpus_hs_latent() {
 #[test]
 fn pending_email_is_email_is_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Email/IS/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Email/IS/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5744,13 +7030,18 @@ fn pending_email_is_email_is_corpus_hs_positive() {
 #[test]
 fn pending_email_is_email_is_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5767,13 +7058,18 @@ fn pending_email_is_email_is_corpus_hs_negative() {
 #[test]
 fn pending_email_is_email_is_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5790,13 +7086,19 @@ fn pending_email_is_email_is_corpus_hs_latent() {
 #[test]
 fn pending_email_it_email_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Email/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Email/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5813,13 +7115,18 @@ fn pending_email_it_email_it_corpus_hs_positive() {
 #[test]
 fn pending_email_it_email_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5836,13 +7143,18 @@ fn pending_email_it_email_it_corpus_hs_negative() {
 #[test]
 fn pending_email_it_email_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Email/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Email/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Email");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5859,13 +7171,19 @@ fn pending_email_it_email_it_corpus_hs_latent() {
 #[test]
 fn pending_numeral_af_numeral_af_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AF"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/AF/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5882,13 +7200,18 @@ fn pending_numeral_af_numeral_af_corpus_hs_positive() {
 #[test]
 fn pending_numeral_af_numeral_af_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AF"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5905,13 +7228,18 @@ fn pending_numeral_af_numeral_af_corpus_hs_negative() {
 #[test]
 fn pending_numeral_af_numeral_af_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AF/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AF"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5928,13 +7256,19 @@ fn pending_numeral_af_numeral_af_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ar_numeral_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5951,13 +7285,18 @@ fn pending_numeral_ar_numeral_ar_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ar_numeral_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5974,13 +7313,18 @@ fn pending_numeral_ar_numeral_ar_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ar_numeral_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -5997,13 +7341,19 @@ fn pending_numeral_ar_numeral_ar_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("EG"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6020,13 +7370,18 @@ fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("EG"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6043,13 +7398,18 @@ fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/AR/EG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("EG"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6066,13 +7426,19 @@ fn pending_numeral_ar_eg_numeral_ar_eg_corpus_hs_latent() {
 #[test]
 fn pending_numeral_bg_numeral_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6089,13 +7455,18 @@ fn pending_numeral_bg_numeral_bg_corpus_hs_positive() {
 #[test]
 fn pending_numeral_bg_numeral_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6112,13 +7483,18 @@ fn pending_numeral_bg_numeral_bg_corpus_hs_negative() {
 #[test]
 fn pending_numeral_bg_numeral_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6135,13 +7511,19 @@ fn pending_numeral_bg_numeral_bg_corpus_hs_latent() {
 #[test]
 fn pending_numeral_bn_numeral_bn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/BN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6158,13 +7540,18 @@ fn pending_numeral_bn_numeral_bn_corpus_hs_positive() {
 #[test]
 fn pending_numeral_bn_numeral_bn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6181,13 +7568,18 @@ fn pending_numeral_bn_numeral_bn_corpus_hs_negative() {
 #[test]
 fn pending_numeral_bn_numeral_bn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/BN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("BN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6204,13 +7596,19 @@ fn pending_numeral_bn_numeral_bn_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ca_numeral_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6227,13 +7625,18 @@ fn pending_numeral_ca_numeral_ca_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ca_numeral_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6250,13 +7653,18 @@ fn pending_numeral_ca_numeral_ca_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ca_numeral_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6273,13 +7681,19 @@ fn pending_numeral_ca_numeral_ca_corpus_hs_latent() {
 #[test]
 fn pending_numeral_cs_numeral_cs_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/CS/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6296,13 +7710,18 @@ fn pending_numeral_cs_numeral_cs_corpus_hs_positive() {
 #[test]
 fn pending_numeral_cs_numeral_cs_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6319,13 +7738,18 @@ fn pending_numeral_cs_numeral_cs_corpus_hs_negative() {
 #[test]
 fn pending_numeral_cs_numeral_cs_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/CS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("CS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6342,13 +7766,19 @@ fn pending_numeral_cs_numeral_cs_corpus_hs_latent() {
 #[test]
 fn pending_numeral_da_numeral_da_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/DA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6365,13 +7795,18 @@ fn pending_numeral_da_numeral_da_corpus_hs_positive() {
 #[test]
 fn pending_numeral_da_numeral_da_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6388,13 +7823,18 @@ fn pending_numeral_da_numeral_da_corpus_hs_negative() {
 #[test]
 fn pending_numeral_da_numeral_da_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6411,13 +7851,19 @@ fn pending_numeral_da_numeral_da_corpus_hs_latent() {
 #[test]
 fn pending_numeral_de_numeral_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6434,13 +7880,18 @@ fn pending_numeral_de_numeral_de_corpus_hs_positive() {
 #[test]
 fn pending_numeral_de_numeral_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6457,13 +7908,18 @@ fn pending_numeral_de_numeral_de_corpus_hs_negative() {
 #[test]
 fn pending_numeral_de_numeral_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6480,13 +7936,19 @@ fn pending_numeral_de_numeral_de_corpus_hs_latent() {
 #[test]
 fn pending_numeral_el_numeral_el_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/EL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6503,13 +7965,18 @@ fn pending_numeral_el_numeral_el_corpus_hs_positive() {
 #[test]
 fn pending_numeral_el_numeral_el_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6526,13 +7993,18 @@ fn pending_numeral_el_numeral_el_corpus_hs_negative() {
 #[test]
 fn pending_numeral_el_numeral_el_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6549,13 +8021,19 @@ fn pending_numeral_el_numeral_el_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("AR"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6572,13 +8050,18 @@ fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("AR"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6595,13 +8078,18 @@ fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("AR"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6618,13 +8106,19 @@ fn pending_numeral_es_ar_numeral_es_ar_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CL"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6641,13 +8135,18 @@ fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CL"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6664,13 +8163,18 @@ fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CL"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6687,13 +8191,19 @@ fn pending_numeral_es_cl_numeral_es_cl_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_co_numeral_es_co_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CO"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6710,13 +8220,18 @@ fn pending_numeral_es_co_numeral_es_co_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_co_numeral_es_co_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CO"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6733,13 +8248,18 @@ fn pending_numeral_es_co_numeral_es_co_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_co_numeral_es_co_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/CO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("CO"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6756,13 +8276,19 @@ fn pending_numeral_es_co_numeral_es_co_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_numeral_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6779,13 +8305,18 @@ fn pending_numeral_es_numeral_es_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_numeral_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6802,13 +8333,18 @@ fn pending_numeral_es_numeral_es_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_numeral_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6825,13 +8361,19 @@ fn pending_numeral_es_numeral_es_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_es_numeral_es_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("ES"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6848,13 +8390,18 @@ fn pending_numeral_es_es_numeral_es_es_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_es_numeral_es_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("ES"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6871,13 +8418,18 @@ fn pending_numeral_es_es_numeral_es_es_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_es_numeral_es_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("ES"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6894,13 +8446,19 @@ fn pending_numeral_es_es_numeral_es_es_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("MX"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6917,13 +8475,18 @@ fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("MX"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6940,13 +8503,18 @@ fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/MX/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("MX"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6963,13 +8531,19 @@ fn pending_numeral_es_mx_numeral_es_mx_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("PE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -6986,13 +8560,18 @@ fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("PE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7009,13 +8588,18 @@ fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/PE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("PE"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7032,13 +8616,19 @@ fn pending_numeral_es_pe_numeral_es_pe_corpus_hs_latent() {
 #[test]
 fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("VE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7055,13 +8645,18 @@ fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_positive() {
 #[test]
 fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("VE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7078,13 +8673,18 @@ fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_negative() {
 #[test]
 fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ES/VE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("VE"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7101,13 +8701,19 @@ fn pending_numeral_es_ve_numeral_es_ve_corpus_hs_latent() {
 #[test]
 fn pending_numeral_et_numeral_et_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ET/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7124,13 +8730,18 @@ fn pending_numeral_et_numeral_et_corpus_hs_positive() {
 #[test]
 fn pending_numeral_et_numeral_et_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7147,13 +8758,18 @@ fn pending_numeral_et_numeral_et_corpus_hs_negative() {
 #[test]
 fn pending_numeral_et_numeral_et_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7170,13 +8786,19 @@ fn pending_numeral_et_numeral_et_corpus_hs_latent() {
 #[test]
 fn pending_numeral_fa_numeral_fa_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/FA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7193,13 +8815,18 @@ fn pending_numeral_fa_numeral_fa_corpus_hs_positive() {
 #[test]
 fn pending_numeral_fa_numeral_fa_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7216,13 +8843,18 @@ fn pending_numeral_fa_numeral_fa_corpus_hs_negative() {
 #[test]
 fn pending_numeral_fa_numeral_fa_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7239,13 +8871,19 @@ fn pending_numeral_fa_numeral_fa_corpus_hs_latent() {
 #[test]
 fn pending_numeral_fi_numeral_fi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/FI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7262,13 +8900,18 @@ fn pending_numeral_fi_numeral_fi_corpus_hs_positive() {
 #[test]
 fn pending_numeral_fi_numeral_fi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7285,13 +8928,18 @@ fn pending_numeral_fi_numeral_fi_corpus_hs_negative() {
 #[test]
 fn pending_numeral_fi_numeral_fi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7308,13 +8956,19 @@ fn pending_numeral_fi_numeral_fi_corpus_hs_latent() {
 #[test]
 fn pending_numeral_fr_numeral_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7331,13 +8985,18 @@ fn pending_numeral_fr_numeral_fr_corpus_hs_positive() {
 #[test]
 fn pending_numeral_fr_numeral_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7354,13 +9013,18 @@ fn pending_numeral_fr_numeral_fr_corpus_hs_negative() {
 #[test]
 fn pending_numeral_fr_numeral_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7377,13 +9041,19 @@ fn pending_numeral_fr_numeral_fr_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ga_numeral_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7400,13 +9070,18 @@ fn pending_numeral_ga_numeral_ga_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ga_numeral_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7423,13 +9098,18 @@ fn pending_numeral_ga_numeral_ga_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ga_numeral_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7446,13 +9126,19 @@ fn pending_numeral_ga_numeral_ga_corpus_hs_latent() {
 #[test]
 fn pending_numeral_he_numeral_he_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/HE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7469,13 +9155,18 @@ fn pending_numeral_he_numeral_he_corpus_hs_positive() {
 #[test]
 fn pending_numeral_he_numeral_he_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7492,13 +9183,18 @@ fn pending_numeral_he_numeral_he_corpus_hs_negative() {
 #[test]
 fn pending_numeral_he_numeral_he_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7515,13 +9211,19 @@ fn pending_numeral_he_numeral_he_corpus_hs_latent() {
 #[test]
 fn pending_numeral_hi_numeral_hi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/HI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7538,13 +9240,18 @@ fn pending_numeral_hi_numeral_hi_corpus_hs_positive() {
 #[test]
 fn pending_numeral_hi_numeral_hi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7561,13 +9268,18 @@ fn pending_numeral_hi_numeral_hi_corpus_hs_negative() {
 #[test]
 fn pending_numeral_hi_numeral_hi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7584,13 +9296,19 @@ fn pending_numeral_hi_numeral_hi_corpus_hs_latent() {
 #[test]
 fn pending_numeral_hr_numeral_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7607,13 +9325,18 @@ fn pending_numeral_hr_numeral_hr_corpus_hs_positive() {
 #[test]
 fn pending_numeral_hr_numeral_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7630,13 +9353,18 @@ fn pending_numeral_hr_numeral_hr_corpus_hs_negative() {
 #[test]
 fn pending_numeral_hr_numeral_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7653,13 +9381,19 @@ fn pending_numeral_hr_numeral_hr_corpus_hs_latent() {
 #[test]
 fn pending_numeral_hu_numeral_hu_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/HU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7676,13 +9410,18 @@ fn pending_numeral_hu_numeral_hu_corpus_hs_positive() {
 #[test]
 fn pending_numeral_hu_numeral_hu_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7699,13 +9438,18 @@ fn pending_numeral_hu_numeral_hu_corpus_hs_negative() {
 #[test]
 fn pending_numeral_hu_numeral_hu_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7722,13 +9466,19 @@ fn pending_numeral_hu_numeral_hu_corpus_hs_latent() {
 #[test]
 fn pending_numeral_id_numeral_id_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ID/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7745,13 +9495,18 @@ fn pending_numeral_id_numeral_id_corpus_hs_positive() {
 #[test]
 fn pending_numeral_id_numeral_id_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7768,13 +9523,18 @@ fn pending_numeral_id_numeral_id_corpus_hs_negative() {
 #[test]
 fn pending_numeral_id_numeral_id_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7791,13 +9551,19 @@ fn pending_numeral_id_numeral_id_corpus_hs_latent() {
 #[test]
 fn pending_numeral_is_numeral_is_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/IS/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7814,13 +9580,18 @@ fn pending_numeral_is_numeral_is_corpus_hs_positive() {
 #[test]
 fn pending_numeral_is_numeral_is_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7837,13 +9608,18 @@ fn pending_numeral_is_numeral_is_corpus_hs_negative() {
 #[test]
 fn pending_numeral_is_numeral_is_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IS/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IS"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7860,13 +9636,19 @@ fn pending_numeral_is_numeral_is_corpus_hs_latent() {
 #[test]
 fn pending_numeral_it_numeral_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7883,13 +9665,18 @@ fn pending_numeral_it_numeral_it_corpus_hs_positive() {
 #[test]
 fn pending_numeral_it_numeral_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7906,13 +9693,18 @@ fn pending_numeral_it_numeral_it_corpus_hs_negative() {
 #[test]
 fn pending_numeral_it_numeral_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7929,13 +9721,19 @@ fn pending_numeral_it_numeral_it_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ja_numeral_ja_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/JA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7952,13 +9750,18 @@ fn pending_numeral_ja_numeral_ja_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ja_numeral_ja_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7975,13 +9778,18 @@ fn pending_numeral_ja_numeral_ja_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ja_numeral_ja_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -7998,13 +9806,19 @@ fn pending_numeral_ja_numeral_ja_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ka_numeral_ka_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/KA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8021,13 +9835,18 @@ fn pending_numeral_ka_numeral_ka_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ka_numeral_ka_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8044,13 +9863,18 @@ fn pending_numeral_ka_numeral_ka_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ka_numeral_ka_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8067,13 +9891,19 @@ fn pending_numeral_ka_numeral_ka_corpus_hs_latent() {
 #[test]
 fn pending_numeral_km_numeral_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8090,13 +9920,18 @@ fn pending_numeral_km_numeral_km_corpus_hs_positive() {
 #[test]
 fn pending_numeral_km_numeral_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8113,13 +9948,18 @@ fn pending_numeral_km_numeral_km_corpus_hs_negative() {
 #[test]
 fn pending_numeral_km_numeral_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8136,13 +9976,19 @@ fn pending_numeral_km_numeral_km_corpus_hs_latent() {
 #[test]
 fn pending_numeral_kn_numeral_kn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/KN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8159,13 +10005,18 @@ fn pending_numeral_kn_numeral_kn_corpus_hs_positive() {
 #[test]
 fn pending_numeral_kn_numeral_kn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8182,13 +10033,18 @@ fn pending_numeral_kn_numeral_kn_corpus_hs_negative() {
 #[test]
 fn pending_numeral_kn_numeral_kn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8205,13 +10061,19 @@ fn pending_numeral_kn_numeral_kn_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ko_numeral_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8228,13 +10090,18 @@ fn pending_numeral_ko_numeral_ko_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ko_numeral_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8251,13 +10118,18 @@ fn pending_numeral_ko_numeral_ko_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ko_numeral_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8274,13 +10146,19 @@ fn pending_numeral_ko_numeral_ko_corpus_hs_latent() {
 #[test]
 fn pending_numeral_lo_numeral_lo_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("LO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/LO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8297,13 +10175,18 @@ fn pending_numeral_lo_numeral_lo_corpus_hs_positive() {
 #[test]
 fn pending_numeral_lo_numeral_lo_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("LO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8320,13 +10203,18 @@ fn pending_numeral_lo_numeral_lo_corpus_hs_negative() {
 #[test]
 fn pending_numeral_lo_numeral_lo_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/LO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("LO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8343,13 +10231,19 @@ fn pending_numeral_lo_numeral_lo_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ml_numeral_ml_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ML/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8366,13 +10260,18 @@ fn pending_numeral_ml_numeral_ml_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ml_numeral_ml_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8389,13 +10288,18 @@ fn pending_numeral_ml_numeral_ml_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ml_numeral_ml_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8412,13 +10316,19 @@ fn pending_numeral_ml_numeral_ml_corpus_hs_latent() {
 #[test]
 fn pending_numeral_mn_numeral_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8435,13 +10345,18 @@ fn pending_numeral_mn_numeral_mn_corpus_hs_positive() {
 #[test]
 fn pending_numeral_mn_numeral_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8458,13 +10373,18 @@ fn pending_numeral_mn_numeral_mn_corpus_hs_negative() {
 #[test]
 fn pending_numeral_mn_numeral_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8481,13 +10401,19 @@ fn pending_numeral_mn_numeral_mn_corpus_hs_latent() {
 #[test]
 fn pending_numeral_my_numeral_my_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MY"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/MY/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8504,13 +10430,18 @@ fn pending_numeral_my_numeral_my_corpus_hs_positive() {
 #[test]
 fn pending_numeral_my_numeral_my_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MY"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8527,13 +10458,18 @@ fn pending_numeral_my_numeral_my_corpus_hs_negative() {
 #[test]
 fn pending_numeral_my_numeral_my_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/MY/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("MY"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8550,13 +10486,19 @@ fn pending_numeral_my_numeral_my_corpus_hs_latent() {
 #[test]
 fn pending_numeral_nb_numeral_nb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/NB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8573,13 +10515,18 @@ fn pending_numeral_nb_numeral_nb_corpus_hs_positive() {
 #[test]
 fn pending_numeral_nb_numeral_nb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8596,13 +10543,18 @@ fn pending_numeral_nb_numeral_nb_corpus_hs_negative() {
 #[test]
 fn pending_numeral_nb_numeral_nb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8619,13 +10571,19 @@ fn pending_numeral_nb_numeral_nb_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ne_numeral_ne_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/NE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8642,13 +10600,18 @@ fn pending_numeral_ne_numeral_ne_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ne_numeral_ne_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8665,13 +10628,18 @@ fn pending_numeral_ne_numeral_ne_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ne_numeral_ne_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8688,13 +10656,19 @@ fn pending_numeral_ne_numeral_ne_corpus_hs_latent() {
 #[test]
 fn pending_numeral_nl_numeral_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8711,13 +10685,18 @@ fn pending_numeral_nl_numeral_nl_corpus_hs_positive() {
 #[test]
 fn pending_numeral_nl_numeral_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8734,13 +10713,18 @@ fn pending_numeral_nl_numeral_nl_corpus_hs_negative() {
 #[test]
 fn pending_numeral_nl_numeral_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8757,13 +10741,19 @@ fn pending_numeral_nl_numeral_nl_corpus_hs_latent() {
 #[test]
 fn pending_numeral_pl_numeral_pl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/PL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8780,13 +10770,18 @@ fn pending_numeral_pl_numeral_pl_corpus_hs_positive() {
 #[test]
 fn pending_numeral_pl_numeral_pl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8803,13 +10798,18 @@ fn pending_numeral_pl_numeral_pl_corpus_hs_negative() {
 #[test]
 fn pending_numeral_pl_numeral_pl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8826,13 +10826,19 @@ fn pending_numeral_pl_numeral_pl_corpus_hs_latent() {
 #[test]
 fn pending_numeral_pt_numeral_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8849,13 +10855,18 @@ fn pending_numeral_pt_numeral_pt_corpus_hs_positive() {
 #[test]
 fn pending_numeral_pt_numeral_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8872,13 +10883,18 @@ fn pending_numeral_pt_numeral_pt_corpus_hs_negative() {
 #[test]
 fn pending_numeral_pt_numeral_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8895,13 +10911,19 @@ fn pending_numeral_pt_numeral_pt_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ro_numeral_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8918,13 +10940,18 @@ fn pending_numeral_ro_numeral_ro_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ro_numeral_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8941,13 +10968,18 @@ fn pending_numeral_ro_numeral_ro_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ro_numeral_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8964,13 +10996,19 @@ fn pending_numeral_ro_numeral_ro_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ru_numeral_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -8987,13 +11025,18 @@ fn pending_numeral_ru_numeral_ru_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ru_numeral_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9010,13 +11053,18 @@ fn pending_numeral_ru_numeral_ru_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ru_numeral_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9033,13 +11081,19 @@ fn pending_numeral_ru_numeral_ru_corpus_hs_latent() {
 #[test]
 fn pending_numeral_sk_numeral_sk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/SK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9056,13 +11110,18 @@ fn pending_numeral_sk_numeral_sk_corpus_hs_positive() {
 #[test]
 fn pending_numeral_sk_numeral_sk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9079,13 +11138,18 @@ fn pending_numeral_sk_numeral_sk_corpus_hs_negative() {
 #[test]
 fn pending_numeral_sk_numeral_sk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9102,13 +11166,19 @@ fn pending_numeral_sk_numeral_sk_corpus_hs_latent() {
 #[test]
 fn pending_numeral_sv_numeral_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9125,13 +11195,18 @@ fn pending_numeral_sv_numeral_sv_corpus_hs_positive() {
 #[test]
 fn pending_numeral_sv_numeral_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9148,13 +11223,18 @@ fn pending_numeral_sv_numeral_sv_corpus_hs_negative() {
 #[test]
 fn pending_numeral_sv_numeral_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9171,13 +11251,19 @@ fn pending_numeral_sv_numeral_sv_corpus_hs_latent() {
 #[test]
 fn pending_numeral_sw_numeral_sw_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SW"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/SW/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9194,13 +11280,18 @@ fn pending_numeral_sw_numeral_sw_corpus_hs_positive() {
 #[test]
 fn pending_numeral_sw_numeral_sw_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SW"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9217,13 +11308,18 @@ fn pending_numeral_sw_numeral_sw_corpus_hs_negative() {
 #[test]
 fn pending_numeral_sw_numeral_sw_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/SW/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("SW"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9240,13 +11336,19 @@ fn pending_numeral_sw_numeral_sw_corpus_hs_latent() {
 #[test]
 fn pending_numeral_ta_numeral_ta_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/TA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9263,13 +11365,18 @@ fn pending_numeral_ta_numeral_ta_corpus_hs_positive() {
 #[test]
 fn pending_numeral_ta_numeral_ta_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9286,13 +11393,18 @@ fn pending_numeral_ta_numeral_ta_corpus_hs_negative() {
 #[test]
 fn pending_numeral_ta_numeral_ta_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9309,13 +11421,19 @@ fn pending_numeral_ta_numeral_ta_corpus_hs_latent() {
 #[test]
 fn pending_numeral_te_numeral_te_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/TE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9332,13 +11450,18 @@ fn pending_numeral_te_numeral_te_corpus_hs_positive() {
 #[test]
 fn pending_numeral_te_numeral_te_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9355,13 +11478,18 @@ fn pending_numeral_te_numeral_te_corpus_hs_negative() {
 #[test]
 fn pending_numeral_te_numeral_te_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TE/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9378,13 +11506,19 @@ fn pending_numeral_te_numeral_te_corpus_hs_latent() {
 #[test]
 fn pending_numeral_th_numeral_th_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/TH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9401,13 +11535,18 @@ fn pending_numeral_th_numeral_th_corpus_hs_positive() {
 #[test]
 fn pending_numeral_th_numeral_th_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9424,13 +11563,18 @@ fn pending_numeral_th_numeral_th_corpus_hs_negative() {
 #[test]
 fn pending_numeral_th_numeral_th_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9447,13 +11591,19 @@ fn pending_numeral_th_numeral_th_corpus_hs_latent() {
 #[test]
 fn pending_numeral_tr_numeral_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9470,13 +11620,18 @@ fn pending_numeral_tr_numeral_tr_corpus_hs_positive() {
 #[test]
 fn pending_numeral_tr_numeral_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9493,13 +11648,18 @@ fn pending_numeral_tr_numeral_tr_corpus_hs_negative() {
 #[test]
 fn pending_numeral_tr_numeral_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9516,13 +11676,19 @@ fn pending_numeral_tr_numeral_tr_corpus_hs_latent() {
 #[test]
 fn pending_numeral_uk_numeral_uk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/UK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9539,13 +11705,18 @@ fn pending_numeral_uk_numeral_uk_corpus_hs_positive() {
 #[test]
 fn pending_numeral_uk_numeral_uk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9562,13 +11733,18 @@ fn pending_numeral_uk_numeral_uk_corpus_hs_negative() {
 #[test]
 fn pending_numeral_uk_numeral_uk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9585,13 +11761,19 @@ fn pending_numeral_uk_numeral_uk_corpus_hs_latent() {
 #[test]
 fn pending_numeral_vi_numeral_vi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/VI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9608,13 +11790,18 @@ fn pending_numeral_vi_numeral_vi_corpus_hs_positive() {
 #[test]
 fn pending_numeral_vi_numeral_vi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9631,13 +11818,18 @@ fn pending_numeral_vi_numeral_vi_corpus_hs_negative() {
 #[test]
 fn pending_numeral_vi_numeral_vi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9654,13 +11846,19 @@ fn pending_numeral_vi_numeral_vi_corpus_hs_latent() {
 #[test]
 fn pending_numeral_zh_numeral_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Numeral/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9677,13 +11875,18 @@ fn pending_numeral_zh_numeral_zh_corpus_hs_positive() {
 #[test]
 fn pending_numeral_zh_numeral_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9700,13 +11903,18 @@ fn pending_numeral_zh_numeral_zh_corpus_hs_negative() {
 #[test]
 fn pending_numeral_zh_numeral_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Numeral/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Numeral");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9723,13 +11931,19 @@ fn pending_numeral_zh_numeral_zh_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ar_ordinal_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9746,13 +11960,18 @@ fn pending_ordinal_ar_ordinal_ar_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ar_ordinal_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9769,13 +11988,18 @@ fn pending_ordinal_ar_ordinal_ar_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ar_ordinal_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9792,13 +12016,19 @@ fn pending_ordinal_ar_ordinal_ar_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_bg_ordinal_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9815,13 +12045,18 @@ fn pending_ordinal_bg_ordinal_bg_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_bg_ordinal_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9838,13 +12073,18 @@ fn pending_ordinal_bg_ordinal_bg_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_bg_ordinal_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9861,13 +12101,19 @@ fn pending_ordinal_bg_ordinal_bg_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ca_ordinal_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9884,13 +12130,18 @@ fn pending_ordinal_ca_ordinal_ca_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ca_ordinal_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9907,13 +12158,18 @@ fn pending_ordinal_ca_ordinal_ca_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ca_ordinal_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9930,13 +12186,19 @@ fn pending_ordinal_ca_ordinal_ca_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_da_ordinal_da_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/DA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9953,13 +12215,18 @@ fn pending_ordinal_da_ordinal_da_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_da_ordinal_da_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9976,13 +12243,18 @@ fn pending_ordinal_da_ordinal_da_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_da_ordinal_da_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -9999,13 +12271,19 @@ fn pending_ordinal_da_ordinal_da_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_de_ordinal_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10022,13 +12300,18 @@ fn pending_ordinal_de_ordinal_de_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_de_ordinal_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10045,13 +12328,18 @@ fn pending_ordinal_de_ordinal_de_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_de_ordinal_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10068,13 +12356,19 @@ fn pending_ordinal_de_ordinal_de_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_el_ordinal_el_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/EL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10091,13 +12385,18 @@ fn pending_ordinal_el_ordinal_el_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_el_ordinal_el_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10114,13 +12413,18 @@ fn pending_ordinal_el_ordinal_el_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_el_ordinal_el_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10137,13 +12441,19 @@ fn pending_ordinal_el_ordinal_el_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_es_ordinal_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10160,13 +12470,18 @@ fn pending_ordinal_es_ordinal_es_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_es_ordinal_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10183,13 +12498,18 @@ fn pending_ordinal_es_ordinal_es_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_es_ordinal_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10206,13 +12526,19 @@ fn pending_ordinal_es_ordinal_es_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_et_ordinal_et_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/ET/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10229,13 +12555,18 @@ fn pending_ordinal_et_ordinal_et_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_et_ordinal_et_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10252,13 +12583,18 @@ fn pending_ordinal_et_ordinal_et_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_et_ordinal_et_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ET/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ET"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10275,13 +12611,19 @@ fn pending_ordinal_et_ordinal_et_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_fr_ordinal_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10298,13 +12640,18 @@ fn pending_ordinal_fr_ordinal_fr_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_fr_ordinal_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10321,13 +12668,18 @@ fn pending_ordinal_fr_ordinal_fr_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_fr_ordinal_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10344,13 +12696,19 @@ fn pending_ordinal_fr_ordinal_fr_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ga_ordinal_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10367,13 +12725,18 @@ fn pending_ordinal_ga_ordinal_ga_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ga_ordinal_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10390,13 +12753,18 @@ fn pending_ordinal_ga_ordinal_ga_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ga_ordinal_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10413,13 +12781,19 @@ fn pending_ordinal_ga_ordinal_ga_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_he_ordinal_he_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/HE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10436,13 +12810,18 @@ fn pending_ordinal_he_ordinal_he_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_he_ordinal_he_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10459,13 +12838,18 @@ fn pending_ordinal_he_ordinal_he_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_he_ordinal_he_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10482,13 +12866,19 @@ fn pending_ordinal_he_ordinal_he_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_hi_ordinal_hi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/HI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10505,13 +12895,18 @@ fn pending_ordinal_hi_ordinal_hi_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_hi_ordinal_hi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10528,13 +12923,18 @@ fn pending_ordinal_hi_ordinal_hi_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_hi_ordinal_hi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10551,13 +12951,19 @@ fn pending_ordinal_hi_ordinal_hi_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_hr_ordinal_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10574,13 +12980,18 @@ fn pending_ordinal_hr_ordinal_hr_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_hr_ordinal_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10597,13 +13008,18 @@ fn pending_ordinal_hr_ordinal_hr_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_hr_ordinal_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10620,13 +13036,19 @@ fn pending_ordinal_hr_ordinal_hr_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_hu_ordinal_hu_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/HU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10643,13 +13065,18 @@ fn pending_ordinal_hu_ordinal_hu_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_hu_ordinal_hu_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10666,13 +13093,18 @@ fn pending_ordinal_hu_ordinal_hu_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_hu_ordinal_hu_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10689,13 +13121,19 @@ fn pending_ordinal_hu_ordinal_hu_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_id_ordinal_id_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/ID/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10712,13 +13150,18 @@ fn pending_ordinal_id_ordinal_id_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_id_ordinal_id_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10735,13 +13178,18 @@ fn pending_ordinal_id_ordinal_id_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_id_ordinal_id_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ID/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ID"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10758,13 +13206,19 @@ fn pending_ordinal_id_ordinal_id_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_it_ordinal_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10781,13 +13235,18 @@ fn pending_ordinal_it_ordinal_it_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_it_ordinal_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10804,13 +13263,18 @@ fn pending_ordinal_it_ordinal_it_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_it_ordinal_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10827,13 +13291,19 @@ fn pending_ordinal_it_ordinal_it_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ja_ordinal_ja_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/JA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10850,13 +13320,18 @@ fn pending_ordinal_ja_ordinal_ja_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ja_ordinal_ja_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10873,13 +13348,18 @@ fn pending_ordinal_ja_ordinal_ja_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ja_ordinal_ja_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10896,13 +13376,19 @@ fn pending_ordinal_ja_ordinal_ja_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ka_ordinal_ka_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/KA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10919,13 +13405,18 @@ fn pending_ordinal_ka_ordinal_ka_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ka_ordinal_ka_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10942,13 +13433,18 @@ fn pending_ordinal_ka_ordinal_ka_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ka_ordinal_ka_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10965,13 +13461,19 @@ fn pending_ordinal_ka_ordinal_ka_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_km_ordinal_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -10988,13 +13490,18 @@ fn pending_ordinal_km_ordinal_km_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_km_ordinal_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11011,13 +13518,18 @@ fn pending_ordinal_km_ordinal_km_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_km_ordinal_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11034,13 +13546,19 @@ fn pending_ordinal_km_ordinal_km_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ko_ordinal_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11057,13 +13575,18 @@ fn pending_ordinal_ko_ordinal_ko_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ko_ordinal_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11080,13 +13603,18 @@ fn pending_ordinal_ko_ordinal_ko_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ko_ordinal_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11103,13 +13631,19 @@ fn pending_ordinal_ko_ordinal_ko_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ml_ordinal_ml_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/ML/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11126,13 +13660,18 @@ fn pending_ordinal_ml_ordinal_ml_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ml_ordinal_ml_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11149,13 +13688,18 @@ fn pending_ordinal_ml_ordinal_ml_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ml_ordinal_ml_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ML/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ML"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11172,13 +13716,19 @@ fn pending_ordinal_ml_ordinal_ml_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_mn_ordinal_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11195,13 +13745,18 @@ fn pending_ordinal_mn_ordinal_mn_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_mn_ordinal_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11218,13 +13773,18 @@ fn pending_ordinal_mn_ordinal_mn_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_mn_ordinal_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11241,13 +13801,19 @@ fn pending_ordinal_mn_ordinal_mn_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_nb_ordinal_nb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/NB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11264,13 +13830,18 @@ fn pending_ordinal_nb_ordinal_nb_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_nb_ordinal_nb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11287,13 +13858,18 @@ fn pending_ordinal_nb_ordinal_nb_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_nb_ordinal_nb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11310,13 +13886,19 @@ fn pending_ordinal_nb_ordinal_nb_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_nl_ordinal_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11333,13 +13915,18 @@ fn pending_ordinal_nl_ordinal_nl_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_nl_ordinal_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11356,13 +13943,18 @@ fn pending_ordinal_nl_ordinal_nl_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_nl_ordinal_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11379,13 +13971,19 @@ fn pending_ordinal_nl_ordinal_nl_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_pl_ordinal_pl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/PL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11402,13 +14000,18 @@ fn pending_ordinal_pl_ordinal_pl_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_pl_ordinal_pl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11425,13 +14028,18 @@ fn pending_ordinal_pl_ordinal_pl_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_pl_ordinal_pl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11448,13 +14056,19 @@ fn pending_ordinal_pl_ordinal_pl_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_pt_ordinal_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11471,13 +14085,18 @@ fn pending_ordinal_pt_ordinal_pt_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_pt_ordinal_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11494,13 +14113,18 @@ fn pending_ordinal_pt_ordinal_pt_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_pt_ordinal_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11517,13 +14141,19 @@ fn pending_ordinal_pt_ordinal_pt_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ro_ordinal_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11540,13 +14170,18 @@ fn pending_ordinal_ro_ordinal_ro_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ro_ordinal_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11563,13 +14198,18 @@ fn pending_ordinal_ro_ordinal_ro_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ro_ordinal_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11586,13 +14226,19 @@ fn pending_ordinal_ro_ordinal_ro_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ru_ordinal_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11609,13 +14255,18 @@ fn pending_ordinal_ru_ordinal_ru_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ru_ordinal_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11632,13 +14283,18 @@ fn pending_ordinal_ru_ordinal_ru_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ru_ordinal_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11655,13 +14311,19 @@ fn pending_ordinal_ru_ordinal_ru_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_sv_ordinal_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11678,13 +14340,18 @@ fn pending_ordinal_sv_ordinal_sv_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_sv_ordinal_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11701,13 +14368,18 @@ fn pending_ordinal_sv_ordinal_sv_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_sv_ordinal_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11724,13 +14396,19 @@ fn pending_ordinal_sv_ordinal_sv_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_ta_ordinal_ta_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/TA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11747,13 +14425,18 @@ fn pending_ordinal_ta_ordinal_ta_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_ta_ordinal_ta_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11770,13 +14453,18 @@ fn pending_ordinal_ta_ordinal_ta_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_ta_ordinal_ta_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TA/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11793,13 +14481,19 @@ fn pending_ordinal_ta_ordinal_ta_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_tr_ordinal_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11816,13 +14510,18 @@ fn pending_ordinal_tr_ordinal_tr_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_tr_ordinal_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11839,13 +14538,18 @@ fn pending_ordinal_tr_ordinal_tr_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_tr_ordinal_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11862,13 +14566,19 @@ fn pending_ordinal_tr_ordinal_tr_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_uk_ordinal_uk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/UK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11885,13 +14595,18 @@ fn pending_ordinal_uk_ordinal_uk_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_uk_ordinal_uk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11908,13 +14623,18 @@ fn pending_ordinal_uk_ordinal_uk_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_uk_ordinal_uk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11931,13 +14651,19 @@ fn pending_ordinal_uk_ordinal_uk_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_vi_ordinal_vi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/VI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11954,13 +14680,18 @@ fn pending_ordinal_vi_ordinal_vi_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_vi_ordinal_vi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -11977,13 +14708,18 @@ fn pending_ordinal_vi_ordinal_vi_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_vi_ordinal_vi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12000,13 +14736,19 @@ fn pending_ordinal_vi_ordinal_vi_corpus_hs_latent() {
 #[test]
 fn pending_ordinal_zh_ordinal_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12023,13 +14765,18 @@ fn pending_ordinal_zh_ordinal_zh_corpus_hs_positive() {
 #[test]
 fn pending_ordinal_zh_ordinal_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12046,13 +14793,18 @@ fn pending_ordinal_zh_ordinal_zh_corpus_hs_negative() {
 #[test]
 fn pending_ordinal_zh_ordinal_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Ordinal/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Ordinal");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12069,13 +14821,19 @@ fn pending_ordinal_zh_ordinal_zh_corpus_hs_latent() {
 #[test]
 fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12092,13 +14850,18 @@ fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_positive() {
 #[test]
 fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12115,13 +14878,18 @@ fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_negative() {
 #[test]
 fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/AR/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12138,13 +14906,19 @@ fn pending_phonenumber_ar_phonenumber_ar_corpus_hs_latent() {
 #[test]
 fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12161,13 +14935,18 @@ fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_positive() {
 #[test]
 fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12184,13 +14963,18 @@ fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_negative() {
 #[test]
 fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/PhoneNumber/PT/Corpus.hs"
+    );
     let dim = dim_from_name("PhoneNumber");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12207,13 +14991,19 @@ fn pending_phonenumber_pt_phonenumber_pt_corpus_hs_latent() {
 #[test]
 fn pending_quantity_ar_quantity_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12230,13 +15020,18 @@ fn pending_quantity_ar_quantity_ar_corpus_hs_positive() {
 #[test]
 fn pending_quantity_ar_quantity_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12253,13 +15048,18 @@ fn pending_quantity_ar_quantity_ar_corpus_hs_negative() {
 #[test]
 fn pending_quantity_ar_quantity_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12276,13 +15076,19 @@ fn pending_quantity_ar_quantity_ar_corpus_hs_latent() {
 #[test]
 fn pending_quantity_es_quantity_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12299,13 +15105,18 @@ fn pending_quantity_es_quantity_es_corpus_hs_positive() {
 #[test]
 fn pending_quantity_es_quantity_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12322,13 +15133,18 @@ fn pending_quantity_es_quantity_es_corpus_hs_negative() {
 #[test]
 fn pending_quantity_es_quantity_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12345,13 +15161,19 @@ fn pending_quantity_es_quantity_es_corpus_hs_latent() {
 #[test]
 fn pending_quantity_fr_quantity_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12368,13 +15190,18 @@ fn pending_quantity_fr_quantity_fr_corpus_hs_positive() {
 #[test]
 fn pending_quantity_fr_quantity_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12391,13 +15218,18 @@ fn pending_quantity_fr_quantity_fr_corpus_hs_negative() {
 #[test]
 fn pending_quantity_fr_quantity_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12414,13 +15246,19 @@ fn pending_quantity_fr_quantity_fr_corpus_hs_latent() {
 #[test]
 fn pending_quantity_hr_quantity_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12437,13 +15275,18 @@ fn pending_quantity_hr_quantity_hr_corpus_hs_positive() {
 #[test]
 fn pending_quantity_hr_quantity_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12460,13 +15303,18 @@ fn pending_quantity_hr_quantity_hr_corpus_hs_negative() {
 #[test]
 fn pending_quantity_hr_quantity_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12483,13 +15331,19 @@ fn pending_quantity_hr_quantity_hr_corpus_hs_latent() {
 #[test]
 fn pending_quantity_km_quantity_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12506,13 +15360,18 @@ fn pending_quantity_km_quantity_km_corpus_hs_positive() {
 #[test]
 fn pending_quantity_km_quantity_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12529,13 +15388,18 @@ fn pending_quantity_km_quantity_km_corpus_hs_negative() {
 #[test]
 fn pending_quantity_km_quantity_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12552,13 +15416,19 @@ fn pending_quantity_km_quantity_km_corpus_hs_latent() {
 #[test]
 fn pending_quantity_ko_quantity_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12575,13 +15445,18 @@ fn pending_quantity_ko_quantity_ko_corpus_hs_positive() {
 #[test]
 fn pending_quantity_ko_quantity_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12598,13 +15473,18 @@ fn pending_quantity_ko_quantity_ko_corpus_hs_negative() {
 #[test]
 fn pending_quantity_ko_quantity_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12621,13 +15501,19 @@ fn pending_quantity_ko_quantity_ko_corpus_hs_latent() {
 #[test]
 fn pending_quantity_mn_quantity_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12644,13 +15530,18 @@ fn pending_quantity_mn_quantity_mn_corpus_hs_positive() {
 #[test]
 fn pending_quantity_mn_quantity_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12667,13 +15558,18 @@ fn pending_quantity_mn_quantity_mn_corpus_hs_negative() {
 #[test]
 fn pending_quantity_mn_quantity_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12690,13 +15586,19 @@ fn pending_quantity_mn_quantity_mn_corpus_hs_latent() {
 #[test]
 fn pending_quantity_nl_quantity_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12713,13 +15615,18 @@ fn pending_quantity_nl_quantity_nl_corpus_hs_positive() {
 #[test]
 fn pending_quantity_nl_quantity_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12736,13 +15643,18 @@ fn pending_quantity_nl_quantity_nl_corpus_hs_negative() {
 #[test]
 fn pending_quantity_nl_quantity_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12759,13 +15671,19 @@ fn pending_quantity_nl_quantity_nl_corpus_hs_latent() {
 #[test]
 fn pending_quantity_pt_quantity_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12782,13 +15700,18 @@ fn pending_quantity_pt_quantity_pt_corpus_hs_positive() {
 #[test]
 fn pending_quantity_pt_quantity_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12805,13 +15728,18 @@ fn pending_quantity_pt_quantity_pt_corpus_hs_negative() {
 #[test]
 fn pending_quantity_pt_quantity_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12828,13 +15756,19 @@ fn pending_quantity_pt_quantity_pt_corpus_hs_latent() {
 #[test]
 fn pending_quantity_ro_quantity_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12851,13 +15785,18 @@ fn pending_quantity_ro_quantity_ro_corpus_hs_positive() {
 #[test]
 fn pending_quantity_ro_quantity_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12874,13 +15813,18 @@ fn pending_quantity_ro_quantity_ro_corpus_hs_negative() {
 #[test]
 fn pending_quantity_ro_quantity_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12897,13 +15841,19 @@ fn pending_quantity_ro_quantity_ro_corpus_hs_latent() {
 #[test]
 fn pending_quantity_ru_quantity_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12920,13 +15870,18 @@ fn pending_quantity_ru_quantity_ru_corpus_hs_positive() {
 #[test]
 fn pending_quantity_ru_quantity_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12943,13 +15898,18 @@ fn pending_quantity_ru_quantity_ru_corpus_hs_negative() {
 #[test]
 fn pending_quantity_ru_quantity_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12966,13 +15926,19 @@ fn pending_quantity_ru_quantity_ru_corpus_hs_latent() {
 #[test]
 fn pending_quantity_zh_quantity_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Quantity/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -12989,13 +15955,18 @@ fn pending_quantity_zh_quantity_zh_corpus_hs_positive() {
 #[test]
 fn pending_quantity_zh_quantity_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13012,13 +15983,18 @@ fn pending_quantity_zh_quantity_zh_corpus_hs_negative() {
 #[test]
 fn pending_quantity_zh_quantity_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Quantity/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Quantity");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13035,13 +16011,19 @@ fn pending_quantity_zh_quantity_zh_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ar_temperature_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13058,13 +16040,18 @@ fn pending_temperature_ar_temperature_ar_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ar_temperature_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13081,13 +16068,18 @@ fn pending_temperature_ar_temperature_ar_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ar_temperature_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13104,13 +16096,19 @@ fn pending_temperature_ar_temperature_ar_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ca_temperature_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13127,13 +16125,18 @@ fn pending_temperature_ca_temperature_ca_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ca_temperature_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13150,13 +16153,18 @@ fn pending_temperature_ca_temperature_ca_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ca_temperature_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13173,13 +16181,19 @@ fn pending_temperature_ca_temperature_ca_corpus_hs_latent() {
 #[test]
 fn pending_temperature_es_temperature_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13196,13 +16210,18 @@ fn pending_temperature_es_temperature_es_corpus_hs_positive() {
 #[test]
 fn pending_temperature_es_temperature_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13219,13 +16238,18 @@ fn pending_temperature_es_temperature_es_corpus_hs_negative() {
 #[test]
 fn pending_temperature_es_temperature_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13242,13 +16266,19 @@ fn pending_temperature_es_temperature_es_corpus_hs_latent() {
 #[test]
 fn pending_temperature_fr_temperature_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13265,13 +16295,18 @@ fn pending_temperature_fr_temperature_fr_corpus_hs_positive() {
 #[test]
 fn pending_temperature_fr_temperature_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13288,13 +16323,18 @@ fn pending_temperature_fr_temperature_fr_corpus_hs_negative() {
 #[test]
 fn pending_temperature_fr_temperature_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13311,13 +16351,19 @@ fn pending_temperature_fr_temperature_fr_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ga_temperature_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13334,13 +16380,18 @@ fn pending_temperature_ga_temperature_ga_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ga_temperature_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13357,13 +16408,18 @@ fn pending_temperature_ga_temperature_ga_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ga_temperature_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13380,13 +16436,19 @@ fn pending_temperature_ga_temperature_ga_corpus_hs_latent() {
 #[test]
 fn pending_temperature_hi_temperature_hi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/HI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13403,13 +16465,18 @@ fn pending_temperature_hi_temperature_hi_corpus_hs_positive() {
 #[test]
 fn pending_temperature_hi_temperature_hi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13426,13 +16493,18 @@ fn pending_temperature_hi_temperature_hi_corpus_hs_negative() {
 #[test]
 fn pending_temperature_hi_temperature_hi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HI/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13449,13 +16521,19 @@ fn pending_temperature_hi_temperature_hi_corpus_hs_latent() {
 #[test]
 fn pending_temperature_hr_temperature_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13472,13 +16550,18 @@ fn pending_temperature_hr_temperature_hr_corpus_hs_positive() {
 #[test]
 fn pending_temperature_hr_temperature_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13495,13 +16578,18 @@ fn pending_temperature_hr_temperature_hr_corpus_hs_negative() {
 #[test]
 fn pending_temperature_hr_temperature_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13518,13 +16606,19 @@ fn pending_temperature_hr_temperature_hr_corpus_hs_latent() {
 #[test]
 fn pending_temperature_it_temperature_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13541,13 +16635,18 @@ fn pending_temperature_it_temperature_it_corpus_hs_positive() {
 #[test]
 fn pending_temperature_it_temperature_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13564,13 +16663,18 @@ fn pending_temperature_it_temperature_it_corpus_hs_negative() {
 #[test]
 fn pending_temperature_it_temperature_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13587,13 +16691,19 @@ fn pending_temperature_it_temperature_it_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ja_temperature_ja_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/JA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13610,13 +16720,18 @@ fn pending_temperature_ja_temperature_ja_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ja_temperature_ja_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13633,13 +16748,18 @@ fn pending_temperature_ja_temperature_ja_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ja_temperature_ja_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13656,13 +16776,19 @@ fn pending_temperature_ja_temperature_ja_corpus_hs_latent() {
 #[test]
 fn pending_temperature_km_temperature_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13679,13 +16805,18 @@ fn pending_temperature_km_temperature_km_corpus_hs_positive() {
 #[test]
 fn pending_temperature_km_temperature_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13702,13 +16833,18 @@ fn pending_temperature_km_temperature_km_corpus_hs_negative() {
 #[test]
 fn pending_temperature_km_temperature_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13725,13 +16861,19 @@ fn pending_temperature_km_temperature_km_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ko_temperature_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13748,13 +16890,18 @@ fn pending_temperature_ko_temperature_ko_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ko_temperature_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13771,13 +16918,18 @@ fn pending_temperature_ko_temperature_ko_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ko_temperature_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13794,13 +16946,19 @@ fn pending_temperature_ko_temperature_ko_corpus_hs_latent() {
 #[test]
 fn pending_temperature_mn_temperature_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13817,13 +16975,18 @@ fn pending_temperature_mn_temperature_mn_corpus_hs_positive() {
 #[test]
 fn pending_temperature_mn_temperature_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13840,13 +17003,18 @@ fn pending_temperature_mn_temperature_mn_corpus_hs_negative() {
 #[test]
 fn pending_temperature_mn_temperature_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13863,13 +17031,19 @@ fn pending_temperature_mn_temperature_mn_corpus_hs_latent() {
 #[test]
 fn pending_temperature_pt_temperature_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13886,13 +17060,18 @@ fn pending_temperature_pt_temperature_pt_corpus_hs_positive() {
 #[test]
 fn pending_temperature_pt_temperature_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13909,13 +17088,18 @@ fn pending_temperature_pt_temperature_pt_corpus_hs_negative() {
 #[test]
 fn pending_temperature_pt_temperature_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13932,13 +17116,19 @@ fn pending_temperature_pt_temperature_pt_corpus_hs_latent() {
 #[test]
 fn pending_temperature_ro_temperature_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13955,13 +17145,18 @@ fn pending_temperature_ro_temperature_ro_corpus_hs_positive() {
 #[test]
 fn pending_temperature_ro_temperature_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -13978,13 +17173,18 @@ fn pending_temperature_ro_temperature_ro_corpus_hs_negative() {
 #[test]
 fn pending_temperature_ro_temperature_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14001,13 +17201,19 @@ fn pending_temperature_ro_temperature_ro_corpus_hs_latent() {
 #[test]
 fn pending_temperature_tr_temperature_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14024,13 +17230,18 @@ fn pending_temperature_tr_temperature_tr_corpus_hs_positive() {
 #[test]
 fn pending_temperature_tr_temperature_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14047,13 +17258,18 @@ fn pending_temperature_tr_temperature_tr_corpus_hs_negative() {
 #[test]
 fn pending_temperature_tr_temperature_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14070,13 +17286,19 @@ fn pending_temperature_tr_temperature_tr_corpus_hs_latent() {
 #[test]
 fn pending_temperature_zh_temperature_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Temperature/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14093,13 +17315,18 @@ fn pending_temperature_zh_temperature_zh_corpus_hs_positive() {
 #[test]
 fn pending_temperature_zh_temperature_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14116,13 +17343,18 @@ fn pending_temperature_zh_temperature_zh_corpus_hs_negative() {
 #[test]
 fn pending_temperature_zh_temperature_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Temperature/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Temperature");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14139,13 +17371,19 @@ fn pending_temperature_zh_temperature_zh_corpus_hs_latent() {
 #[test]
 fn pending_time_ar_time_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14162,13 +17400,18 @@ fn pending_time_ar_time_ar_corpus_hs_positive() {
 #[test]
 fn pending_time_ar_time_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14185,13 +17428,18 @@ fn pending_time_ar_time_ar_corpus_hs_negative() {
 #[test]
 fn pending_time_ar_time_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14208,13 +17456,19 @@ fn pending_time_ar_time_ar_corpus_hs_latent() {
 #[test]
 fn pending_time_bg_time_bg_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/BG/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/BG/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14231,13 +17485,18 @@ fn pending_time_bg_time_bg_corpus_hs_positive() {
 #[test]
 fn pending_time_bg_time_bg_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14254,13 +17513,18 @@ fn pending_time_bg_time_bg_corpus_hs_negative() {
 #[test]
 fn pending_time_bg_time_bg_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/BG/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/BG/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("BG"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14277,13 +17541,19 @@ fn pending_time_bg_time_bg_corpus_hs_latent() {
 #[test]
 fn pending_time_ca_time_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14300,13 +17570,18 @@ fn pending_time_ca_time_ca_corpus_hs_positive() {
 #[test]
 fn pending_time_ca_time_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14323,13 +17598,18 @@ fn pending_time_ca_time_ca_corpus_hs_negative() {
 #[test]
 fn pending_time_ca_time_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14346,13 +17626,18 @@ fn pending_time_ca_time_ca_corpus_hs_latent() {
 #[test]
 fn pending_time_common_time_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14369,13 +17654,18 @@ fn pending_time_common_time_corpus_hs_positive() {
 #[test]
 fn pending_time_common_time_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14392,13 +17682,18 @@ fn pending_time_common_time_corpus_hs_negative() {
 #[test]
 fn pending_time_common_time_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("COMMON"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14415,13 +17710,19 @@ fn pending_time_common_time_corpus_hs_latent() {
 #[test]
 fn pending_time_da_time_da_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/DA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/DA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14438,13 +17739,18 @@ fn pending_time_da_time_da_corpus_hs_positive() {
 #[test]
 fn pending_time_da_time_da_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14461,13 +17767,18 @@ fn pending_time_da_time_da_corpus_hs_negative() {
 #[test]
 fn pending_time_da_time_da_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14484,13 +17795,19 @@ fn pending_time_da_time_da_corpus_hs_latent() {
 #[test]
 fn pending_time_de_time_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14507,13 +17824,18 @@ fn pending_time_de_time_de_corpus_hs_positive() {
 #[test]
 fn pending_time_de_time_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14530,13 +17852,18 @@ fn pending_time_de_time_de_corpus_hs_negative() {
 #[test]
 fn pending_time_de_time_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14553,13 +17880,19 @@ fn pending_time_de_time_de_corpus_hs_latent() {
 #[test]
 fn pending_time_el_time_el_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14576,13 +17909,18 @@ fn pending_time_el_time_el_corpus_hs_positive() {
 #[test]
 fn pending_time_el_time_el_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14599,13 +17937,18 @@ fn pending_time_el_time_el_corpus_hs_negative() {
 #[test]
 fn pending_time_el_time_el_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14622,13 +17965,19 @@ fn pending_time_el_time_el_corpus_hs_latent() {
 #[test]
 fn pending_time_en_au_time_en_au_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/AU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14645,13 +17994,18 @@ fn pending_time_en_au_time_en_au_corpus_hs_positive() {
 #[test]
 fn pending_time_en_au_time_en_au_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14668,13 +18022,18 @@ fn pending_time_en_au_time_en_au_corpus_hs_negative() {
 #[test]
 fn pending_time_en_au_time_en_au_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/AU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("AU"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14691,13 +18050,19 @@ fn pending_time_en_au_time_en_au_corpus_hs_latent() {
 #[test]
 fn pending_time_en_bz_time_en_bz_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14714,13 +18079,18 @@ fn pending_time_en_bz_time_en_bz_corpus_hs_positive() {
 #[test]
 fn pending_time_en_bz_time_en_bz_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14737,13 +18107,18 @@ fn pending_time_en_bz_time_en_bz_corpus_hs_negative() {
 #[test]
 fn pending_time_en_bz_time_en_bz_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/BZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("BZ"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14760,13 +18135,19 @@ fn pending_time_en_bz_time_en_bz_corpus_hs_latent() {
 #[test]
 fn pending_time_en_ca_time_en_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14783,13 +18164,18 @@ fn pending_time_en_ca_time_en_ca_corpus_hs_positive() {
 #[test]
 fn pending_time_en_ca_time_en_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14806,13 +18192,18 @@ fn pending_time_en_ca_time_en_ca_corpus_hs_negative() {
 #[test]
 fn pending_time_en_ca_time_en_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("CA"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14829,13 +18220,19 @@ fn pending_time_en_ca_time_en_ca_corpus_hs_latent() {
 #[test]
 fn pending_time_en_gb_time_en_gb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/GB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14852,13 +18249,18 @@ fn pending_time_en_gb_time_en_gb_corpus_hs_positive() {
 #[test]
 fn pending_time_en_gb_time_en_gb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14875,13 +18277,18 @@ fn pending_time_en_gb_time_en_gb_corpus_hs_negative() {
 #[test]
 fn pending_time_en_gb_time_en_gb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/GB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("GB"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14898,13 +18305,19 @@ fn pending_time_en_gb_time_en_gb_corpus_hs_latent() {
 #[test]
 fn pending_time_en_ie_time_en_ie_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/IE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14921,13 +18334,18 @@ fn pending_time_en_ie_time_en_ie_corpus_hs_positive() {
 #[test]
 fn pending_time_en_ie_time_en_ie_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14944,13 +18362,18 @@ fn pending_time_en_ie_time_en_ie_corpus_hs_negative() {
 #[test]
 fn pending_time_en_ie_time_en_ie_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IE"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14967,13 +18390,19 @@ fn pending_time_en_ie_time_en_ie_corpus_hs_latent() {
 #[test]
 fn pending_time_en_in_time_en_in_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/IN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -14990,13 +18419,18 @@ fn pending_time_en_in_time_en_in_corpus_hs_positive() {
 #[test]
 fn pending_time_en_in_time_en_in_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15013,13 +18447,18 @@ fn pending_time_en_in_time_en_in_corpus_hs_negative() {
 #[test]
 fn pending_time_en_in_time_en_in_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/IN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("IN"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15036,13 +18475,19 @@ fn pending_time_en_in_time_en_in_corpus_hs_latent() {
 #[test]
 fn pending_time_en_jm_time_en_jm_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/JM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15059,13 +18504,18 @@ fn pending_time_en_jm_time_en_jm_corpus_hs_positive() {
 #[test]
 fn pending_time_en_jm_time_en_jm_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15082,13 +18532,18 @@ fn pending_time_en_jm_time_en_jm_corpus_hs_negative() {
 #[test]
 fn pending_time_en_jm_time_en_jm_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/JM/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("JM"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15105,13 +18560,19 @@ fn pending_time_en_jm_time_en_jm_corpus_hs_latent() {
 #[test]
 fn pending_time_en_nz_time_en_nz_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15128,13 +18589,18 @@ fn pending_time_en_nz_time_en_nz_corpus_hs_positive() {
 #[test]
 fn pending_time_en_nz_time_en_nz_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15151,13 +18617,18 @@ fn pending_time_en_nz_time_en_nz_corpus_hs_negative() {
 #[test]
 fn pending_time_en_nz_time_en_nz_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/NZ/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("NZ"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15174,13 +18645,19 @@ fn pending_time_en_nz_time_en_nz_corpus_hs_latent() {
 #[test]
 fn pending_time_en_ph_time_en_ph_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/PH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15197,13 +18674,18 @@ fn pending_time_en_ph_time_en_ph_corpus_hs_positive() {
 #[test]
 fn pending_time_en_ph_time_en_ph_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15220,13 +18702,18 @@ fn pending_time_en_ph_time_en_ph_corpus_hs_negative() {
 #[test]
 fn pending_time_en_ph_time_en_ph_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/PH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("PH"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15243,13 +18730,19 @@ fn pending_time_en_ph_time_en_ph_corpus_hs_latent() {
 #[test]
 fn pending_time_en_tt_time_en_tt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/TT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15266,13 +18759,18 @@ fn pending_time_en_tt_time_en_tt_corpus_hs_positive() {
 #[test]
 fn pending_time_en_tt_time_en_tt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15289,13 +18787,18 @@ fn pending_time_en_tt_time_en_tt_corpus_hs_negative() {
 #[test]
 fn pending_time_en_tt_time_en_tt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/TT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("TT"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15312,13 +18815,19 @@ fn pending_time_en_tt_time_en_tt_corpus_hs_latent() {
 #[test]
 fn pending_time_en_us_time_en_us_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/US/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15335,13 +18844,18 @@ fn pending_time_en_us_time_en_us_corpus_hs_positive() {
 #[test]
 fn pending_time_en_us_time_en_us_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15358,13 +18872,18 @@ fn pending_time_en_us_time_en_us_corpus_hs_negative() {
 #[test]
 fn pending_time_en_us_time_en_us_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/US/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("US"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15381,13 +18900,19 @@ fn pending_time_en_us_time_en_us_corpus_hs_latent() {
 #[test]
 fn pending_time_en_za_time_en_za_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15404,13 +18929,18 @@ fn pending_time_en_za_time_en_za_corpus_hs_positive() {
 #[test]
 fn pending_time_en_za_time_en_za_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15427,13 +18957,18 @@ fn pending_time_en_za_time_en_za_corpus_hs_negative() {
 #[test]
 fn pending_time_en_za_time_en_za_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/EN/ZA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("EN"), region_from_code("ZA"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15450,13 +18985,19 @@ fn pending_time_en_za_time_en_za_corpus_hs_latent() {
 #[test]
 fn pending_time_es_time_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15473,13 +19014,18 @@ fn pending_time_es_time_es_corpus_hs_positive() {
 #[test]
 fn pending_time_es_time_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15496,13 +19042,18 @@ fn pending_time_es_time_es_corpus_hs_negative() {
 #[test]
 fn pending_time_es_time_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15519,13 +19070,19 @@ fn pending_time_es_time_es_corpus_hs_latent() {
 #[test]
 fn pending_time_fr_time_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15542,13 +19099,18 @@ fn pending_time_fr_time_fr_corpus_hs_positive() {
 #[test]
 fn pending_time_fr_time_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15565,13 +19127,18 @@ fn pending_time_fr_time_fr_corpus_hs_negative() {
 #[test]
 fn pending_time_fr_time_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15588,13 +19155,19 @@ fn pending_time_fr_time_fr_corpus_hs_latent() {
 #[test]
 fn pending_time_ga_time_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15611,13 +19184,18 @@ fn pending_time_ga_time_ga_corpus_hs_positive() {
 #[test]
 fn pending_time_ga_time_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15634,13 +19212,18 @@ fn pending_time_ga_time_ga_corpus_hs_negative() {
 #[test]
 fn pending_time_ga_time_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15657,13 +19240,19 @@ fn pending_time_ga_time_ga_corpus_hs_latent() {
 #[test]
 fn pending_time_he_time_he_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/HE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/HE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15680,13 +19269,18 @@ fn pending_time_he_time_he_corpus_hs_positive() {
 #[test]
 fn pending_time_he_time_he_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15703,13 +19297,18 @@ fn pending_time_he_time_he_corpus_hs_negative() {
 #[test]
 fn pending_time_he_time_he_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15726,13 +19325,19 @@ fn pending_time_he_time_he_corpus_hs_latent() {
 #[test]
 fn pending_time_hr_time_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15749,13 +19354,18 @@ fn pending_time_hr_time_hr_corpus_hs_positive() {
 #[test]
 fn pending_time_hr_time_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15772,13 +19382,18 @@ fn pending_time_hr_time_hr_corpus_hs_negative() {
 #[test]
 fn pending_time_hr_time_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15795,13 +19410,19 @@ fn pending_time_hr_time_hr_corpus_hs_latent() {
 #[test]
 fn pending_time_hu_time_hu_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/HU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/HU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15818,13 +19439,18 @@ fn pending_time_hu_time_hu_corpus_hs_positive() {
 #[test]
 fn pending_time_hu_time_hu_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15841,13 +19467,18 @@ fn pending_time_hu_time_hu_corpus_hs_negative() {
 #[test]
 fn pending_time_hu_time_hu_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/HU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/HU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("HU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15864,13 +19495,19 @@ fn pending_time_hu_time_hu_corpus_hs_latent() {
 #[test]
 fn pending_time_it_time_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15887,13 +19524,18 @@ fn pending_time_it_time_it_corpus_hs_positive() {
 #[test]
 fn pending_time_it_time_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15910,13 +19552,18 @@ fn pending_time_it_time_it_corpus_hs_negative() {
 #[test]
 fn pending_time_it_time_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15933,13 +19580,19 @@ fn pending_time_it_time_it_corpus_hs_latent() {
 #[test]
 fn pending_time_ja_time_ja_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/JA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/JA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15956,13 +19609,18 @@ fn pending_time_ja_time_ja_corpus_hs_positive() {
 #[test]
 fn pending_time_ja_time_ja_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -15979,13 +19637,18 @@ fn pending_time_ja_time_ja_corpus_hs_negative() {
 #[test]
 fn pending_time_ja_time_ja_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/JA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/JA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("JA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16002,13 +19665,19 @@ fn pending_time_ja_time_ja_corpus_hs_latent() {
 #[test]
 fn pending_time_ka_time_ka_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/KA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/KA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16025,13 +19694,18 @@ fn pending_time_ka_time_ka_corpus_hs_positive() {
 #[test]
 fn pending_time_ka_time_ka_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16048,13 +19722,18 @@ fn pending_time_ka_time_ka_corpus_hs_negative() {
 #[test]
 fn pending_time_ka_time_ka_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KA/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16071,13 +19750,19 @@ fn pending_time_ka_time_ka_corpus_hs_latent() {
 #[test]
 fn pending_time_ko_time_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16094,13 +19779,18 @@ fn pending_time_ko_time_ko_corpus_hs_positive() {
 #[test]
 fn pending_time_ko_time_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16117,13 +19807,18 @@ fn pending_time_ko_time_ko_corpus_hs_negative() {
 #[test]
 fn pending_time_ko_time_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16140,13 +19835,19 @@ fn pending_time_ko_time_ko_corpus_hs_latent() {
 #[test]
 fn pending_time_nb_time_nb_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/NB/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/NB/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16163,13 +19864,18 @@ fn pending_time_nb_time_nb_corpus_hs_positive() {
 #[test]
 fn pending_time_nb_time_nb_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16186,13 +19892,18 @@ fn pending_time_nb_time_nb_corpus_hs_negative() {
 #[test]
 fn pending_time_nb_time_nb_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NB/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NB/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NB"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16209,13 +19920,19 @@ fn pending_time_nb_time_nb_corpus_hs_latent() {
 #[test]
 fn pending_time_nl_be_time_nl_be_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("BE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/NL/BE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16232,13 +19949,18 @@ fn pending_time_nl_be_time_nl_be_corpus_hs_positive() {
 #[test]
 fn pending_time_nl_be_time_nl_be_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("BE"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16255,13 +19977,18 @@ fn pending_time_nl_be_time_nl_be_corpus_hs_negative() {
 #[test]
 fn pending_time_nl_be_time_nl_be_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/BE/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("BE"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16278,13 +20005,19 @@ fn pending_time_nl_be_time_nl_be_corpus_hs_latent() {
 #[test]
 fn pending_time_nl_time_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16301,13 +20034,18 @@ fn pending_time_nl_time_nl_corpus_hs_positive() {
 #[test]
 fn pending_time_nl_time_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16324,13 +20062,18 @@ fn pending_time_nl_time_nl_corpus_hs_negative() {
 #[test]
 fn pending_time_nl_time_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16347,13 +20090,19 @@ fn pending_time_nl_time_nl_corpus_hs_latent() {
 #[test]
 fn pending_time_pl_time_pl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/PL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/PL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16370,13 +20119,18 @@ fn pending_time_pl_time_pl_corpus_hs_positive() {
 #[test]
 fn pending_time_pl_time_pl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16393,13 +20147,18 @@ fn pending_time_pl_time_pl_corpus_hs_negative() {
 #[test]
 fn pending_time_pl_time_pl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PL/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16416,13 +20175,19 @@ fn pending_time_pl_time_pl_corpus_hs_latent() {
 #[test]
 fn pending_time_pt_time_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16439,13 +20204,18 @@ fn pending_time_pt_time_pt_corpus_hs_positive() {
 #[test]
 fn pending_time_pt_time_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16462,13 +20232,18 @@ fn pending_time_pt_time_pt_corpus_hs_negative() {
 #[test]
 fn pending_time_pt_time_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16485,13 +20260,19 @@ fn pending_time_pt_time_pt_corpus_hs_latent() {
 #[test]
 fn pending_time_ro_time_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16508,13 +20289,18 @@ fn pending_time_ro_time_ro_corpus_hs_positive() {
 #[test]
 fn pending_time_ro_time_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16531,13 +20317,18 @@ fn pending_time_ro_time_ro_corpus_hs_negative() {
 #[test]
 fn pending_time_ro_time_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16554,13 +20345,19 @@ fn pending_time_ro_time_ro_corpus_hs_latent() {
 #[test]
 fn pending_time_ru_time_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16577,13 +20374,18 @@ fn pending_time_ru_time_ru_corpus_hs_positive() {
 #[test]
 fn pending_time_ru_time_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16600,13 +20402,18 @@ fn pending_time_ru_time_ru_corpus_hs_negative() {
 #[test]
 fn pending_time_ru_time_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16623,13 +20430,19 @@ fn pending_time_ru_time_ru_corpus_hs_latent() {
 #[test]
 fn pending_time_sv_time_sv_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/SV/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/SV/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16646,13 +20459,18 @@ fn pending_time_sv_time_sv_corpus_hs_positive() {
 #[test]
 fn pending_time_sv_time_sv_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16669,13 +20487,18 @@ fn pending_time_sv_time_sv_corpus_hs_negative() {
 #[test]
 fn pending_time_sv_time_sv_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/SV/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/SV/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("SV"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16692,13 +20515,19 @@ fn pending_time_sv_time_sv_corpus_hs_latent() {
 #[test]
 fn pending_time_tr_time_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16715,13 +20544,18 @@ fn pending_time_tr_time_tr_corpus_hs_positive() {
 #[test]
 fn pending_time_tr_time_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16738,13 +20572,18 @@ fn pending_time_tr_time_tr_corpus_hs_negative() {
 #[test]
 fn pending_time_tr_time_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16761,13 +20600,19 @@ fn pending_time_tr_time_tr_corpus_hs_latent() {
 #[test]
 fn pending_time_uk_time_uk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/UK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/UK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16784,13 +20629,18 @@ fn pending_time_uk_time_uk_corpus_hs_positive() {
 #[test]
 fn pending_time_uk_time_uk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16807,13 +20657,18 @@ fn pending_time_uk_time_uk_corpus_hs_negative() {
 #[test]
 fn pending_time_uk_time_uk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/UK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/UK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("UK"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16830,13 +20685,19 @@ fn pending_time_uk_time_uk_corpus_hs_latent() {
 #[test]
 fn pending_time_vi_time_vi_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/VI/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/VI/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16853,13 +20714,18 @@ fn pending_time_vi_time_vi_corpus_hs_positive() {
 #[test]
 fn pending_time_vi_time_vi_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16876,13 +20742,18 @@ fn pending_time_vi_time_vi_corpus_hs_negative() {
 #[test]
 fn pending_time_vi_time_vi_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/VI/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/VI/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("VI"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16899,13 +20770,19 @@ fn pending_time_vi_time_vi_corpus_hs_latent() {
 #[test]
 fn pending_time_zh_cn_time_zh_cn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("CN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16922,13 +20799,18 @@ fn pending_time_zh_cn_time_zh_cn_corpus_hs_positive() {
 #[test]
 fn pending_time_zh_cn_time_zh_cn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("CN"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16945,13 +20827,18 @@ fn pending_time_zh_cn_time_zh_cn_corpus_hs_negative() {
 #[test]
 fn pending_time_zh_cn_time_zh_cn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/CN/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("CN"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16968,13 +20855,19 @@ fn pending_time_zh_cn_time_zh_cn_corpus_hs_latent() {
 #[test]
 fn pending_time_zh_time_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -16991,13 +20884,18 @@ fn pending_time_zh_time_zh_corpus_hs_positive() {
 #[test]
 fn pending_time_zh_time_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17014,13 +20912,18 @@ fn pending_time_zh_time_zh_corpus_hs_negative() {
 #[test]
 fn pending_time_zh_time_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17037,13 +20940,19 @@ fn pending_time_zh_time_zh_corpus_hs_latent() {
 #[test]
 fn pending_time_zh_hk_time_zh_hk_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("HK"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17060,13 +20969,18 @@ fn pending_time_zh_hk_time_zh_hk_corpus_hs_positive() {
 #[test]
 fn pending_time_zh_hk_time_zh_hk_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("HK"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17083,13 +20997,18 @@ fn pending_time_zh_hk_time_zh_hk_corpus_hs_negative() {
 #[test]
 fn pending_time_zh_hk_time_zh_hk_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/HK/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("HK"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17106,13 +21025,19 @@ fn pending_time_zh_hk_time_zh_hk_corpus_hs_latent() {
 #[test]
 fn pending_time_zh_mo_time_zh_mo_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("MO"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17129,13 +21054,18 @@ fn pending_time_zh_mo_time_zh_mo_corpus_hs_positive() {
 #[test]
 fn pending_time_zh_mo_time_zh_mo_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("MO"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17152,13 +21082,18 @@ fn pending_time_zh_mo_time_zh_mo_corpus_hs_negative() {
 #[test]
 fn pending_time_zh_mo_time_zh_mo_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/MO/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("MO"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17175,13 +21110,19 @@ fn pending_time_zh_mo_time_zh_mo_corpus_hs_latent() {
 #[test]
 fn pending_time_zh_tw_time_zh_tw_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("TW"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17198,13 +21139,18 @@ fn pending_time_zh_tw_time_zh_tw_corpus_hs_positive() {
 #[test]
 fn pending_time_zh_tw_time_zh_tw_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("TW"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17221,13 +21167,18 @@ fn pending_time_zh_tw_time_zh_tw_corpus_hs_negative() {
 #[test]
 fn pending_time_zh_tw_time_zh_tw_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Time/ZH/TW/Corpus.hs"
+    );
     let dim = dim_from_name("Time");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("TW"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17244,13 +21195,19 @@ fn pending_time_zh_tw_time_zh_tw_corpus_hs_latent() {
 #[test]
 fn pending_volume_ar_volume_ar_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/AR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/AR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17267,13 +21224,18 @@ fn pending_volume_ar_volume_ar_corpus_hs_positive() {
 #[test]
 fn pending_volume_ar_volume_ar_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17290,13 +21252,18 @@ fn pending_volume_ar_volume_ar_corpus_hs_negative() {
 #[test]
 fn pending_volume_ar_volume_ar_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/AR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/AR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("AR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17313,13 +21280,19 @@ fn pending_volume_ar_volume_ar_corpus_hs_latent() {
 #[test]
 fn pending_volume_ca_volume_ca_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/CA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/CA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17336,13 +21309,18 @@ fn pending_volume_ca_volume_ca_corpus_hs_positive() {
 #[test]
 fn pending_volume_ca_volume_ca_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17359,13 +21337,18 @@ fn pending_volume_ca_volume_ca_corpus_hs_negative() {
 #[test]
 fn pending_volume_ca_volume_ca_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/CA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/CA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("CA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17382,13 +21365,19 @@ fn pending_volume_ca_volume_ca_corpus_hs_latent() {
 #[test]
 fn pending_volume_de_volume_de_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/DE/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/DE/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17405,13 +21394,18 @@ fn pending_volume_de_volume_de_corpus_hs_positive() {
 #[test]
 fn pending_volume_de_volume_de_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17428,13 +21422,18 @@ fn pending_volume_de_volume_de_corpus_hs_negative() {
 #[test]
 fn pending_volume_de_volume_de_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/DE/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/DE/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("DE"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17451,13 +21450,19 @@ fn pending_volume_de_volume_de_corpus_hs_latent() {
 #[test]
 fn pending_volume_es_volume_es_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/ES/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/ES/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17474,13 +21479,18 @@ fn pending_volume_es_volume_es_corpus_hs_positive() {
 #[test]
 fn pending_volume_es_volume_es_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17497,13 +21507,18 @@ fn pending_volume_es_volume_es_corpus_hs_negative() {
 #[test]
 fn pending_volume_es_volume_es_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ES/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ES/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ES"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17520,13 +21535,19 @@ fn pending_volume_es_volume_es_corpus_hs_latent() {
 #[test]
 fn pending_volume_fr_volume_fr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/FR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/FR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17543,13 +21564,18 @@ fn pending_volume_fr_volume_fr_corpus_hs_positive() {
 #[test]
 fn pending_volume_fr_volume_fr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17566,13 +21592,18 @@ fn pending_volume_fr_volume_fr_corpus_hs_negative() {
 #[test]
 fn pending_volume_fr_volume_fr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/FR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/FR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("FR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17589,13 +21620,19 @@ fn pending_volume_fr_volume_fr_corpus_hs_latent() {
 #[test]
 fn pending_volume_ga_volume_ga_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/GA/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/GA/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17612,13 +21649,18 @@ fn pending_volume_ga_volume_ga_corpus_hs_positive() {
 #[test]
 fn pending_volume_ga_volume_ga_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17635,13 +21677,18 @@ fn pending_volume_ga_volume_ga_corpus_hs_negative() {
 #[test]
 fn pending_volume_ga_volume_ga_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/GA/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/GA/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("GA"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17658,13 +21705,19 @@ fn pending_volume_ga_volume_ga_corpus_hs_latent() {
 #[test]
 fn pending_volume_hr_volume_hr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/HR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/HR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17681,13 +21734,18 @@ fn pending_volume_hr_volume_hr_corpus_hs_positive() {
 #[test]
 fn pending_volume_hr_volume_hr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17704,13 +21762,18 @@ fn pending_volume_hr_volume_hr_corpus_hs_negative() {
 #[test]
 fn pending_volume_hr_volume_hr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/HR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/HR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("HR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17727,13 +21790,19 @@ fn pending_volume_hr_volume_hr_corpus_hs_latent() {
 #[test]
 fn pending_volume_it_volume_it_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/IT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/IT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17750,13 +21819,18 @@ fn pending_volume_it_volume_it_corpus_hs_positive() {
 #[test]
 fn pending_volume_it_volume_it_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17773,13 +21847,18 @@ fn pending_volume_it_volume_it_corpus_hs_negative() {
 #[test]
 fn pending_volume_it_volume_it_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/IT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/IT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("IT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17796,13 +21875,19 @@ fn pending_volume_it_volume_it_corpus_hs_latent() {
 #[test]
 fn pending_volume_km_volume_km_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/KM/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/KM/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17819,13 +21904,18 @@ fn pending_volume_km_volume_km_corpus_hs_positive() {
 #[test]
 fn pending_volume_km_volume_km_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17842,13 +21932,18 @@ fn pending_volume_km_volume_km_corpus_hs_negative() {
 #[test]
 fn pending_volume_km_volume_km_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KM/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KM/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KM"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17865,13 +21960,19 @@ fn pending_volume_km_volume_km_corpus_hs_latent() {
 #[test]
 fn pending_volume_ko_volume_ko_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/KO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/KO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17888,13 +21989,18 @@ fn pending_volume_ko_volume_ko_corpus_hs_positive() {
 #[test]
 fn pending_volume_ko_volume_ko_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17911,13 +22017,18 @@ fn pending_volume_ko_volume_ko_corpus_hs_negative() {
 #[test]
 fn pending_volume_ko_volume_ko_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/KO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/KO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("KO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17934,13 +22045,19 @@ fn pending_volume_ko_volume_ko_corpus_hs_latent() {
 #[test]
 fn pending_volume_mn_volume_mn_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/MN/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/MN/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17957,13 +22074,18 @@ fn pending_volume_mn_volume_mn_corpus_hs_positive() {
 #[test]
 fn pending_volume_mn_volume_mn_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -17980,13 +22102,18 @@ fn pending_volume_mn_volume_mn_corpus_hs_negative() {
 #[test]
 fn pending_volume_mn_volume_mn_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/MN/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/MN/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("MN"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18003,13 +22130,19 @@ fn pending_volume_mn_volume_mn_corpus_hs_latent() {
 #[test]
 fn pending_volume_nl_volume_nl_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/NL/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/NL/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18026,13 +22159,18 @@ fn pending_volume_nl_volume_nl_corpus_hs_positive() {
 #[test]
 fn pending_volume_nl_volume_nl_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18049,13 +22187,18 @@ fn pending_volume_nl_volume_nl_corpus_hs_negative() {
 #[test]
 fn pending_volume_nl_volume_nl_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/NL/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/NL/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("NL"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18072,13 +22215,19 @@ fn pending_volume_nl_volume_nl_corpus_hs_latent() {
 #[test]
 fn pending_volume_pt_volume_pt_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/PT/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/PT/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18095,13 +22244,18 @@ fn pending_volume_pt_volume_pt_corpus_hs_positive() {
 #[test]
 fn pending_volume_pt_volume_pt_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18118,13 +22272,18 @@ fn pending_volume_pt_volume_pt_corpus_hs_negative() {
 #[test]
 fn pending_volume_pt_volume_pt_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/PT/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/PT/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("PT"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18141,13 +22300,19 @@ fn pending_volume_pt_volume_pt_corpus_hs_latent() {
 #[test]
 fn pending_volume_ro_volume_ro_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/RO/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/RO/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18164,13 +22329,18 @@ fn pending_volume_ro_volume_ro_corpus_hs_positive() {
 #[test]
 fn pending_volume_ro_volume_ro_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18187,13 +22357,18 @@ fn pending_volume_ro_volume_ro_corpus_hs_negative() {
 #[test]
 fn pending_volume_ro_volume_ro_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RO/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RO/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RO"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18210,13 +22385,19 @@ fn pending_volume_ro_volume_ro_corpus_hs_latent() {
 #[test]
 fn pending_volume_ru_volume_ru_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/RU/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/RU/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18233,13 +22414,18 @@ fn pending_volume_ru_volume_ru_corpus_hs_positive() {
 #[test]
 fn pending_volume_ru_volume_ru_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18256,13 +22442,18 @@ fn pending_volume_ru_volume_ru_corpus_hs_negative() {
 #[test]
 fn pending_volume_ru_volume_ru_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/RU/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/RU/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("RU"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18279,13 +22470,19 @@ fn pending_volume_ru_volume_ru_corpus_hs_latent() {
 #[test]
 fn pending_volume_tr_volume_tr_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/TR/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/TR/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18302,13 +22499,18 @@ fn pending_volume_tr_volume_tr_corpus_hs_positive() {
 #[test]
 fn pending_volume_tr_volume_tr_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18325,13 +22527,18 @@ fn pending_volume_tr_volume_tr_corpus_hs_negative() {
 #[test]
 fn pending_volume_tr_volume_tr_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/TR/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/TR/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("TR"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18348,13 +22555,19 @@ fn pending_volume_tr_volume_tr_corpus_hs_latent() {
 #[test]
 fn pending_volume_zh_volume_zh_corpus_hs_positive() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_all_examples_strings(corpus);
-    assert!(!utterances.is_empty(), "No utterances extracted from haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
+    assert!(
+        !utterances.is_empty(),
+        "No utterances extracted from haskell_upstream/Duckling/Volume/ZH/Corpus.hs"
+    );
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18371,13 +22584,18 @@ fn pending_volume_zh_volume_zh_corpus_hs_positive() {
 #[test]
 fn pending_volume_zh_volume_zh_corpus_hs_negative() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options::default();
     let utterances = extract_negative_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);
@@ -18394,13 +22612,18 @@ fn pending_volume_zh_volume_zh_corpus_hs_negative() {
 #[test]
 fn pending_volume_zh_volume_zh_corpus_hs_latent() {
     let corpus = include_str!("haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
-    assert!(has_content(corpus), "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs");
+    assert!(
+        has_content(corpus),
+        "Corpus fixture is empty: haskell_upstream/Duckling/Volume/ZH/Corpus.hs"
+    );
     let dim = dim_from_name("Volume");
     let locale = Locale::new(lang_from_code("ZH"), region_from_code("-"));
     let ctx = parse_context(locale);
     let options = Options { with_latent: true };
     let utterances = extract_latent_examples_strings(corpus);
-    if utterances.is_empty() { return; }
+    if utterances.is_empty() {
+        return;
+    }
     for utterance in utterances {
         let entities = parse(&utterance, &locale, &[dim], &ctx, &options);
         let has_dim = entities.iter().any(|e| e.value.dim_kind() == dim);

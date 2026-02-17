@@ -115,9 +115,9 @@ impl Grain {
             Grain::Hour => n.checked_mul(3600),
             Grain::Day => n.checked_mul(86400),
             Grain::Week => n.checked_mul(604800),
-            Grain::Month => n.checked_mul(2592000),   // 30 days
+            Grain::Month => n.checked_mul(2592000), // 30 days
             Grain::Quarter => n.checked_mul(7776000), // 90 days
-            Grain::Year => n.checked_mul(31536000),   // 365 days
+            Grain::Year => n.checked_mul(31536000), // 365 days
         }
     }
 

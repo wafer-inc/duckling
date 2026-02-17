@@ -70,12 +70,16 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("l(t|itre)")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("gal(l?on?)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
         Rule {
             name: "half".to_string(),

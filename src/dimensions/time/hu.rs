@@ -1,8 +1,8 @@
+use super::Direction;
+use super::{TimeData, TimeForm};
 use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::Direction;
-use super::{TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();
@@ -247,7 +247,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -280,7 +280,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),

@@ -51,7 +51,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("м(етър|етр(а|и))?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {

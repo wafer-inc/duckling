@@ -70,32 +70,44 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("л(итр(а|ов)?)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("галлон(а|ов)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
         Rule {
             name: "half liter".to_string(),
             pattern: vec![regex("поллитра|пол-литра|пол литра")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "one liter word".to_string(),
             pattern: vec![regex("один литр")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(1.0, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(1.0, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "two liters word".to_string(),
             pattern: vec![regex("два литра")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "one and a half liter".to_string(),
             pattern: vec![regex("полтора литра")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(1.5, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(1.5, VolumeUnit::Litre)))
+            }),
         },
     ]
 }

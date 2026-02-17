@@ -301,7 +301,11 @@ mod integration_tests {
                     if (*value - 10.0).abs() < 0.01
             )
         });
-        assert!(found, "Expected '$10' in non-EN locale, got: {:?}", entities);
+        assert!(
+            found,
+            "Expected '$10' in non-EN locale, got: {:?}",
+            entities
+        );
     }
 
     #[test]

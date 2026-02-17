@@ -45,7 +45,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<temp> Celsius".to_string(),
-            pattern: vec![is_value_only(true), regex("ceinteagr(á|a)d|c(el[cs]?(ius)?)?\\.?")],
+            pattern: vec![
+                is_value_only(true),
+                regex("ceinteagr(á|a)d|c(el[cs]?(ius)?)?\\.?"),
+            ],
             production: Box::new(|nodes| {
                 let td = temperature_data(&nodes[0].token_data)?;
                 Some(TokenData::Temperature(

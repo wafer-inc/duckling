@@ -23,7 +23,9 @@ fn cs_number_value(s: &str) -> Option<f64> {
 pub fn rules() -> Vec<Rule> {
     vec![Rule {
         name: "number (0..10)".to_string(),
-        pattern: vec![regex(r"(nula|jed(en|n[ao])|dv(a|ě|ĕ)|t(ř)i|(č)ty(ř)i|p(ě)t|(š)est|sedm|osm|dev(ě)t|deset)")],
+        pattern: vec![regex(
+            r"(nula|jed(en|n[ao])|dv(a|ě|ĕ)|t(ř)i|(č)ty(ř)i|p(ě)t|(š)est|sedm|osm|dev(ě)t|deset)",
+        )],
         production: Box::new(|nodes| {
             let s = match &nodes[0].token_data {
                 TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),

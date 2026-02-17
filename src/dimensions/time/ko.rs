@@ -1,7 +1,7 @@
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();
@@ -250,7 +250,7 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
                     month,
                     day,
-                    year: Some(1900 + year2),
+                    year: Some(1900_i32.checked_add(year2)?),
                 })))
             }),
         },
@@ -326,7 +326,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let year2: i32 = yy.parse().ok()?;
-                Some(TokenData::Time(TimeData::new(TimeForm::Year(2000 + year2))))
+                Some(TokenData::Time(TimeData::new(TimeForm::Year(2000_i32.checked_add(year2)?))))
             }),
         },
         Rule {
@@ -394,7 +394,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -670,7 +670,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if ap == "오후" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 } else if ap == "오전" && hour == 12 {
                     hour = 0;
                 }
@@ -704,7 +704,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if ap == "오후" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 } else if ap == "오전" && hour == 12 {
                     hour = 0;
                 }

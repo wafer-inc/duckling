@@ -108,7 +108,10 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Numeral(n) => n.value,
                     _ => return None,
                 };
-                Some(TokenData::Quantity(QuantityData::new(v * 500.0, QuantityUnit::Gram)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    v * 500.0,
+                    QuantityUnit::Gram,
+                )))
             }),
         },
         Rule {
@@ -119,7 +122,10 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Numeral(n) => n.value,
                     _ => return None,
                 };
-                Some(TokenData::Quantity(QuantityData::new(v * 100.0, QuantityUnit::Gram)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    v * 100.0,
+                    QuantityUnit::Gram,
+                )))
             }),
         },
         Rule {
@@ -190,7 +196,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<numeral> - <quantity>".to_string(),
-            pattern: vec![predicate(is_positive), regex("\\-"), predicate(is_simple_quantity)],
+            pattern: vec![
+                predicate(is_positive),
+                regex("\\-"),
+                predicate(is_simple_quantity),
+            ],
             production: Box::new(|nodes| {
                 let from = match &nodes[0].token_data {
                     TokenData::Numeral(n) => n.value,
@@ -255,7 +265,12 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "een <quantity> kopje".to_string(),
             pattern: vec![regex("een? (kopjes?)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Cup)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Cup,
+                )))
+            }),
         },
         Rule {
             name: "een <quantity> grams".to_string(),
@@ -302,12 +317,22 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "een <quantity> pond".to_string(),
             pattern: vec![regex("een? (pond(je(s)?)?)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(500.0, QuantityUnit::Gram)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    500.0,
+                    QuantityUnit::Gram,
+                )))
+            }),
         },
         Rule {
             name: "een <quantity> ons".to_string(),
             pattern: vec![regex("een? (ons(je(s)?)?)")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(100.0, QuantityUnit::Gram)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    100.0,
+                    QuantityUnit::Gram,
+                )))
+            }),
         },
     ]
 }

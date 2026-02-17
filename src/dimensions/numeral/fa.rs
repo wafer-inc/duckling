@@ -72,7 +72,9 @@ fn tens_hundreds(s: &str) -> Option<f64> {
 fn power(s: &str) -> Option<NumeralData> {
     match s {
         "هزار" => Some(NumeralData::new(1e3).with_grain(3).with_multipliable(true)),
-        "میلیون" | "ملیون" => Some(NumeralData::new(1e6).with_grain(6).with_multipliable(true)),
+        "میلیون" | "ملیون" => {
+            Some(NumeralData::new(1e6).with_grain(6).with_multipliable(true))
+        }
         "میلیارد" => Some(NumeralData::new(1e9).with_grain(9).with_multipliable(true)),
         _ => None,
     }

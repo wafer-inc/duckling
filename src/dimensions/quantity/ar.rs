@@ -133,7 +133,8 @@ fn pound_multiplier(unit: &str) -> Option<f64> {
 
 fn ounce_multiplier(unit: &str) -> Option<f64> {
     let u = unit.to_lowercase();
-    if ["أونصتان", "أونصتين", "اونصتان", "اونصتين"].contains(&u.as_str()) {
+    if ["أونصتان", "أونصتين", "اونصتان", "اونصتين"].contains(&u.as_str())
+    {
         Some(2.0)
     } else if u.contains("اونص") || u.contains("أونص") {
         Some(1.0)

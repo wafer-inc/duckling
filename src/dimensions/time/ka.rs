@@ -1,6 +1,6 @@
+use super::{Direction, PartOfDay, TimeData, TimeForm};
 use crate::pattern::{predicate, regex};
 use crate::types::{Rule, TokenData};
-use super::{Direction, PartOfDay, TimeData, TimeForm};
 
 fn is_dom_token(td: &TokenData) -> bool {
     match td {
@@ -17,7 +17,11 @@ fn dom_value(td: &TokenData) -> Option<u32> {
     match td {
         TokenData::Numeral(n) if (n.value - n.value.floor()).abs() < f64::EPSILON => {
             let v = n.value as i64;
-            if (1..=31).contains(&v) { Some(v as u32) } else { None }
+            if (1..=31).contains(&v) {
+                Some(v as u32)
+            } else {
+                None
+            }
         }
         TokenData::Ordinal(o) if (1..=31).contains(&o.value) => Some(o.value as u32),
         _ => None,
@@ -398,7 +402,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=24).contains(&hour) {
                     return None;
                 }
-                let out_hour = if hour == 24 { 23 } else { hour - 1 };
+                let out_hour = if hour == 24 { 23 } else { hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 30, false))))
             }),
         },
@@ -426,7 +430,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let days: i32 = d.parse().ok()?;
-                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: crate::dimensions::time_grain::Grain::Day, offset: -days })))
+                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: crate::dimensions::time_grain::Grain::Day, offset: days.checked_neg()? })))
             }),
         },
         Rule {

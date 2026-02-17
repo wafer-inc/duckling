@@ -1,8 +1,8 @@
-use crate::dimensions::time_grain::Grain;
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 use crate::dimensions::numeral::helpers::{is_natural, numeral_data};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, predicate, regex};
 use crate::types::{DimensionKind, Rule, TokenData};
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
 fn time_data(td: &TokenData) -> Option<&TimeData> {
     match td {
@@ -47,7 +47,13 @@ fn is_day_of_week(td: &TokenData) -> bool {
 
 fn parse_tr_number_word(s: &str) -> Option<u32> {
     let t = s.trim().to_lowercase();
-    let t = t.replace("ü", "u").replace("ö", "o").replace("ı", "i").replace("ş", "s").replace("ç", "c").replace("ğ", "g");
+    let t = t
+        .replace("ü", "u")
+        .replace("ö", "o")
+        .replace("ı", "i")
+        .replace("ş", "s")
+        .replace("ç", "c")
+        .replace("ğ", "g");
     let tokens: Vec<&str> = t.split_whitespace().collect();
     if tokens.is_empty() {
         return None;
@@ -82,17 +88,19 @@ fn parse_tr_number_word(s: &str) -> Option<u32> {
     }
     if tokens.len() == 2 {
         if let Some(tn) = tens(tokens[0]) {
-            return Some(tn + unit(tokens[1]).unwrap_or(0));
+            return Some(tn.checked_add(unit(tokens[1]).unwrap_or(0))?);
         }
         if tokens[0] == "on" {
-            return Some(10 + unit(tokens[1])?);
+            return Some(unit(tokens[1])?.checked_add(10)?);
         }
     }
     None
 }
 
 fn tr_month_num(s: &str) -> Option<u32> {
-    let t = s.trim().to_lowercase()
+    let t = s
+        .trim()
+        .to_lowercase()
         .replace("ı", "i")
         .replace("ş", "s")
         .replace("ç", "c")
@@ -100,19 +108,33 @@ fn tr_month_num(s: &str) -> Option<u32> {
         .replace("ö", "o")
         .replace("ü", "u")
         .replace(".", "");
-    if t.starts_with("ocak") { Some(1) }
-    else if t.starts_with("sub") { Some(2) }
-    else if t.starts_with("mart") { Some(3) }
-    else if t.starts_with("nisan") { Some(4) }
-    else if t.starts_with("may") { Some(5) }
-    else if t.starts_with("haz") { Some(6) }
-    else if t.starts_with("tem") { Some(7) }
-    else if t.starts_with("agu") { Some(8) }
-    else if t.starts_with("eyl") { Some(9) }
-    else if t.starts_with("ekim") { Some(10) }
-    else if t.starts_with("kas") { Some(11) }
-    else if t.starts_with("ara") { Some(12) }
-    else { None }
+    if t.starts_with("ocak") {
+        Some(1)
+    } else if t.starts_with("sub") {
+        Some(2)
+    } else if t.starts_with("mart") {
+        Some(3)
+    } else if t.starts_with("nisan") {
+        Some(4)
+    } else if t.starts_with("may") {
+        Some(5)
+    } else if t.starts_with("haz") {
+        Some(6)
+    } else if t.starts_with("tem") {
+        Some(7)
+    } else if t.starts_with("agu") {
+        Some(8)
+    } else if t.starts_with("eyl") {
+        Some(9)
+    } else if t.starts_with("ekim") {
+        Some(10)
+    } else if t.starts_with("kas") {
+        Some(11)
+    } else if t.starts_with("ara") {
+        Some(12)
+    } else {
+        None
+    }
 }
 
 pub fn rules() -> Vec<Rule> {
@@ -578,7 +600,7 @@ pub fn rules() -> Vec<Rule> {
                 let month: u32 = m.parse().ok()?;
                 let mut year: i32 = y.parse().ok()?;
                 if y.len() == 2 {
-                    year += if year < 50 { 2000 } else { 1900 };
+                    year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                 }
                 if !(1..=31).contains(&day) || !(1..=12).contains(&month) {
                     return None;
@@ -625,7 +647,7 @@ pub fn rules() -> Vec<Rule> {
                 let start = if let Some(ys) = y_opt {
                     let mut year: i32 = ys.parse().ok()?;
                     if ys.len() == 2 {
-                        year += if year < 50 { 2000 } else { 1900 };
+                        year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                     }
                     TimeData::new(TimeForm::DateMDY { month: month1, day: day1, year: Some(year) })
                 } else {
@@ -634,7 +656,7 @@ pub fn rules() -> Vec<Rule> {
                 let end = if let Some(ys) = y_opt {
                     let mut year: i32 = ys.parse().ok()?;
                     if ys.len() == 2 {
-                        year += if year < 50 { 2000 } else { 1900 };
+                        year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                     }
                     TimeData::new(TimeForm::DateMDY { month: month2, day: day2, year: Some(year) })
                 } else {
@@ -1144,7 +1166,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -d.value,
+                    n: d.value.checked_neg()?,
                     grain: d.grain,
                 })))
             }),

@@ -14,7 +14,10 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "<dist> centimeters".to_string(),
-            pattern: vec![dim(DimensionKind::Distance), regex("cm|센(티|치)((미|메)터)?")],
+            pattern: vec![
+                dim(DimensionKind::Distance),
+                regex("cm|센(티|치)((미|메)터)?"),
+            ],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
                 Some(TokenData::Distance(
@@ -27,7 +30,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("m|(미|메|매)터")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
@@ -40,7 +45,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<latent dist> km".to_string(),
-            pattern: vec![dim(DimensionKind::Distance), regex("km|(킬|키)로((미|메)터)?")],
+            pattern: vec![
+                dim(DimensionKind::Distance),
+                regex("km|(킬|키)로((미|메)터)?"),
+            ],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
                 Some(TokenData::Distance(
@@ -51,7 +59,12 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "구메터".to_string(),
             pattern: vec![regex("구메터")],
-            production: Box::new(|_| Some(TokenData::Distance(DistanceData::new(9.0, DistanceUnit::Metre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Distance(DistanceData::new(
+                    9.0,
+                    DistanceUnit::Metre,
+                )))
+            }),
         },
         Rule {
             name: "이센치".to_string(),

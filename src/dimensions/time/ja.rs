@@ -1,6 +1,6 @@
+use super::{Direction, IntervalDirection, TimeData, TimeForm};
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::{Direction, IntervalDirection, TimeData, TimeForm};
 
 fn parse_kanji_under_60(s: &str) -> Option<u32> {
     fn d(c: char) -> Option<u32> {
@@ -21,15 +21,15 @@ fn parse_kanji_under_60(s: &str) -> Option<u32> {
         return Some(10);
     }
     if let Some(rest) = s.strip_prefix('十') {
-        return Some(10 + d(rest.chars().next()?)?);
+        return Some(d(rest.chars().next()?)?.checked_add(10)?);
     }
     if let Some(rest) = s.strip_suffix('十') {
-        return Some(d(rest.chars().next()?)? * 10);
+        return Some(d(rest.chars().next()?)?.checked_mul(10)?);
     }
     if let Some((a, b)) = s.split_once('十') {
         let aa = d(a.chars().next()?)?;
         let bb = d(b.chars().next()?)?;
-        return Some(aa * 10 + bb);
+        return Some(aa.checked_mul(10)?.checked_add(bb)?);
     }
     d(s.chars().next()?)
 }
@@ -465,7 +465,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut h: u32 = h.parse().ok()?;
                 let m: u32 = m.parse().ok()?;
                 if h < 12 {
-                    h += 12;
+                    h = h.checked_add(12)?;
                 }
                 if h > 23 || m > 59 {
                     return None;
@@ -522,7 +522,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut h = parse_kanji_under_60(h)?;
                 let m = parse_kanji_under_60(m)?;
                 if h < 12 {
-                    h += 12;
+                    h = h.checked_add(12)?;
                 }
                 if h > 23 || m > 59 {
                     return None;
@@ -1635,7 +1635,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let reiwa: i32 = n.parse().ok()?;
-                let year = 2018 + reiwa;
+                let year = 2018_i32.checked_add(reiwa)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::Year(year))))
             }),
         },
@@ -1649,7 +1649,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let e = era.trim();
                 let v: i32 = n.parse().ok()?;
-                let base = match e {
+                let base: i32 = match e {
                     "明治" => 1867,
                     "大正" => 1911,
                     "昭和" => 1925,
@@ -1657,7 +1657,7 @@ pub fn rules() -> Vec<Rule> {
                     "令和" => 2018,
                     _ => return None,
                 };
-                Some(TokenData::Time(TimeData::new(TimeForm::Year(base + v))))
+                Some(TokenData::Time(TimeData::new(TimeForm::Year(base.checked_add(v)?))))
             }),
         },
         Rule {

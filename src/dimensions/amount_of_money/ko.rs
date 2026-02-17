@@ -6,7 +6,9 @@ use super::{AmountOfMoneyData, Currency};
 pub fn rules() -> Vec<Rule> {
     vec![Rule {
         name: "amount keywords (ko)".to_string(),
-        pattern: vec![regex("(\\$|€|£|₩|원|달러|불|센트|유로|파운드|EUR|GBP|KRW|USD)")],
+        pattern: vec![regex(
+            "(\\$|€|£|₩|원|달러|불|센트|유로|파운드|EUR|GBP|KRW|USD)",
+        )],
         production: Box::new(|nodes| {
             let m = match &nodes[0].token_data {
                 TokenData::RegexMatch(m) => m.group(1)?,

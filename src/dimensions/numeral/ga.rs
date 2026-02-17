@@ -73,7 +73,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "count numbers".to_string(),
-            pattern: vec![regex("a (n(á|a)id|haon|d(ó|o)|tr(í|i)|ceathair|c(ú|u)ig|s(é|e)|seacht|hocht|naoi|deich)")],
+            pattern: vec![regex(
+                "a (n(á|a)id|haon|d(ó|o)|tr(í|i)|ceathair|c(ú|u)ig|s(é|e)|seacht|hocht|naoi|deich)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -125,7 +127,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "numbers, 20-90".to_string(),
-            pattern: vec![regex("(fiche|tr(í|i)ocha|daichead|caoga|seasca|seacht(ó|o)|ocht(ó|o)|n(ó|o)cha)")],
+            pattern: vec![regex(
+                "(fiche|tr(í|i)ocha|daichead|caoga|seasca|seacht(ó|o)|ocht(ó|o)|n(ó|o)cha)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -137,7 +141,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "numbers, 1-10".to_string(),
-            pattern: vec![regex("(aon|dh(á|a)|tr(í|i)|ceithre|c(ú|u)ig|seacht|s(é|e)|ocht|naoi|deich)")],
+            pattern: vec![regex(
+                "(aon|dh(á|a)|tr(í|i)|ceithre|c(ú|u)ig|seacht|s(é|e)|ocht|naoi|deich)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -157,7 +163,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "numbers suffixes (K, M, G)".to_string(),
-            pattern: vec![predicate(|td| matches!(td, TokenData::Numeral(_))), regex("([kmg])")],
+            pattern: vec![
+                predicate(|td| matches!(td, TokenData::Numeral(_))),
+                regex("([kmg])"),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value;
                 let s = match &nodes[1].token_data {
@@ -175,7 +184,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "old vigesimal numbers, 20s".to_string(),
-            pattern: vec![regex("(d[ée]ag )?is (dh?(á|a) fhichead|tr(í|i) fichid|ceithre fichid)")],
+            pattern: vec![regex(
+                "(d[ée]ag )?is (dh?(á|a) fhichead|tr(í|i) fichid|ceithre fichid)",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,

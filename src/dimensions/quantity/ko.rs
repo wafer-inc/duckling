@@ -17,12 +17,22 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "ko quantity one geun".to_string(),
             pattern: vec![regex("한근")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(1.0, QuantityUnit::Pound)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    1.0,
+                    QuantityUnit::Pound,
+                )))
+            }),
         },
         Rule {
             name: "ko quantity 600 gram".to_string(),
             pattern: vec![regex("육백그람")],
-            production: Box::new(|_| Some(TokenData::Quantity(QuantityData::new(600.0, QuantityUnit::Gram)))),
+            production: Box::new(|_| {
+                Some(TokenData::Quantity(QuantityData::new(
+                    600.0,
+                    QuantityUnit::Gram,
+                )))
+            }),
         },
         Rule {
             name: "ko quantity cola three cups".to_string(),

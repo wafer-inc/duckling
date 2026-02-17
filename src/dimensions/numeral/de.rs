@@ -67,11 +67,19 @@ fn parse_de_compound_number(s: &str) -> Option<f64> {
     }
 
     if let Some(stem) = n.strip_suffix("hundert") {
-        let lead = if stem.is_empty() { 1.0 } else { lookup_simple_number(stem)? };
+        let lead = if stem.is_empty() {
+            1.0
+        } else {
+            lookup_simple_number(stem)?
+        };
         return Some(lead * 100.0);
     }
     if let Some(stem) = n.strip_suffix("tausend") {
-        let lead = if stem.is_empty() { 1.0 } else { lookup_simple_number(stem)? };
+        let lead = if stem.is_empty() {
+            1.0
+        } else {
+            lookup_simple_number(stem)?
+        };
         return Some(lead * 1000.0);
     }
 
@@ -79,8 +87,7 @@ fn parse_de_compound_number(s: &str) -> Option<f64> {
     if let Some((u, t)) = n.split_once("und") {
         let units = lookup_simple_number(u)?;
         let tens = lookup_simple_number(t)?;
-        if (tens % 10.0 == 0.0) && (20.0..=90.0).contains(&tens) && (1.0..10.0).contains(&units)
-        {
+        if (tens % 10.0 == 0.0) && (20.0..=90.0).contains(&tens) && (1.0..10.0).contains(&units) {
             return Some(units + tens);
         }
     }
@@ -195,12 +202,24 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let out = match s.as_str() {
-                    "hundert" | "hunderte" => NumeralData::new(1e2).with_grain(2).with_multipliable(true),
-                    "tausend" | "tausende" => NumeralData::new(1e3).with_grain(3).with_multipliable(true),
-                    "million" | "millionen" => NumeralData::new(1e6).with_grain(6).with_multipliable(true),
-                    "milliarde" | "milliarden" => NumeralData::new(1e9).with_grain(9).with_multipliable(true),
-                    "billion" | "billionen" => NumeralData::new(1e12).with_grain(12).with_multipliable(true),
-                    "billiarde" | "billiarden" => NumeralData::new(1e15).with_grain(15).with_multipliable(true),
+                    "hundert" | "hunderte" => {
+                        NumeralData::new(1e2).with_grain(2).with_multipliable(true)
+                    }
+                    "tausend" | "tausende" => {
+                        NumeralData::new(1e3).with_grain(3).with_multipliable(true)
+                    }
+                    "million" | "millionen" => {
+                        NumeralData::new(1e6).with_grain(6).with_multipliable(true)
+                    }
+                    "milliarde" | "milliarden" => {
+                        NumeralData::new(1e9).with_grain(9).with_multipliable(true)
+                    }
+                    "billion" | "billionen" => NumeralData::new(1e12)
+                        .with_grain(12)
+                        .with_multipliable(true),
+                    "billiarde" | "billiarden" => NumeralData::new(1e15)
+                        .with_grain(15)
+                        .with_multipliable(true),
                     _ => return None,
                 };
                 Some(TokenData::Numeral(out))
@@ -213,9 +232,9 @@ pub fn rules() -> Vec<Rule> {
                 let a = numeral_data(&nodes[0].token_data)?;
                 let b = numeral_data(&nodes[1].token_data)?;
                 match b.grain {
-                    Some(g) if b.value > a.value => {
-                        Some(TokenData::Numeral(NumeralData::new(a.value * b.value).with_grain(g)))
-                    }
+                    Some(g) if b.value > a.value => Some(TokenData::Numeral(
+                        NumeralData::new(a.value * b.value).with_grain(g),
+                    )),
                     Some(_) => None,
                     None => Some(TokenData::Numeral(NumeralData::new(a.value * b.value))),
                 }

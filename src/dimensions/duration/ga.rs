@@ -40,7 +40,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "aon X amhain".to_string(),
-            pattern: vec![predicate(numeral_is(1.0)), dim(DimensionKind::TimeGrain), predicate(numeral_is(1.0))],
+            pattern: vec![
+                predicate(numeral_is(1.0)),
+                dim(DimensionKind::TimeGrain),
+                predicate(numeral_is(1.0)),
+            ],
             production: Box::new(|nodes| {
                 let g = match &nodes[1].token_data {
                     TokenData::TimeGrain(g) => *g,
@@ -51,7 +55,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<unit-integer> <unit-of-duration> <tens-integer>".to_string(),
-            pattern: vec![predicate(numeral_lt(10.0)), dim(DimensionKind::TimeGrain), predicate(numeral_in_tens)],
+            pattern: vec![
+                predicate(numeral_lt(10.0)),
+                dim(DimensionKind::TimeGrain),
+                predicate(numeral_in_tens),
+            ],
             production: Box::new(|nodes| {
                 let v1 = numeral_data(&nodes[0].token_data)?.value;
                 let g = match &nodes[1].token_data {
@@ -59,12 +67,19 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let v2 = numeral_data(&nodes[2].token_data)?.value;
-                Some(TokenData::Duration(DurationData::new((v1 + v2).floor() as i64, g)))
+                Some(TokenData::Duration(DurationData::new(
+                    (v1 + v2).floor() as i64,
+                    g,
+                )))
             }),
         },
         Rule {
             name: "composite <duration>".to_string(),
-            pattern: vec![predicate(crate::dimensions::numeral::helpers::is_natural), dim(DimensionKind::TimeGrain), dim(DimensionKind::Duration)],
+            pattern: vec![
+                predicate(crate::dimensions::numeral::helpers::is_natural),
+                dim(DimensionKind::TimeGrain),
+                dim(DimensionKind::Duration),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
                 let g = match &nodes[1].token_data {
@@ -80,7 +95,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "composite <duration> (with and)".to_string(),
-            pattern: vec![predicate(crate::dimensions::numeral::helpers::is_natural), dim(DimensionKind::TimeGrain), regex("agus|is"), dim(DimensionKind::Duration)],
+            pattern: vec![
+                predicate(crate::dimensions::numeral::helpers::is_natural),
+                dim(DimensionKind::TimeGrain),
+                regex("agus|is"),
+                dim(DimensionKind::Duration),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
                 let g = match &nodes[1].token_data {

@@ -1,6 +1,6 @@
+pub mod ar;
 pub mod en;
 pub mod es;
-pub mod ar;
 pub mod fr;
 pub mod hr;
 pub mod km;

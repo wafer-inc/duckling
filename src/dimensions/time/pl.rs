@@ -1,7 +1,7 @@
+use super::{Direction, PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, PartOfDay, TimeData, TimeForm};
 
 fn parse_pl_number_word(s: &str) -> Option<i64> {
     match s.to_lowercase().as_str() {
@@ -35,7 +35,11 @@ fn parse_pl_grain(s: &str) -> Option<Grain> {
         Some(Grain::Day)
     } else if u.starts_with("tydzie") || u.starts_with("tygodn") {
         Some(Grain::Week)
-    } else if u.starts_with("miesią") || u.starts_with("miesia") || u.starts_with("miesię") || u.starts_with("miesie") {
+    } else if u.starts_with("miesią")
+        || u.starts_with("miesia")
+        || u.starts_with("miesię")
+        || u.starts_with("miesie")
+    {
         Some(Grain::Month)
     } else if u.starts_with("rok") || u.starts_with("lat") {
         Some(Grain::Year)
@@ -503,7 +507,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let y_raw: i32 = y.parse().ok()?;
-                let year = if y_raw < 100 { 2000 + y_raw } else { y_raw };
+                let year = if y_raw < 100 { y_raw.checked_add(2000)? } else { y_raw };
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 4, day, year: Some(year) })))
             }),
         },
@@ -520,7 +524,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let y_raw: i32 = y.parse().ok()?;
-                let year = if y_raw < 100 { 2000 + y_raw } else { y_raw };
+                let year = if y_raw < 100 { y_raw.checked_add(2000)? } else { y_raw };
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 4, day, year: Some(year) })))
             }),
         },
@@ -533,7 +537,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let y_raw: i32 = y.parse().ok()?;
-                let year = if y_raw < 100 { 2000 + y_raw } else { y_raw };
+                let year = if y_raw < 100 { y_raw.checked_add(2000)? } else { y_raw };
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 4, day: 14, year: Some(year) })))
             }),
         },
@@ -719,7 +723,7 @@ pub fn rules() -> Vec<Rule> {
                 let grain = parse_pl_grain(g_s)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset {
                     grain,
-                    offset: -(n as i32),
+                    offset: (n as i32).checked_neg()?,
                 })))
             }),
         },
@@ -1206,7 +1210,7 @@ pub fn rules() -> Vec<Rule> {
                 if target == 0 || target > 23 {
                     return None;
                 }
-                let out = if target == 0 { 23 } else { target - 1 };
+                let out = if target == 0 { 23 } else { target.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 30, false))))
             }),
         },
@@ -1232,7 +1236,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour == 0 || hour > 23 {
                     return None;
                 }
-                let out = if hour < 12 { hour + 12 } else { hour };
+                let out = if hour < 12 { hour.checked_add(12)? } else { hour };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out, 0, false))))
             }),
         },
@@ -1247,7 +1251,7 @@ pub fn rules() -> Vec<Rule> {
                 let base = parse_pl_hour_word(w)?;
                 let mut hour = base;
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),

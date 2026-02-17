@@ -51,7 +51,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "kiloliter".to_string(),
-            pattern: vec![predicate(is_positive), regex("(kl\\.?|g?ch?illil(í|i)t(ea|i)r)")],
+            pattern: vec![
+                predicate(is_positive),
+                regex("(kl\\.?|g?ch?illil(í|i)t(ea|i)r)"),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value;
                 Some(TokenData::Volume(VolumeData::new(
@@ -81,12 +84,16 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("(l(í|i)t(ea|i)r|l\\.?)")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("n?gh?al(ú|u)i?n")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
     ]
 }

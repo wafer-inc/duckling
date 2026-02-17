@@ -33,7 +33,9 @@ fn is_number_value(s: &str) -> Option<f64> {
 pub fn rules() -> Vec<Rule> {
     vec![Rule {
         name: "number (0..20)".to_string(),
-        pattern: vec![regex(r"(n[úu]ll|einn|tveir|þrír|fjórir|fimm(tán)?|sex(tán)?|sjö|átta|níu|tíu|ellefu|tólf|þrettán|fjórtán|sautján|átján|nítján|tuttugu)")],
+        pattern: vec![regex(
+            r"(n[úu]ll|einn|tveir|þrír|fjórir|fimm(tán)?|sex(tán)?|sjö|átta|níu|tíu|ellefu|tólf|þrettán|fjórtán|sautján|átján|nítján|tuttugu)",
+        )],
         production: Box::new(|nodes| {
             let s = match &nodes[0].token_data {
                 TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),

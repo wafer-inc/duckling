@@ -55,7 +55,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("m(etern?)?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
@@ -81,7 +83,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "about|exactly <dist>".to_string(),
             pattern: vec![
-                regex("genau|exakt|präzise|ungefähr|(in )?etwa|nahe?( an)?|um( die)?|fast|rund|gut"),
+                regex(
+                    "genau|exakt|präzise|ungefähr|(in )?etwa|nahe?( an)?|um( die)?|fast|rund|gut",
+                ),
                 dim(DimensionKind::Distance),
             ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
@@ -130,7 +134,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<numeral> - <dist>".to_string(),
-            pattern: vec![predicate(is_positive), regex("-"), predicate(is_simple_distance)],
+            pattern: vec![
+                predicate(is_positive),
+                regex("-"),
+                predicate(is_simple_distance),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[0].token_data)?.value;
                 let d = distance_data(&nodes[2].token_data)?;

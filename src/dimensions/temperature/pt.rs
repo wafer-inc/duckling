@@ -68,7 +68,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<latent temp> temp abaixo de zero".to_string(),
-            pattern: vec![is_value_only(true), regex("((graus?)|°)?( abaixo (de)? zero)")],
+            pattern: vec![
+                is_value_only(true),
+                regex("((graus?)|°)?( abaixo (de)? zero)"),
+            ],
             production: Box::new(|nodes| {
                 let mut td = temperature_data(&nodes[0].token_data)?.clone();
                 let v = td.value?;

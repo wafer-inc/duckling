@@ -15,7 +15,10 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "<number> <units>".to_string(),
-            pattern: vec![crate::pattern::predicate(is_positive), regex("(de )?livr(a|e|ă)")],
+            pattern: vec![
+                crate::pattern::predicate(is_positive),
+                regex("(de )?livr(a|e|ă)"),
+            ],
             production: Box::new(|nodes| {
                 let n = numeral_data(&nodes[0].token_data)?;
                 Some(TokenData::Quantity(QuantityData::new(
@@ -26,7 +29,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<quantity> of product".to_string(),
-            pattern: vec![dim(DimensionKind::Quantity), regex("de (carne|can[aă]|zah[aă]r|mamaliga)")],
+            pattern: vec![
+                dim(DimensionKind::Quantity),
+                regex("de (carne|can[aă]|zah[aă]r|mamaliga)"),
+            ],
             production: Box::new(|nodes| {
                 let mut q = quantity_data(&nodes[0].token_data)?.clone();
                 let product = match &nodes[1].token_data {

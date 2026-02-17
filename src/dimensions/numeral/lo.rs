@@ -90,7 +90,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (21..29)".to_string(),
-            pattern: vec![regex("(ຊາວເອັດ|ຊາວສອງ|ຊາວສາມ|ຊາວສີ່|ຊາວຫ້າ|ຊາວຫົກ|ຊາວເຈັດ|ຊາວແປດ|ຊາວເກົ້າ)")],
+            pattern: vec![regex(
+                "(ຊາວເອັດ|ຊາວສອງ|ຊາວສາມ|ຊາວສີ່|ຊາວຫ້າ|ຊາວຫົກ|ຊາວເຈັດ|ຊາວແປດ|ຊາວເກົ້າ)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -112,7 +114,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer ([3-9][1-9])".to_string(),
-            pattern: vec![regex("(ສາມສິບ|ສິບສີ່|ຫ້າສິບ|ຫົກສິບ|ເຈັດສິບ|ແປດສິບ|ເກົ້າສິບ)(ໜຶ່ງ|ສອງ|ສາມ|ສີ່|ຫ້າ|ຫົກ|ເຈັດ|ແປດ|ເກົ້າ)")],
+            pattern: vec![regex(
+                "(ສາມສິບ|ສິບສີ່|ຫ້າສິບ|ຫົກສິບ|ເຈັດສິບ|ແປດສິບ|ເກົ້າສິບ)(ໜຶ່ງ|ສອງ|ສາມ|ສີ່|ຫ້າ|ຫົກ|ເຈັດ|ແປດ|ເກົ້າ)",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,

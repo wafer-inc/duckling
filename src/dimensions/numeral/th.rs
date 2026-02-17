@@ -24,8 +24,24 @@ fn tokenize_thai_number(mut s: &str) -> Option<Vec<&str>> {
     let mut out = Vec::new();
     while !s.is_empty() {
         let candidates = [
-            "ศูนย์", "หนึ่ง", "เอ็ด", "สอง", "ยี่", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด",
-            "เก้า", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน",
+            "ศูนย์",
+            "หนึ่ง",
+            "เอ็ด",
+            "สอง",
+            "ยี่",
+            "สาม",
+            "สี่",
+            "ห้า",
+            "หก",
+            "เจ็ด",
+            "แปด",
+            "เก้า",
+            "สิบ",
+            "ร้อย",
+            "พัน",
+            "หมื่น",
+            "แสน",
+            "ล้าน",
         ];
         let mut matched = None;
         for c in candidates {
@@ -133,7 +149,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "compose multiply".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), predicate(|td| matches!(td, TokenData::Numeral(d) if d.multipliable))],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.multipliable)),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?;
                 let b = numeral_data(&nodes[1].token_data)?;
@@ -155,7 +174,9 @@ pub fn rules() -> Vec<Rule> {
             name: "intersect".to_string(),
             pattern: vec![
                 predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_some())),
-                predicate(|td| matches!(td, TokenData::Numeral(d) if !d.multipliable && d.value >= 0.0)),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if !d.multipliable && d.value >= 0.0),
+                ),
             ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?;
@@ -170,16 +191,24 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "dot word decimal".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), regex("จุด"), predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none()))],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex("จุด"),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none())),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;
                 let b = numeral_data(&nodes[2].token_data)?.value;
-                Some(TokenData::Numeral(NumeralData::new(a + decimals_to_double(b))))
+                Some(TokenData::Numeral(NumeralData::new(
+                    a + decimals_to_double(b),
+                )))
             }),
         },
         Rule {
             name: "dot word decimal compact".to_string(),
-            pattern: vec![regex("([ศูนย์หนึ่งเอ็ดสองยี่สามสี่ห้าหกเจ็ดแปดเก้า]+)จุด([ศูนย์หนึ่งเอ็ดสองยี่สามสี่ห้าหกเจ็ดแปดเก้า]+)")],
+            pattern: vec![regex(
+                "([ศูนย์หนึ่งเอ็ดสองยี่สามสี่ห้าหกเจ็ดแปดเก้า]+)จุด([ศูนย์หนึ่งเอ็ดสองยี่สามสี่ห้าหกเจ็ดแปดเก้า]+)",
+            )],
             production: Box::new(|nodes| {
                 let (a, b) = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => (m.group(1)?, m.group(2)?),
@@ -187,12 +216,17 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let lhs = parse_thai_integer(a)?;
                 let rhs = parse_thai_integer(b)?;
-                Some(TokenData::Numeral(NumeralData::new(lhs + decimals_to_double(rhs))))
+                Some(TokenData::Numeral(NumeralData::new(
+                    lhs + decimals_to_double(rhs),
+                )))
             }),
         },
         Rule {
             name: "negative".to_string(),
-            pattern: vec![regex("-|ลบ"), predicate(|td| matches!(td, TokenData::Numeral(d) if d.value >= 0.0))],
+            pattern: vec![
+                regex("-|ลบ"),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value >= 0.0)),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(-v)))

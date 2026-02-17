@@ -1,8 +1,8 @@
+use super::{Direction, PartOfDay, TimeData, TimeForm};
 use crate::dimensions::numeral::helpers::{is_natural, numeral_data};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, predicate, regex};
 use crate::types::{DimensionKind, Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, PartOfDay, TimeData, TimeForm};
 
 fn time_data(td: &TokenData) -> Option<&TimeData> {
     match td {
@@ -586,7 +586,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -d.value,
+                    n: d.value.checked_neg()?,
                     grain: d.grain,
                 })))
             }),
@@ -788,7 +788,7 @@ pub fn rules() -> Vec<Rule> {
                 match td.form {
                     TimeForm::HourMinute(h, m, _) => {
                         let hh = if ampm.contains('p') && h < 12 {
-                            h + 12
+                            h.checked_add(12)?
                         } else if ampm.contains('a') && h == 12 {
                             0
                         } else {
@@ -798,7 +798,7 @@ pub fn rules() -> Vec<Rule> {
                     }
                     TimeForm::Hour(h, _) => {
                         let hh = if ampm.contains('p') && h < 12 {
-                            h + 12
+                            h.checked_add(12)?
                         } else if ampm.contains('a') && h == 12 {
                             0
                         } else {
@@ -987,8 +987,8 @@ pub fn rules() -> Vec<Rule> {
                 if hh > 23 || mm > 59 {
                     return None;
                 }
-                let out_h = if hh == 0 { 23 } else { hh - 1 };
-                let out_m = 60 - mm;
+                let out_h = if hh == 0 { 23 } else { hh.checked_sub(1)? };
+                let out_m = 60_u32.checked_sub(mm)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_h, out_m, false))))
             }),
         },
@@ -1005,8 +1005,8 @@ pub fn rules() -> Vec<Rule> {
                 if hh > 23 || mm > 59 {
                     return None;
                 }
-                let out_h = if hh == 0 { 23 } else { hh - 1 };
-                let out_m = 60 - mm;
+                let out_h = if hh == 0 { 23 } else { hh.checked_sub(1)? };
+                let out_m = 60_u32.checked_sub(mm)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_h, out_m, false))))
             }),
         },
@@ -1022,7 +1022,7 @@ pub fn rules() -> Vec<Rule> {
                 if hh > 23 {
                     return None;
                 }
-                let out_h = if hh == 0 { 23 } else { hh - 1 };
+                let out_h = if hh == 0 { 23 } else { hh.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_h, 45, false))))
             }),
         },
@@ -1038,7 +1038,7 @@ pub fn rules() -> Vec<Rule> {
                 if hh > 23 {
                     return None;
                 }
-                let out_h = if hh == 0 { 23 } else { hh - 1 };
+                let out_h = if hh == 0 { 23 } else { hh.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_h, 30, false))))
             }),
         },
@@ -1054,7 +1054,7 @@ pub fn rules() -> Vec<Rule> {
                 if hh > 23 {
                     return None;
                 }
-                let out_h = if hh == 0 { 23 } else { hh - 1 };
+                let out_h = if hh == 0 { 23 } else { hh.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_h, 15, false))))
             }),
         },
@@ -1094,7 +1094,7 @@ pub fn rules() -> Vec<Rule> {
                 let month: u32 = m.parse().ok()?;
                 let mut year: i32 = y.parse().ok()?;
                 if y.len() == 2 {
-                    year += if year < 50 { 2000 } else { 1900 };
+                    year = year.checked_add(if year < 50 { 2000 } else { 1900 })?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(year) })))
             }),
@@ -1391,7 +1391,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), regex("d[eo]|em"), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let n = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let grain = match &nodes[1].token_data {
@@ -1407,7 +1407,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let n = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let grain = match &nodes[1].token_data {
@@ -1423,7 +1423,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("o|a"), regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), regex("d[eo]|em"), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let n = match &nodes[1].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let grain = match &nodes[2].token_data {
@@ -1531,7 +1531,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), regex("d[eo]|em"), dim(DimensionKind::Time), regex("\\-|at[eé](\\s+ao?)?|ao?"), regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), regex("d[eo]|em"), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let n1 = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let g1 = match &nodes[1].token_data {
@@ -1540,7 +1540,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let y1 = time_data(&nodes[3].token_data)?.clone();
                 let n2 = match &nodes[5].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let g2 = match &nodes[6].token_data {
@@ -1558,7 +1558,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), dim(DimensionKind::Time), regex("\\-|at[eé](\\s+ao?)?|ao?"), regex("([0-9]{1,2}|primeiro|segundo|terceiro|quarto|quinto|sexto|s[eé]timo|oitavo|nono|d[eé]cimo(\\s+primeiro|\\s+segundo)?|[úu]ltimo)"), dim(DimensionKind::TimeGrain), dim(DimensionKind::Time)],
             production: Box::new(|nodes| {
                 let n1 = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let g1 = match &nodes[1].token_data {
@@ -1567,7 +1567,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let y1 = time_data(&nodes[2].token_data)?.clone();
                 let n2 = match &nodes[4].token_data {
-                    TokenData::RegexMatch(rm) => pt_ordinal_value(rm.group(1)?)? as i32 - 1,
+                    TokenData::RegexMatch(rm) => (pt_ordinal_value(rm.group(1)?)? as i32).checked_sub(1)?,
                     _ => return None,
                 };
                 let g2 = match &nodes[5].token_data {

@@ -103,7 +103,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer (10..19)".to_string(),
-            pattern: vec![regex("(పదకొండు|పన్నెండు|పదమూడు|పద్నాల్గు|పదిహేను|పదహారు|పదిహేడు|పద్దెనిమిది|పంతొమ్మిది|పది)")],
+            pattern: vec![regex(
+                "(పదకొండు|పన్నెండు|పదమూడు|పద్నాల్గు|పదిహేను|పదహారు|పదిహేడు|పద్దెనిమిది|పంతొమ్మిది|పది)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

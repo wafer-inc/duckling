@@ -73,7 +73,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "thart ar <amount-of-money>".to_string(),
-            pattern: vec![regex("thart( ar)?|beagnach|breis (is|agus)"), predicate(is_money_with_value)],
+            pattern: vec![
+                regex("thart( ar)?|beagnach|breis (is|agus)"),
+                predicate(is_money_with_value),
+            ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
         },
         Rule {
@@ -96,7 +99,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect (and X cents)".to_string(),
-            pattern: vec![predicate(is_without_cents), regex("agus|is"), predicate(is_cents)],
+            pattern: vec![
+                predicate(is_without_cents),
+                regex("agus|is"),
+                predicate(is_cents),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[0].token_data)?;
                 let c = money_data(&nodes[2].token_data)?.value?;
@@ -123,7 +130,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect (agus number)".to_string(),
-            pattern: vec![predicate(is_without_cents), regex("agus|is"), predicate(is_natural)],
+            pattern: vec![
+                predicate(is_without_cents),
+                regex("agus|is"),
+                predicate(is_natural),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[0].token_data)?;
                 let c = numeral_data(&nodes[2].token_data)?.value;
@@ -132,7 +143,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<amount-of-money> glan".to_string(),
-            pattern: vec![predicate(is_money_with_value), regex("glan|baileach|(go )?d(í|i)reach")],
+            pattern: vec![
+                predicate(is_money_with_value),
+                regex("glan|baileach|(go )?d(í|i)reach"),
+            ],
             production: Box::new(|nodes| Some(nodes[0].token_data.clone())),
         },
     ]

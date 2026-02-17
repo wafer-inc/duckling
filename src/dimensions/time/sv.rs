@@ -1,8 +1,8 @@
+use super::{Direction, IntervalDirection};
+use super::{PartOfDay, TimeData, TimeForm};
 use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, regex};
-use super::{Direction, IntervalDirection};
 use crate::types::{DimensionKind, Rule, TokenData};
-use super::{PartOfDay, TimeData, TimeForm};
 
 fn parse_sv_month(s: &str) -> Option<u32> {
     let t = s.to_lowercase();
@@ -772,7 +772,7 @@ pub fn rules() -> Vec<Rule> {
                 if in_hour == 0 || in_hour > 24 {
                     return None;
                 }
-                let hour = if in_hour == 1 { 0 } else { in_hour - 1 };
+                let hour = if in_hour == 1 { 0 } else { in_hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 45, false))))
             }),
         },
@@ -859,7 +859,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -d.value,
+                    n: d.value.checked_neg()?,
                     grain: d.grain,
                 })))
             }),

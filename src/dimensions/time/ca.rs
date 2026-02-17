@@ -1,7 +1,7 @@
+use super::{TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{TimeData, TimeForm};
 
 fn ca_small_number(s: &str) -> Option<i32> {
     match s {
@@ -462,7 +462,7 @@ pub fn rules() -> Vec<Rule> {
                 }
                 if pod == "vespre" || pod == "nit" || pod == "tarda" {
                     if hour < 12 {
-                        hour += 12;
+                        hour = hour.checked_add(12)?;
                     }
                 } else if pod.starts_with("mat") && hour == 12 {
                     hour = 0;
@@ -484,7 +484,7 @@ pub fn rules() -> Vec<Rule> {
                 }
                 if pod == "vespre" || pod == "nit" || pod == "tarda" {
                     if hour < 12 {
-                        hour += 12;
+                        hour = hour.checked_add(12)?;
                     }
                 } else if pod.starts_with("mat") && hour == 12 {
                     hour = 0;
@@ -543,7 +543,7 @@ pub fn rules() -> Vec<Rule> {
                 } else {
                     Grain::Year
                 };
-                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain, offset: -n })))
+                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain, offset: n.checked_neg()? })))
             }),
         },
         Rule {

@@ -1,8 +1,8 @@
-use crate::pattern::{dim, regex};
-use crate::types::{DimensionKind, Rule, TokenData};
 use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 use crate::dimensions::numeral::helpers::numeral_data;
 use crate::dimensions::time_grain::Grain;
+use crate::pattern::{dim, regex};
+use crate::types::{DimensionKind, Rule, TokenData};
 
 fn duration_data(td: &TokenData) -> Option<&crate::dimensions::duration::DurationData> {
     match td {
@@ -306,7 +306,7 @@ pub fn rules() -> Vec<Rule> {
                 }
                 let mut year: i32 = y.parse().ok()?;
                 if y.len() == 2 {
-                    year += if year >= 50 { 1900 } else { 2000 };
+                    year = year.checked_add(if year >= 50 { 1900 } else { 2000 })?;
                 }
                 let month = match m.as_str() {
                     "januar" => 1,
@@ -1013,7 +1013,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=24).contains(&hour) {
                     return None;
                 }
-                let out_hour = if hour == 24 { 23 } else { hour - 1 };
+                let out_hour = if hour == 24 { 23 } else { hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 30, true))))
             }),
         },
@@ -1029,7 +1029,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=24).contains(&hour) {
                     return None;
                 }
-                let out_hour = if hour == 24 { 23 } else { hour - 1 };
+                let out_hour = if hour == 24 { 23 } else { hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 45, true))))
             }),
         },
@@ -1042,7 +1042,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let days: i32 = d.parse().ok()?;
-                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: crate::dimensions::time_grain::Grain::Day, offset: -days })))
+                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain: crate::dimensions::time_grain::Grain::Day, offset: days.checked_neg()? })))
             }),
         },
         Rule {
@@ -1135,7 +1135,7 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let dur = duration_data(&nodes[1].token_data)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -dur.value,
+                    n: dur.value.checked_neg()?,
                     grain: dur.grain,
                 })))
             }),

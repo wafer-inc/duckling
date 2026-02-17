@@ -9,7 +9,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "pandrah minute".to_string(),
             pattern: vec![regex("पंद्रह मिनट")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "a day".to_string(),
@@ -34,7 +36,10 @@ pub fn rules() -> Vec<Rule> {
                     "ढाई" => 2,
                     _ => return None,
                 };
-                Some(TokenData::Duration(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)))
+                Some(TokenData::Duration(DurationData::new(
+                    12_i64.checked_mul(n)?.checked_add(6)?,
+                    Grain::Month,
+                )))
             }),
         },
         Rule {
@@ -50,7 +55,10 @@ pub fn rules() -> Vec<Rule> {
                     "ढाई" => 2,
                     _ => return None,
                 };
-                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(
+                    60_i64.checked_mul(n)?.checked_add(30)?,
+                    Grain::Minute,
+                )))
             }),
         },
         Rule {

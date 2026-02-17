@@ -1,7 +1,7 @@
+use super::{Direction, TimeData, TimeForm};
 use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use super::{Direction, TimeData, TimeForm};
 
 fn da_small_number(s: &str) -> Option<i32> {
     match s {
@@ -486,7 +486,7 @@ pub fn rules() -> Vec<Rule> {
                 } else {
                     Grain::Year
                 };
-                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain, offset: -n })))
+                Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset { grain, offset: n.checked_neg()? })))
             }),
         },
         Rule {
@@ -707,7 +707,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=24).contains(&hour) {
                     return None;
                 }
-                let out_hour = if hour == 24 { 23 } else { hour - 1 };
+                let out_hour = if hour == 24 { 23 } else { hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 45, out_hour <= 12))))
             }),
         },
@@ -766,7 +766,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let from = TimeData::new(TimeForm::DateMDY { month: 7, day: day1, year: None });
-                let to = TimeData::new(TimeForm::DateMDY { month: 7, day: day2 + 1, year: None });
+                let to = TimeData::new(TimeForm::DateMDY { month: 7, day: day2.checked_add(1)?, year: None });
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(Box::new(from), Box::new(to), false))))
             }),
         },
@@ -784,7 +784,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let from = TimeData::new(TimeForm::DateMDY { month: 7, day: day1, year: None });
-                let to = TimeData::new(TimeForm::DateMDY { month: 7, day: day2 + 1, year: None });
+                let to = TimeData::new(TimeForm::DateMDY { month: 7, day: day2.checked_add(1)?, year: None });
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(Box::new(from), Box::new(to), false))))
             }),
         },
@@ -802,7 +802,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 let from = TimeData::new(TimeForm::DateMDY { month: 8, day: day1, year: None });
-                let to = TimeData::new(TimeForm::DateMDY { month: 8, day: day2 + 1, year: None });
+                let to = TimeData::new(TimeForm::DateMDY { month: 8, day: day2.checked_add(1)?, year: None });
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(Box::new(from), Box::new(to), false))))
             }),
         },

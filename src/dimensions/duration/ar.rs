@@ -22,30 +22,41 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "half an hour".to_string(),
             pattern: vec![regex(r"(1/2\s?ساع[ةه]?|نصف? ساع[ةه])")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "quarter of an hour".to_string(),
             pattern: vec![regex(r"(ربع ساعة)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "<integer> and half hour".to_string(),
             pattern: vec![predicate(is_natural), regex(r"و ?نصف? ساع[ةه]")],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(
+                    60_i64.checked_mul(v)?.checked_add(30)?,
+                    Grain::Minute,
+                )))
             }),
         },
         Rule {
             name: "two seconds".to_string(),
             pattern: vec![regex(r"ثانيتين|ثانيتان|لحظتين|لحظتان")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(2, Grain::Second)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(2, Grain::Second)))
+            }),
         },
         Rule {
             name: "two minutes".to_string(),
             pattern: vec![regex(r"دقيقتين|دقيقتان")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(2, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(2, Grain::Minute)))
+            }),
         },
         Rule {
             name: "two hours".to_string(),

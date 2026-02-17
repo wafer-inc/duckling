@@ -121,7 +121,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect (and X cents)".to_string(),
-            pattern: vec![predicate(is_without_cents), regex("et"), predicate(is_cents)],
+            pattern: vec![
+                predicate(is_without_cents),
+                regex("et"),
+                predicate(is_cents),
+            ],
             production: Box::new(|nodes| {
                 let m = money_data(&nodes[0].token_data)?;
                 let c = money_data(&nodes[2].token_data)?.value?;
@@ -171,7 +175,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<numeral> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_natural), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_natural),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[0].token_data)?.value;
                 let d = money_data(&nodes[2].token_data)?;
@@ -186,7 +194,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<amount-of-money> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_simple_money), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_simple_money),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d1 = money_data(&nodes[0].token_data)?;
                 let d2 = money_data(&nodes[2].token_data)?;
@@ -202,7 +214,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "under/less/lower/no more than <amount-of-money>".to_string(),
-            pattern: vec![regex("(moins|pas plus|en-dessous) de"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("(moins|pas plus|en-dessous) de"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[1].token_data)?;
                 Some(TokenData::AmountOfMoney(

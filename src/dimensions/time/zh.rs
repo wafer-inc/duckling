@@ -1,7 +1,7 @@
+use super::{PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{PartOfDay, TimeData, TimeForm};
 
 fn parse_zh_num(s: &str) -> Option<u32> {
     let s = s.trim();
@@ -36,23 +36,39 @@ fn parse_zh_num(s: &str) -> Option<u32> {
         return Some(30);
     }
     if let Some(rest) = s.strip_prefix('廿') {
-        let tail = if rest.is_empty() { 0 } else { d(rest.chars().next()?)? };
-        return Some(20 + tail);
+        let tail = if rest.is_empty() {
+            0
+        } else {
+            d(rest.chars().next()?)?
+        };
+        return Some(20_u32.checked_add(tail)?);
     }
     if let Some(rest) = s.strip_prefix('卅') {
-        let tail = if rest.is_empty() { 0 } else { d(rest.chars().next()?)? };
-        return Some(30 + tail);
+        let tail = if rest.is_empty() {
+            0
+        } else {
+            d(rest.chars().next()?)?
+        };
+        return Some(30_u32.checked_add(tail)?);
     }
     if let Some(rest) = s.strip_prefix('十') {
-        return Some(10 + d(rest.chars().next()?)?);
+        return Some(d(rest.chars().next()?)?.checked_add(10)?);
     }
     if let Some(rest) = s.strip_suffix('十') {
-        return Some(d(rest.chars().next()?)? * 10);
+        return Some(d(rest.chars().next()?)?.checked_mul(10)?);
     }
     if let Some((a, b)) = s.split_once('十') {
-        let aa = if a.is_empty() { 1 } else { d(a.chars().next()?)? };
-        let bb = if b.is_empty() { 0 } else { d(b.chars().next()?)? };
-        return Some(aa * 10 + bb);
+        let aa = if a.is_empty() {
+            1
+        } else {
+            d(a.chars().next()?)?
+        };
+        let bb = if b.is_empty() {
+            0
+        } else {
+            d(b.chars().next()?)?
+        };
+        return Some(aa.checked_mul(10)?.checked_add(bb)?);
     }
     d(s.chars().next()?)
 }
@@ -64,7 +80,12 @@ fn parse_zh_grain(s: &str) -> Option<Grain> {
     if s.starts_with("分鐘") || s.starts_with("分钟") || s.starts_with("分") {
         return Some(Grain::Minute);
     }
-    if s.starts_with("小時") || s.starts_with("小时") || s.starts_with("個鐘") || s.starts_with("鐘") || s.starts_with("钟") {
+    if s.starts_with("小時")
+        || s.starts_with("小时")
+        || s.starts_with("個鐘")
+        || s.starts_with("鐘")
+        || s.starts_with("钟")
+    {
         return Some(Grain::Hour);
     }
     if s == "天" || s == "日" {

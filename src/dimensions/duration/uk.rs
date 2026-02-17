@@ -7,11 +7,26 @@ use super::DurationData;
 
 fn n_plus_one_half(grain: Grain, n: i64) -> Option<DurationData> {
     match grain {
-        Grain::Minute => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Second)),
-        Grain::Hour => Some(DurationData::new(60_i64.checked_mul(n)?.checked_add(30)?, Grain::Minute)),
-        Grain::Day => Some(DurationData::new(24_i64.checked_mul(n)?.checked_add(12)?, Grain::Hour)),
-        Grain::Month => Some(DurationData::new(30_i64.checked_mul(n)?.checked_add(15)?, Grain::Day)),
-        Grain::Year => Some(DurationData::new(12_i64.checked_mul(n)?.checked_add(6)?, Grain::Month)),
+        Grain::Minute => Some(DurationData::new(
+            60_i64.checked_mul(n)?.checked_add(30)?,
+            Grain::Second,
+        )),
+        Grain::Hour => Some(DurationData::new(
+            60_i64.checked_mul(n)?.checked_add(30)?,
+            Grain::Minute,
+        )),
+        Grain::Day => Some(DurationData::new(
+            24_i64.checked_mul(n)?.checked_add(12)?,
+            Grain::Hour,
+        )),
+        Grain::Month => Some(DurationData::new(
+            30_i64.checked_mul(n)?.checked_add(15)?,
+            Grain::Day,
+        )),
+        Grain::Year => Some(DurationData::new(
+            12_i64.checked_mul(n)?.checked_add(6)?,
+            Grain::Month,
+        )),
         _ => None,
     }
 }
@@ -41,7 +56,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "half an hour".to_string(),
             pattern: vec![regex("(1/2\\s?|пів\\s?)години?")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "number.number hours".to_string(),
@@ -55,7 +72,9 @@ pub fn rules() -> Vec<Rule> {
                 let frac = rm.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let total_minutes = 60_i64.checked_mul(h)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
+                let total_minutes = 60_i64
+                    .checked_mul(h)?
+                    .checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Duration(DurationData::new(
                     total_minutes,
                     Grain::Minute,

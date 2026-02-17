@@ -30,8 +30,13 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                let base = s.trim_end_matches("번째").trim_end_matches("째번").trim_end_matches("째");
-                Some(TokenData::Ordinal(OrdinalData::new(parse_ko_cardinal(base)?)))
+                let base = s
+                    .trim_end_matches("번째")
+                    .trim_end_matches("째번")
+                    .trim_end_matches("째");
+                Some(TokenData::Ordinal(OrdinalData::new(parse_ko_cardinal(
+                    base,
+                )?)))
             }),
         },
         Rule {

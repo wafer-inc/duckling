@@ -98,9 +98,7 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "integer 21..99".to_string(),
             pattern: vec![
-                predicate(|td| {
-                    is_val(td, &[20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])
-                }),
+                predicate(|td| is_val(td, &[20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0])),
                 predicate(one_to_nine),
             ],
             production: Box::new(|nodes| {
@@ -116,7 +114,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer (100..199)".to_string(),
-            pattern: vec![regex("百"), predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..100.0).contains(&d.value)))],
+            pattern: vec![
+                regex("百"),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..100.0).contains(&d.value)),
+                ),
+            ],
             production: Box::new(|nodes| {
                 let b = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(100.0 + b)))
@@ -138,9 +141,14 @@ pub fn rules() -> Vec<Rule> {
             name: "integer 201..999".to_string(),
             pattern: vec![
                 predicate(|td| {
-                    is_val(td, &[200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0])
+                    is_val(
+                        td,
+                        &[200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0],
+                    )
                 }),
-                predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..100.0).contains(&d.value))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..100.0).contains(&d.value)),
+                ),
             ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;
@@ -155,7 +163,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer (1000..1999)".to_string(),
-            pattern: vec![regex("千"), predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..1000.0).contains(&d.value)))],
+            pattern: vec![
+                regex("千"),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..1000.0).contains(&d.value)),
+                ),
+            ],
             production: Box::new(|nodes| {
                 let b = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(1000.0 + b)))
@@ -179,10 +192,14 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|td| {
                     is_val(
                         td,
-                        &[2000.0, 3000.0, 4000.0, 5000.0, 6000.0, 7000.0, 8000.0, 9000.0],
+                        &[
+                            2000.0, 3000.0, 4000.0, 5000.0, 6000.0, 7000.0, 8000.0, 9000.0,
+                        ],
                     )
                 }),
-                predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..1000.0).contains(&d.value))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..1000.0).contains(&d.value)),
+                ),
             ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;
@@ -197,7 +214,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer (10000..19999)".to_string(),
-            pattern: vec![regex("万"), predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..10000.0).contains(&d.value)))],
+            pattern: vec![
+                regex("万"),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..10000.0).contains(&d.value)),
+                ),
+            ],
             production: Box::new(|nodes| {
                 let b = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(10000.0 + b)))
@@ -222,12 +244,13 @@ pub fn rules() -> Vec<Rule> {
                     is_val(
                         td,
                         &[
-                            20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0,
-                            90000.0,
+                            20000.0, 30000.0, 40000.0, 50000.0, 60000.0, 70000.0, 80000.0, 90000.0,
                         ],
                     )
                 }),
-                predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..10000.0).contains(&d.value))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..10000.0).contains(&d.value)),
+                ),
             ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;

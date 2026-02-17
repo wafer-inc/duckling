@@ -72,7 +72,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<positive-numeral> <time-grain>".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(n) if n.value > 0.0 && n.value.fract() != 0.0)),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(n) if n.value > 0.0 && n.value.fract() != 0.0),
+                ),
                 dim(DimensionKind::TimeGrain),
             ],
             production: Box::new(|nodes| {
@@ -91,7 +93,10 @@ pub fn rules() -> Vec<Rule> {
                     Grain::Quarter => v * 7776000.0,
                     Grain::Year => v * 31536000.0,
                 };
-                Some(TokenData::Duration(DurationData::new(seconds.floor() as i64, Grain::Second)))
+                Some(TokenData::Duration(DurationData::new(
+                    seconds.floor() as i64,
+                    Grain::Second,
+                )))
             }),
         },
     ]

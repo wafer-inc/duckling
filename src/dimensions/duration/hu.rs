@@ -17,17 +17,23 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "quarter of an hour".to_string(),
             pattern: vec![regex(r"(negyed[\s-]?óra)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "half an hour".to_string(),
             pattern: vec![regex(r"(fél[\s-]?óra)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "kettő perc".to_string(),
             pattern: vec![regex(r"kettő perc")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(2, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(2, Grain::Minute)))
+            }),
         },
         Rule {
             name: "hét hét".to_string(),

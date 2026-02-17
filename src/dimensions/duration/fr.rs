@@ -21,17 +21,23 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "un quart d'heure".to_string(),
             pattern: vec![regex("(1/4\\s?h(eure)?|(un|1) quart d'heure)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "une demi heure".to_string(),
             pattern: vec![regex("(1/2\\s?h(eure)?|(1|une) demi(e)?(\\s|-)heure)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "trois quarts d'heure".to_string(),
             pattern: vec![regex("(3/4\\s?h(eure)?|(3|trois) quart(s)? d'heure)")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))
+            }),
         },
         Rule {
             name: "environ <duration>".to_string(),

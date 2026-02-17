@@ -1,7 +1,7 @@
+use super::{Direction, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();

@@ -1,7 +1,7 @@
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::regex;
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
 fn parse_it_hour_token(s: &str) -> Option<u32> {
     match s {
@@ -382,7 +382,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let n = parse_it_qty(n_s)?;
                 let grain = parse_it_grain(&g_s)?;
-                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: -n, grain })))
+                Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain { n: n.checked_neg()?, grain })))
             }),
         },
         Rule {
@@ -961,7 +961,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour = parse_it_hour_token(&h_raw)?;
                 if pod.contains("pomeriggio") || pod.contains("sera") {
                     if hour < 12 {
-                        hour += 12;
+                        hour = hour.checked_add(12)?;
                     }
                 } else if pod.contains("mattino") {
                     if hour == 12 {
@@ -969,7 +969,7 @@ pub fn rules() -> Vec<Rule> {
                     }
                 } else if pod.contains("notte") {
                     if (6..12).contains(&hour) {
-                        hour += 12;
+                        hour = hour.checked_add(12)?;
                     } else if hour == 12 {
                         hour = 0;
                     }

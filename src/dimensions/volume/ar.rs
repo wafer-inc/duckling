@@ -70,37 +70,51 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<vol> liters".to_string(),
             pattern: vec![regex("لي?تي?ر(ات)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "<latent vol> gallon".to_string(),
             pattern: vec![regex("[جغق]الون(ين|ان|ات)?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::unit_only(VolumeUnit::Gallon)))
+            }),
         },
         Rule {
             name: "quarter liter".to_string(),
             pattern: vec![regex("ربع لي?تي?ر")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(0.25, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(0.25, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "half liter".to_string(),
             pattern: vec![regex("نصف? لي?تي?ر")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(0.5, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "two liters".to_string(),
             pattern: vec![regex("لي?تي?ر(ان|ين)")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(2.0, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "liter and quarter".to_string(),
             pattern: vec![regex("لي?تي?ر و ?ربع")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(1.25, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(1.25, VolumeUnit::Litre)))
+            }),
         },
         Rule {
             name: "liter and half".to_string(),
             pattern: vec![regex("لي?تي?ر و ?نصف?")],
-            production: Box::new(|_| Some(TokenData::Volume(VolumeData::new(1.5, VolumeUnit::Litre)))),
+            production: Box::new(|_| {
+                Some(TokenData::Volume(VolumeData::new(1.5, VolumeUnit::Litre)))
+            }),
         },
     ]
 }

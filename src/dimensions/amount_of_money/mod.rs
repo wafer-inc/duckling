@@ -1,10 +1,10 @@
-pub mod en;
-pub mod es;
+pub mod ar;
 pub mod bg;
 pub mod ca;
-pub mod ar;
-pub mod ga;
+pub mod en;
+pub mod es;
 pub mod fr;
+pub mod ga;
 pub mod he;
 pub mod hr;
 pub mod id;

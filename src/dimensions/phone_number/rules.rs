@@ -44,7 +44,9 @@ fn decode_escaped_arabic_indic_digits(s: &str) -> String {
         if chunk.len() % 4 == 0 {
             let mut ok = true;
             for group in chunk.as_bytes().chunks(4) {
-                let g = std::str::from_utf8(group).ok().and_then(|x| x.parse::<u32>().ok());
+                let g = std::str::from_utf8(group)
+                    .ok()
+                    .and_then(|x| x.parse::<u32>().ok());
                 match g {
                     Some(cp @ 1632..=1641) => {
                         let d = (cp.saturating_sub(1632)) as u8;

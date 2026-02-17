@@ -7,7 +7,9 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "number words (da corpus subset)".to_string(),
-            pattern: vec![regex(r"(nul|én|en|ét|et|to|fjorten|seksten|sytten|atten|Atten)")],
+            pattern: vec![regex(
+                r"(nul|én|en|ét|et|to|fjorten|seksten|sytten|atten|Atten)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -44,7 +46,9 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                Some(TokenData::Numeral(NumeralData::new(t.replace('.', "").parse().ok()?)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    t.replace('.', "").parse().ok()?,
+                )))
             }),
         },
         Rule {
@@ -55,7 +59,9 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m.group(1)?,
                     _ => return None,
                 };
-                Some(TokenData::Numeral(NumeralData::new(t.replace(',', ".").parse().ok()?)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    t.replace(',', ".").parse().ok()?,
+                )))
             }),
         },
         Rule {
@@ -84,7 +90,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "negative".to_string(),
-            pattern: vec![regex(r"(-\s*|minus\s+|negativ\s+)(\d{1,3}(\.\d\d\d){1,5}|\d*\,?\d+|\,\d+)([kmgKMG])?")],
+            pattern: vec![regex(
+                r"(-\s*|minus\s+|negativ\s+)(\d{1,3}(\.\d\d\d){1,5}|\d*\,?\d+|\,\d+)([kmgKMG])?",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -92,7 +100,11 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let n = m.group(2)?;
                 let mut x: f64 = if n.starts_with(',') {
-                    format!("0{}", n).replace('.', "").replace(',', ".").parse().ok()?
+                    format!("0{}", n)
+                        .replace('.', "")
+                        .replace(',', ".")
+                        .parse()
+                        .ok()?
                 } else {
                     n.replace('.', "").replace(',', ".").parse().ok()?
                 };

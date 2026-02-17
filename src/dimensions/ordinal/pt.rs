@@ -41,7 +41,9 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "ordinals (1..10)".to_string(),
-            pattern: vec![regex("(primeir|segund|terceir|quart|quint|sext|s[ée]tim|oitav|non|d[ée]cim)[ao]s?")],
+            pattern: vec![regex(
+                "(primeir|segund|terceir|quart|quint|sext|s[ée]tim|oitav|non|d[ée]cim)[ao]s?",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -53,7 +55,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "cardinals (20 .. 90)".to_string(),
-            pattern: vec![regex("(vi|tri|quadra|q[üu]inqua|sexa|septua|octo|nona)g[ée]sim[ao]s?")],
+            pattern: vec![regex(
+                "(vi|tri|quadra|q[üu]inqua|sexa|septua|octo|nona)g[ée]sim[ao]s?",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

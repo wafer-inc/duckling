@@ -52,7 +52,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (0..90)".to_string(),
-            pattern: vec![regex(r"(nolla|yksi|kaksi|kolme|neljä|viisi|kuusi|seitsemän|kahdeksan|yhdeksän|kymmenen|yksitoista|kaksitoista|kolmetoista|neljätoista|viisitoista|kuusitoista|seitsemäntoista|kahdeksantoista|yhdeksäntoista|kaksikymmentä|kolmekymmentä|neljäkymmentä|viisikymmentä|kuusikymmentä|seitsemänkymmentä|kahdeksankymmentä|yhdeksänkymmentä)")],
+            pattern: vec![regex(
+                r"(nolla|yksi|kaksi|kolme|neljä|viisi|kuusi|seitsemän|kahdeksan|yhdeksän|kymmenen|yksitoista|kaksitoista|kolmetoista|neljätoista|viisitoista|kuusitoista|seitsemäntoista|kahdeksantoista|yhdeksäntoista|kaksikymmentä|kolmekymmentä|neljäkymmentä|viisikymmentä|kuusikymmentä|seitsemänkymmentä|kahdeksankymmentä|yhdeksänkymmentä)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -63,7 +65,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "composite tens".to_string(),
-            pattern: vec![regex(r"(kaksikymmentä|kolmekymmentä|neljäkymmentä|viisikymmentä|kuusikymmentä|seitsemänkymmentä|kahdeksankymmentä|yhdeksänkymmentä)(yksi|kaksi|kolme|neljä|viisi|kuusi|seitsemän|kahdeksan|yhdeksän)")],
+            pattern: vec![regex(
+                r"(kaksikymmentä|kolmekymmentä|neljäkymmentä|viisikymmentä|kuusikymmentä|seitsemänkymmentä|kahdeksankymmentä|yhdeksänkymmentä)(yksi|kaksi|kolme|neljä|viisi|kuusi|seitsemän|kahdeksan|yhdeksän)",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -71,7 +75,9 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let t = m.group(1)?.to_lowercase();
                 let u = m.group(2)?.to_lowercase();
-                Some(TokenData::Numeral(NumeralData::new(fi_num(&t)? + fi_num(&u)?)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    fi_num(&t)? + fi_num(&u)?,
+                )))
             }),
         },
     ]

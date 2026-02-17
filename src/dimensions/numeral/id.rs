@@ -91,15 +91,15 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("(se)?lusin")],
             production: Box::new(|_| {
                 Some(TokenData::Numeral(
-                    NumeralData::new(12.0)
-                        .with_grain(1)
-                        .with_multipliable(true),
+                    NumeralData::new(12.0).with_grain(1).with_multipliable(true),
                 ))
             }),
         },
         Rule {
             name: "integer (0..9 11)".to_string(),
-            pattern: vec![regex("(kosong|nol|satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sebelas)")],
+            pattern: vec![regex(
+                "(kosong|nol|satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sebelas)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -111,7 +111,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "ten".to_string(),
             pattern: vec![regex("(se)?puluh")],
-            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(10.0).with_grain(1)))),
+            production: Box::new(|_| {
+                Some(TokenData::Numeral(NumeralData::new(10.0).with_grain(1)))
+            }),
         },
         Rule {
             name: "teen".to_string(),
@@ -123,7 +125,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "integer 20..90".to_string(),
-            pattern: vec![predicate(number_between(2.0, 10.0)), predicate(|td| matches!(td, TokenData::Numeral(d) if d.value == 10.0))],
+            pattern: vec![
+                predicate(number_between(2.0, 10.0)),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value == 10.0)),
+            ],
             production: Box::new(|nodes| {
                 let v1 = numeral_data(&nodes[0].token_data)?;
                 let v2 = numeral_data(&nodes[1].token_data)?;
@@ -136,7 +141,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "integer 21..99".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(d) if [20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0].contains(&d.value))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if [20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0].contains(&d.value)),
+                ),
                 predicate(number_between(1.0, 10.0)),
             ],
             production: Box::new(|nodes| {
@@ -176,7 +183,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect".to_string(),
-            pattern: vec![predicate(has_grain), predicate(|td| !is_multipliable(td) && is_positive(td))],
+            pattern: vec![
+                predicate(has_grain),
+                predicate(|td| !is_multipliable(td) && is_positive(td)),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?;
                 let b = numeral_data(&nodes[1].token_data)?;
@@ -190,11 +200,17 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number comma number".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), regex("koma"), predicate(|td| !has_grain(td))],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex("koma"),
+                predicate(|td| !has_grain(td)),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;
                 let b = numeral_data(&nodes[2].token_data)?.value;
-                Some(TokenData::Numeral(NumeralData::new(a + decimals_to_double(b))))
+                Some(TokenData::Numeral(NumeralData::new(
+                    a + decimals_to_double(b),
+                )))
             }),
         },
         Rule {

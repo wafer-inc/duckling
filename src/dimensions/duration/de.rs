@@ -21,17 +21,25 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "quarter of an hour".to_string(),
             pattern: vec![regex("(einer? )?Viertelstunde")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(15, Grain::Minute)))
+            }),
         },
         Rule {
             name: "half an hour".to_string(),
             pattern: vec![regex("(1/2\\s?|(eine )?halbe |(einer )?halben )stunde")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
         Rule {
             name: "three-quarters of an hour".to_string(),
-            pattern: vec![regex("3/4\\s?stunde|(einer? )?dreiviertel stunde|drei viertelstunden")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))),
+            pattern: vec![regex(
+                "3/4\\s?stunde|(einer? )?dreiviertel stunde|drei viertelstunden",
+            )],
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(45, Grain::Minute)))
+            }),
         },
         Rule {
             name: "fortnight".to_string(),
@@ -40,7 +48,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "about|exactly <duration>".to_string(),
-            pattern: vec![regex("ungef(ä|a)hr|zirka|genau|exakt"), dim(DimensionKind::Duration)],
+            pattern: vec![
+                regex("ungef(ä|a)hr|zirka|genau|exakt"),
+                dim(DimensionKind::Duration),
+            ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
         },
         Rule {
@@ -55,8 +66,13 @@ pub fn rules() -> Vec<Rule> {
                 let frac = m.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let minutes = 60_i64.checked_mul(hh)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
-                Some(TokenData::Duration(DurationData::new(minutes, Grain::Minute)))
+                let minutes = 60_i64
+                    .checked_mul(hh)?
+                    .checked_add(num.checked_mul(60)?.checked_div(den)?)?;
+                Some(TokenData::Duration(DurationData::new(
+                    minutes,
+                    Grain::Minute,
+                )))
             }),
         },
         Rule {
@@ -71,8 +87,13 @@ pub fn rules() -> Vec<Rule> {
                 let frac = m.group(2)?;
                 let num: i64 = frac.parse().ok()?;
                 let den: i64 = 10_i64.pow(frac.len() as u32);
-                let seconds = 60_i64.checked_mul(mm)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
-                Some(TokenData::Duration(DurationData::new(seconds, Grain::Second)))
+                let seconds = 60_i64
+                    .checked_mul(mm)?
+                    .checked_add(num.checked_mul(60)?.checked_div(den)?)?;
+                Some(TokenData::Duration(DurationData::new(
+                    seconds,
+                    Grain::Second,
+                )))
             }),
         },
         Rule {
@@ -84,7 +105,10 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(
+                    60_i64.checked_mul(v)?.checked_add(30)?,
+                    Grain::Minute,
+                )))
             }),
         },
         Rule {
@@ -96,7 +120,10 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[0].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(v)?.checked_add(30)?, Grain::Second)))
+                Some(TokenData::Duration(DurationData::new(
+                    60_i64.checked_mul(v)?.checked_add(30)?,
+                    Grain::Second,
+                )))
             }),
         },
         Rule {
@@ -112,14 +139,19 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "half a <time-grain>".to_string(),
-            pattern: vec![regex("(ein(en)?)?(1/2|halbe?)"), dim(DimensionKind::TimeGrain)],
+            pattern: vec![
+                regex("(ein(en)?)?(1/2|halbe?)"),
+                dim(DimensionKind::TimeGrain),
+            ],
             production: Box::new(|nodes| {
                 let g = match &nodes[1].token_data {
                     TokenData::TimeGrain(g) => *g,
                     _ => return None,
                 };
                 match g {
-                    Grain::Minute => Some(TokenData::Duration(DurationData::new(30, Grain::Second))),
+                    Grain::Minute => {
+                        Some(TokenData::Duration(DurationData::new(30, Grain::Second)))
+                    }
                     Grain::Hour => Some(TokenData::Duration(DurationData::new(30, Grain::Minute))),
                     Grain::Day => Some(TokenData::Duration(DurationData::new(12, Grain::Hour))),
                     Grain::Month => Some(TokenData::Duration(DurationData::new(15, Grain::Day))),
@@ -171,7 +203,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "composite <duration> and <duration>".to_string(),
-            pattern: vec![dim(DimensionKind::Duration), regex(",|und"), dim(DimensionKind::Duration)],
+            pattern: vec![
+                dim(DimensionKind::Duration),
+                regex(",|und"),
+                dim(DimensionKind::Duration),
+            ],
             production: Box::new(|nodes| {
                 let d1 = duration_data(&nodes[0].token_data)?;
                 let d2 = duration_data(&nodes[2].token_data)?;
@@ -187,14 +223,18 @@ pub fn rules() -> Vec<Rule> {
                 predicate(is_natural),
                 regex("(ein(en?) )?stunden?( und)?"),
                 predicate(|td| {
-                    is_natural(td) && matches!(td, TokenData::Numeral(n) if n.value >= 1.0 && n.value < 60.0)
+                    is_natural(td)
+                        && matches!(td, TokenData::Numeral(n) if n.value >= 1.0 && n.value < 60.0)
                 }),
                 predicate(is_grain(Grain::Minute)),
             ],
             production: Box::new(|nodes| {
                 let h = numeral_data(&nodes[0].token_data)?.value as i64;
                 let m = numeral_data(&nodes[2].token_data)?.value as i64;
-                Some(TokenData::Duration(DurationData::new(60_i64.checked_mul(h)?.checked_add(m)?, Grain::Minute)))
+                Some(TokenData::Duration(DurationData::new(
+                    60_i64.checked_mul(h)?.checked_add(m)?,
+                    Grain::Minute,
+                )))
             }),
         },
     ]

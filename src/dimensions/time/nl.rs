@@ -1,10 +1,17 @@
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{predicate, regex};
 use crate::types::{Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
-fn is_time(td: &TokenData) -> bool { matches!(td, TokenData::Time(_)) }
-fn time_data(td: &TokenData) -> Option<&TimeData> { match td { TokenData::Time(d) => Some(d), _ => None } }
+fn is_time(td: &TokenData) -> bool {
+    matches!(td, TokenData::Time(_))
+}
+fn time_data(td: &TokenData) -> Option<&TimeData> {
+    match td {
+        TokenData::Time(d) => Some(d),
+        _ => None,
+    }
+}
 fn parse_nl_number_word(s: &str) -> Option<i64> {
     match s.to_lowercase().as_str() {
         "een" | "één" => Some(1),
@@ -180,7 +187,7 @@ pub fn rules() -> Vec<Rule> {
                 if !(1..=31).contains(&day) || !(1..=12).contains(&month) {
                     return None;
                 }
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(1900 + yy) })))
+                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: Some(1900_i32.checked_add(yy)?) })))
             }),
         },
         Rule {
@@ -399,7 +406,7 @@ pub fn rules() -> Vec<Rule> {
                 if hour > 23 {
                     return None;
                 }
-                let out_hour = if hour == 0 { 23 } else { hour - 1 };
+                let out_hour = if hour == 0 { 23 } else { hour.checked_sub(1)? };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, 45, false))))
             }),
         },
@@ -479,7 +486,7 @@ pub fn rules() -> Vec<Rule> {
                 let grain = parse_nl_grain(g_s)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset {
                     grain,
-                    offset: -(n as i32),
+                    offset: (n as i32).checked_neg()?,
                 })))
             }),
         },
@@ -495,7 +502,7 @@ pub fn rules() -> Vec<Rule> {
                 let grain = parse_nl_grain(g_s)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::GrainOffset {
                     grain,
-                    offset: -(n as i32),
+                    offset: (n as i32).checked_neg()?,
                 })))
             }),
         },
@@ -891,7 +898,7 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 let mut t = TimeData::new(TimeForm::HourMinute(hour, 0, false));
                 t.open_interval_direction = Some(IntervalDirection::After);

@@ -61,7 +61,10 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Numeral(n) => n.value,
                     _ => return None,
                 };
-                Some(TokenData::Quantity(QuantityData::new(v, QuantityUnit::Pound)))
+                Some(TokenData::Quantity(QuantityData::new(
+                    v,
+                    QuantityUnit::Pound,
+                )))
             }),
         },
         Rule {

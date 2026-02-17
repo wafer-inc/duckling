@@ -66,7 +66,9 @@ fn hundred_word(s: &str) -> Option<f64> {
         "مائة" | "مائه" | "مئة" | "مئه" => Some(100.0),
         "مائتين" | "مائتان" | "متين" => Some(200.0),
         "ثلاثمائة" | "ثلاثماية" | "تلتمية" => Some(300.0),
-        "أربعمائة" | "اربعمائة" | "أربعمية" | "اربعمية" => Some(400.0),
+        "أربعمائة" | "اربعمائة" | "أربعمية" | "اربعمية" => {
+            Some(400.0)
+        }
         "خمسمائة" | "خمسمية" => Some(500.0),
         "ستمائة" | "ستمية" => Some(600.0),
         "سبعمائة" | "سبعمية" => Some(700.0),
@@ -94,7 +96,9 @@ fn power_word(s: &str) -> Option<NumeralData> {
             Some(NumeralData::new(1e3).with_grain(3).with_multipliable(true))
         }
         "الفين" | "الفان" => Some(NumeralData::new(2e3).with_grain(3)),
-        "مليون" | "ملايين" => Some(NumeralData::new(1e6).with_grain(6).with_multipliable(true)),
+        "مليون" | "ملايين" => {
+            Some(NumeralData::new(1e6).with_grain(6).with_multipliable(true))
+        }
         "مليونين" | "مليونان" => Some(NumeralData::new(2e6).with_grain(6)),
         _ => None,
     }

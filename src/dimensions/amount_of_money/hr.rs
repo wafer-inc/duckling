@@ -73,7 +73,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect (and number)".to_string(),
-            pattern: vec![predicate(is_without_cents), regex("i"), predicate(is_natural)],
+            pattern: vec![
+                predicate(is_without_cents),
+                regex("i"),
+                predicate(is_natural),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[0].token_data)?;
                 let c = numeral_data(&nodes[2].token_data)?.value;
@@ -165,7 +169,9 @@ pub fn rules() -> Vec<Rule> {
                     "libanonska" => Currency::LBP,
                     _ => return None,
                 };
-                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(c)))
+                Some(TokenData::AmountOfMoney(AmountOfMoneyData::currency_only(
+                    c,
+                )))
             }),
         },
         Rule {
@@ -206,12 +212,19 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "about|exactly <amount-of-money>".to_string(),
-            pattern: vec![regex("oko|otprilike|u blizini|skoro|približno"), predicate(is_money_with_value)],
+            pattern: vec![
+                regex("oko|otprilike|u blizini|skoro|približno"),
+                predicate(is_money_with_value),
+            ],
             production: Box::new(|nodes| Some(nodes[1].token_data.clone())),
         },
         Rule {
             name: "<numeral> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_natural), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_natural),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[0].token_data)?.value;
                 let d = money_data(&nodes[2].token_data)?;
@@ -226,7 +239,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<amount-of-money> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_simple_money), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_simple_money),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d1 = money_data(&nodes[0].token_data)?;
                 let d2 = money_data(&nodes[2].token_data)?;
@@ -234,13 +251,19 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d1.currency).with_interval(d1.value?, d2.value?),
+                    AmountOfMoneyData::currency_only(d1.currency)
+                        .with_interval(d1.value?, d2.value?),
                 ))
             }),
         },
         Rule {
             name: "between|from <numeral> to|and <amount-of-money>".to_string(),
-            pattern: vec![regex("od|otprilike|približno"), predicate(is_positive), regex("do"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("od|otprilike|približno"),
+                predicate(is_positive),
+                regex("do"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[1].token_data)?.value;
                 let d = money_data(&nodes[3].token_data)?;
@@ -255,7 +278,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "between|from <numeral> and <amount-of-money>".to_string(),
-            pattern: vec![regex("izmedju"), predicate(is_positive), regex("i"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("izmedju"),
+                predicate(is_positive),
+                regex("i"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[1].token_data)?.value;
                 let d = money_data(&nodes[3].token_data)?;
@@ -270,7 +298,12 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "between|from <amount-of-money> to|and <amount-of-money>".to_string(),
-            pattern: vec![regex("od|otprilike"), predicate(is_simple_money), regex("do"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("od|otprilike"),
+                predicate(is_simple_money),
+                regex("do"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d1 = money_data(&nodes[1].token_data)?;
                 let d2 = money_data(&nodes[3].token_data)?;
@@ -278,13 +311,19 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d1.currency).with_interval(d1.value?, d2.value?),
+                    AmountOfMoneyData::currency_only(d1.currency)
+                        .with_interval(d1.value?, d2.value?),
                 ))
             }),
         },
         Rule {
             name: "between <amount-of-money> and <amount-of-money>".to_string(),
-            pattern: vec![regex("izmedju"), predicate(is_simple_money), regex("i"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("izmedju"),
+                predicate(is_simple_money),
+                regex("i"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d1 = money_data(&nodes[1].token_data)?;
                 let d2 = money_data(&nodes[3].token_data)?;
@@ -292,7 +331,8 @@ pub fn rules() -> Vec<Rule> {
                     return None;
                 }
                 Some(TokenData::AmountOfMoney(
-                    AmountOfMoneyData::currency_only(d1.currency).with_interval(d1.value?, d2.value?),
+                    AmountOfMoneyData::currency_only(d1.currency)
+                        .with_interval(d1.value?, d2.value?),
                 ))
             }),
         },
@@ -308,7 +348,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "more than <amount-of-money>".to_string(),
-            pattern: vec![regex("više od|najmanje|preko|iznad"), predicate(is_simple_money)],
+            pattern: vec![
+                regex("više od|najmanje|preko|iznad"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[1].token_data)?;
                 Some(TokenData::AmountOfMoney(

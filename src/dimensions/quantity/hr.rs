@@ -15,7 +15,10 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "<number> <units>".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), regex("k(il(o|e|a))?(g(rama?)?)?")],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex("k(il(o|e|a))?(g(rama?)?)?"),
+            ],
             production: Box::new(|nodes| {
                 let n = numeral_data(&nodes[0].token_data)?;
                 Some(TokenData::Quantity(QuantityData::new(

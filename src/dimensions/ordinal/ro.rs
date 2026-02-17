@@ -51,7 +51,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "spelled out ordinals".to_string(),
-            pattern: vec![regex("al?\\s(doi|trei|patru|cinci|(s|ș)a(s|pt)e|opt|nou(a|ă))[ -]?(le)?a")],
+            pattern: vec![regex(
+                "al?\\s(doi|trei|patru|cinci|(s|ș)a(s|pt)e|opt|nou(a|ă))[ -]?(le)?a",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

@@ -129,7 +129,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "korean native units".to_string(),
-            pattern: vec![regex("(하나|한|둘|두|셋|세|넷|네|다섯|여섯|일곱|여덟|아홉)")],
+            pattern: vec![regex(
+                "(하나|한|둘|두|셋|세|넷|네|다섯|여섯|일곱|여덟|아홉)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,
@@ -141,8 +143,12 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "native 21..99".to_string(),
             pattern: vec![
-                predicate(|td| matches!(td, TokenData::Numeral(d) if [20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,10.0].contains(&d.value))),
-                predicate(|td| matches!(td, TokenData::Numeral(d) if (1.0..10.0).contains(&d.value))),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if [20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,10.0].contains(&d.value)),
+                ),
+                predicate(
+                    |td| matches!(td, TokenData::Numeral(d) if (1.0..10.0).contains(&d.value)),
+                ),
             ],
             production: Box::new(|nodes| {
                 let t = numeral_data(&nodes[0].token_data)?.value;
@@ -152,16 +158,26 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "dot decimal".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), regex("점"), predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none()))],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex("점"),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.grain.is_none())),
+            ],
             production: Box::new(|nodes| {
                 let a = numeral_data(&nodes[0].token_data)?.value;
                 let b = numeral_data(&nodes[2].token_data)?.value;
-                Some(TokenData::Numeral(NumeralData::new(a + decimals_to_double(b))))
+                Some(TokenData::Numeral(NumeralData::new(
+                    a + decimals_to_double(b),
+                )))
             }),
         },
         Rule {
             name: "fraction bun-eui".to_string(),
-            pattern: vec![dim(DimensionKind::Numeral), regex("분의"), dim(DimensionKind::Numeral)],
+            pattern: vec![
+                dim(DimensionKind::Numeral),
+                regex("분의"),
+                dim(DimensionKind::Numeral),
+            ],
             production: Box::new(|nodes| {
                 let d = numeral_data(&nodes[0].token_data)?.value;
                 let n = numeral_data(&nodes[2].token_data)?.value;
@@ -174,7 +190,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "negative".to_string(),
-            pattern: vec![regex("(마이너스|마이나스|-)") , predicate(|td| matches!(td, TokenData::Numeral(d) if d.value >= 0.0))],
+            pattern: vec![
+                regex("(마이너스|마이나스|-)"),
+                predicate(|td| matches!(td, TokenData::Numeral(d) if d.value >= 0.0)),
+            ],
             production: Box::new(|nodes| {
                 let v = numeral_data(&nodes[1].token_data)?.value;
                 Some(TokenData::Numeral(NumeralData::new(-v)))

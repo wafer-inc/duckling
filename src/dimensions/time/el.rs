@@ -1,7 +1,7 @@
+use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
+use crate::dimensions::time_grain::Grain;
 use crate::pattern::{dim, regex};
 use crate::types::{DimensionKind, Rule, TokenData};
-use crate::dimensions::time_grain::Grain;
-use super::{Direction, IntervalDirection, PartOfDay, TimeData, TimeForm};
 
 pub fn rules() -> Vec<Rule> {
     let mut rules = super::en::rules();
@@ -755,7 +755,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = htxt.parse().ok()?;
                 let minute: u32 = mtxt.parse().ok()?;
                 if ap == "μμ" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap == "πμ" && hour == 12 {
                     hour = 0;
@@ -773,7 +773,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 if (pod.contains("βρ") || pod.contains("απ")) && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -789,7 +789,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m.parse().ok()?;
                 if ap == "π" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),
@@ -804,7 +804,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 if ap == "μμ" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap == "πμ" && hour == 12 {
                     hour = 0;
@@ -822,7 +822,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 if ap == "μμ" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap == "πμ" && hour == 12 {
                     hour = 0;
@@ -840,7 +840,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 if ap == "μμ" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap == "πμ" && hour == 12 {
                     hour = 0;
@@ -907,7 +907,7 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(rm) => (rm.group(1)?.to_lowercase(), rm.group(3)?),
                     _ => return None,
                 };
-                let mut hour = match h.as_str() {
+                let mut hour: u32 = match h.as_str() {
                     "μία" | "μια" => 1,
                     "δύο" | "δυο" => 2,
                     "τρεις" => 3,
@@ -923,7 +923,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 if ap == "μμ" && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap == "πμ" && hour == 12 {
                     hour = 0;
@@ -954,7 +954,7 @@ pub fn rules() -> Vec<Rule> {
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m.parse().ok()?;
                 if ap.starts_with('μ') && hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 if ap.starts_with('π') && hour == 12 {
                     hour = 0;
@@ -1003,7 +1003,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 if hour < 12 {
-                    hour += 12;
+                    hour = hour.checked_add(12)?;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, 0, false))))
             }),
@@ -1070,7 +1070,7 @@ pub fn rules() -> Vec<Rule> {
                     Grain::Year
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -value,
+                    n: value.checked_neg()?,
                     grain,
                 })))
             }),
@@ -1100,7 +1100,7 @@ pub fn rules() -> Vec<Rule> {
                     Grain::Year
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -value,
+                    n: value.checked_neg()?,
                     grain,
                 })))
             }),
@@ -1135,7 +1135,7 @@ pub fn rules() -> Vec<Rule> {
                     Grain::Year
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -value,
+                    n: value.checked_neg()?,
                     grain,
                 })))
             }),
@@ -1170,8 +1170,8 @@ pub fn rules() -> Vec<Rule> {
                 if mins >= 60 || !(1..=24).contains(&hour) {
                     return None;
                 }
-                let out_hour = if hour == 24 { 23 } else { hour - 1 };
-                let out_min = 60 - mins;
+                let out_hour = if hour == 24 { 23 } else { hour.checked_sub(1)? };
+                let out_min = 60_u32.checked_sub(mins)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(out_hour, out_min, false))))
             }),
         },
@@ -1301,7 +1301,7 @@ pub fn rules() -> Vec<Rule> {
                 let hh: i64 = h.parse().ok()?;
                 let num: i64 = frac.parse().ok()?;
                 let den = 10_i64.pow(frac.len() as u32);
-                let minutes = hh * 60 + (num * 60) / den;
+                let minutes = hh.checked_mul(60)?.checked_add(num.checked_mul(60)?.checked_div(den)?)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
                     n: minutes,
                     grain: Grain::Minute,
@@ -1318,7 +1318,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let hh: i64 = h.parse().ok()?;
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: hh * 60 + 30,
+                    n: hh.checked_mul(60)?.checked_add(30)?,
                     grain: Grain::Minute,
                 })))
             }),

@@ -77,14 +77,15 @@ fn test_extreme_inputs_do_not_panic_all_dimensions() {
 
 #[test]
 fn test_overflowing_time_inputs_return_no_time_entities() {
-    let cases = [
-        "in 9999999999999999 days",
-    ];
+    let cases = ["in 9999999999999999 days"];
     for text in cases {
         let entities = parse_no_panic(text, &[DimensionKind::Time]);
         let has_time = entities
             .iter()
             .any(|e| matches!(e.value, DimensionValue::Time(_)));
-        assert!(!has_time, "expected no Time entity for {text:?}, got {entities:?}");
+        assert!(
+            !has_time,
+            "expected no Time entity for {text:?}, got {entities:?}"
+        );
     }
 }

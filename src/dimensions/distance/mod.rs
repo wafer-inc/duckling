@@ -1,11 +1,11 @@
+pub mod bg;
 pub mod ca;
 pub mod cs;
 pub mod de;
 pub mod en;
 pub mod es;
-pub mod bg;
-pub mod ga;
 pub mod fr;
+pub mod ga;
 pub mod hr;
 pub mod it;
 pub mod km;

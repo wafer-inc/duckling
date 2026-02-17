@@ -13,11 +13,23 @@ fn time_data(td: &TokenData) -> Option<&TimeData> {
 }
 
 fn is_month(td: &TokenData) -> bool {
-    matches!(td, TokenData::Time(TimeData { form: TimeForm::Month(_), .. }))
+    matches!(
+        td,
+        TokenData::Time(TimeData {
+            form: TimeForm::Month(_),
+            ..
+        })
+    )
 }
 
 fn is_day_of_week(td: &TokenData) -> bool {
-    matches!(td, TokenData::Time(TimeData { form: TimeForm::DayOfWeek(_), .. }))
+    matches!(
+        td,
+        TokenData::Time(TimeData {
+            form: TimeForm::DayOfWeek(_),
+            ..
+        })
+    )
 }
 
 fn is_time_of_day(td: &TokenData) -> bool {
@@ -74,9 +86,9 @@ fn parse_year_2_or_4(y: &str) -> Option<i32> {
     let yr: i32 = y.parse().ok()?;
     if y.len() == 2 {
         if yr < 50 {
-            Some(yr + 2000)
+            Some(yr.checked_add(2000)?)
         } else {
-            Some(yr + 1900)
+            Some(yr.checked_add(1900)?)
         }
     } else {
         Some(yr)
@@ -94,7 +106,7 @@ fn to_h24_for_part(hour: u32, pod: PartOfDay) -> u32 {
         }
         PartOfDay::Afternoon | PartOfDay::Evening | PartOfDay::Night => {
             if hour < 12 {
-                hour + 12
+                hour.saturating_add(12)
             } else {
                 hour
             }
@@ -546,8 +558,8 @@ pub fn rules() -> Vec<Rule> {
                 if minus >= 60 || h == 0 {
                     return None;
                 }
-                let out_h = if h == 0 { 23 } else { h - 1 };
-                let out_m = 60 - minus;
+                let out_h = if h == 0 { 23 } else { h.checked_sub(1)? };
+                let out_m = 60_u32.checked_sub(minus)?;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(
                     out_h, out_m, is12h,
                 ))))
@@ -573,8 +585,8 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let minus = if text.contains("cuarto") { 15 } else { 30 };
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(
-                    h - 1,
-                    60 - minus,
+                    h.checked_sub(1)?,
+                    60_u32.checked_sub(minus)?,
                     is12h,
                 ))))
             }),
@@ -748,7 +760,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("hace"), dim(DimensionKind::Duration)],
             production: Box::new(|nodes| match &nodes[1].token_data {
                 TokenData::Duration(d) => Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -d.value,
+                    n: d.value.checked_neg()?,
                     grain: d.grain,
                 }))),
                 _ => None,
@@ -795,7 +807,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
-                    n: -n,
+                    n: n.checked_neg()?,
                     grain,
                 })))
             }),

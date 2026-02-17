@@ -41,7 +41,9 @@ pub fn rules() -> Vec<Rule> {
     vec![
         Rule {
             name: "number (0..10)".to_string(),
-            pattern: vec![regex(r"(nulla|zéró|egy|kettő|három|négy|öt|hat|hét|nyolc|kilenc|tíz)")],
+            pattern: vec![regex(
+                r"(nulla|zéró|egy|kettő|három|négy|öt|hat|hét|nyolc|kilenc|tíz)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -52,7 +54,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (11..19)".to_string(),
-            pattern: vec![regex(r"(tizenegy|tizenkettő|tizenhárom|tizennégy|tizenöt|tizenhat|tizenhét|tizennyolc|tizenkilenc)")],
+            pattern: vec![regex(
+                r"(tizenegy|tizenkettő|tizenhárom|tizennégy|tizenöt|tizenhat|tizenhét|tizennyolc|tizenkilenc)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -63,7 +67,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "number (21..29)".to_string(),
-            pattern: vec![regex(r"(huszonegy|huszonkettő|huszonhárom|huszonnégy|huszonöt|huszonhat|huszonhét|huszonnyolc|huszonkilenc)")],
+            pattern: vec![regex(
+                r"(huszonegy|huszonkettő|huszonhárom|huszonnégy|huszonöt|huszonhat|huszonhét|huszonnyolc|huszonkilenc)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -86,7 +92,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "tens".to_string(),
-            pattern: vec![regex(r"(húsz|harminc|negyven|ötven|hatvan|hetven|nyolcvan|kilencven)")],
+            pattern: vec![regex(
+                r"(húsz|harminc|negyven|ötven|hatvan|hetven|nyolcvan|kilencven)",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
@@ -97,7 +105,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "composite tens".to_string(),
-            pattern: vec![regex(r"(harminc|negyven|ötven|hatvan|hetven|nyolcvan|kilencven)(egy|kettő|három|négy|öt|hat|hét|nyolc|kilenc)")],
+            pattern: vec![regex(
+                r"(harminc|negyven|ötven|hatvan|hetven|nyolcvan|kilencven)(egy|kettő|három|négy|öt|hat|hét|nyolc|kilenc)",
+            )],
             production: Box::new(|nodes| {
                 let m = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m,
@@ -105,7 +115,9 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let t = m.group(1)?.to_lowercase();
                 let u = m.group(2)?.to_lowercase();
-                Some(TokenData::Numeral(NumeralData::new(hu_num(&t)? + hu_num(&u)?)))
+                Some(TokenData::Numeral(NumeralData::new(
+                    hu_num(&t)? + hu_num(&u)?,
+                )))
             }),
         },
     ]

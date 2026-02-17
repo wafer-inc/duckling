@@ -13,11 +13,23 @@ fn time_data(td: &TokenData) -> Option<&TimeData> {
 }
 
 fn is_day_of_week(td: &TokenData) -> bool {
-    matches!(td, TokenData::Time(TimeData { form: TimeForm::DayOfWeek(_), .. }))
+    matches!(
+        td,
+        TokenData::Time(TimeData {
+            form: TimeForm::DayOfWeek(_),
+            ..
+        })
+    )
 }
 
 fn is_month(td: &TokenData) -> bool {
-    matches!(td, TokenData::Time(TimeData { form: TimeForm::Month(_), .. }))
+    matches!(
+        td,
+        TokenData::Time(TimeData {
+            form: TimeForm::Month(_),
+            ..
+        })
+    )
 }
 
 fn is_time_of_day(td: &TokenData) -> bool {
@@ -74,9 +86,9 @@ fn parse_year_2_or_4(y: &str) -> Option<i32> {
     let yr: i32 = y.parse().ok()?;
     if y.len() == 2 {
         if yr < 50 {
-            Some(yr + 2000)
+            Some(yr.checked_add(2000)?)
         } else {
-            Some(yr + 1900)
+            Some(yr.checked_add(1900)?)
         }
     } else {
         Some(yr)
@@ -94,7 +106,7 @@ fn to_h24_for_part(hour: u32, pod: PartOfDay) -> u32 {
         }
         PartOfDay::Afternoon | PartOfDay::Evening | PartOfDay::Night => {
             if hour < 12 {
-                hour + 12
+                hour.saturating_add(12)
             } else {
                 hour
             }

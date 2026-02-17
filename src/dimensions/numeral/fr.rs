@@ -25,7 +25,9 @@ fn one_of(values: &'static [f64]) -> impl Fn(&TokenData) -> bool {
 }
 
 fn with_grain_multipliable(value: f64, grain: u8) -> NumeralData {
-    NumeralData::new(value).with_grain(grain).with_multipliable(true)
+    NumeralData::new(value)
+        .with_grain(grain)
+        .with_multipliable(true)
 }
 
 pub fn rules() -> Vec<Rule> {

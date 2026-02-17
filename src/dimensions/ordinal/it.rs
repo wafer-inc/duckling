@@ -35,7 +35,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "ordinals (primo..10)".to_string(),
-            pattern: vec![regex("((prim|second|terz|quart|quint|sest|settim|ottav|non|decim)(o|a|i|e))")],
+            pattern: vec![regex(
+                "((prim|second|terz|quart|quint|sest|settim|ottav|non|decim)(o|a|i|e))",
+            )],
             production: Box::new(|nodes| {
                 let s = match &nodes[0].token_data {
                     TokenData::RegexMatch(m) => m.group(1)?,

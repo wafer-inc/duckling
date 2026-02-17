@@ -17,7 +17,9 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "half an hour".to_string(),
             pattern: vec![regex("p(o|ó)(l|ł) godziny")],
-            production: Box::new(|_| Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))),
+            production: Box::new(|_| {
+                Some(TokenData::Duration(DurationData::new(30, Grain::Minute)))
+            }),
         },
     ]
 }

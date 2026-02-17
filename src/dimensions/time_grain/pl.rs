@@ -27,7 +27,9 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "week (grain)".to_string(),
-            pattern: vec![regex(r"tydzie(n|ń|)|tygod(ni(owi|u|a|em))|tygodn(iach|iami|iom|ie|i)|tyg\.?")],
+            pattern: vec![regex(
+                r"tydzie(n|ń|)|tygod(ni(owi|u|a|em))|tygodn(iach|iami|iom|ie|i)|tyg\.?",
+            )],
             production: Box::new(|_| Some(TokenData::TimeGrain(Grain::Week))),
         },
         Rule {

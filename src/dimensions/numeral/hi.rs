@@ -56,7 +56,9 @@ fn zero_to_ninety_nine(s: &str) -> Option<f64> {
 fn power(s: &str) -> Option<NumeralData> {
     match s {
         "सौ" => Some(NumeralData::new(1e2).with_grain(2).with_multipliable(true)),
-        "हज़ार" | "हज़ार" => Some(NumeralData::new(1e3).with_grain(3).with_multipliable(true)),
+        "हज़ार" | "हज़ार" => {
+            Some(NumeralData::new(1e3).with_grain(3).with_multipliable(true))
+        }
         _ => None,
     }
 }

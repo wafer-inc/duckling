@@ -91,7 +91,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "intersect (and number)".to_string(),
-            pattern: vec![predicate(is_without_cents), regex("i"), predicate(is_natural)],
+            pattern: vec![
+                predicate(is_without_cents),
+                regex("i"),
+                predicate(is_natural),
+            ],
             production: Box::new(|nodes| {
                 let d = money_data(&nodes[0].token_data)?;
                 let c = numeral_data(&nodes[2].token_data)?.value;
@@ -159,7 +163,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<numeral> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_natural), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_natural),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let from = numeral_data(&nodes[0].token_data)?.value;
                 let d = money_data(&nodes[2].token_data)?;
@@ -174,7 +182,11 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<amount-of-money> - <amount-of-money>".to_string(),
-            pattern: vec![predicate(is_simple_money), regex("-"), predicate(is_simple_money)],
+            pattern: vec![
+                predicate(is_simple_money),
+                regex("-"),
+                predicate(is_simple_money),
+            ],
             production: Box::new(|nodes| {
                 let d1 = money_data(&nodes[0].token_data)?;
                 let d2 = money_data(&nodes[2].token_data)?;

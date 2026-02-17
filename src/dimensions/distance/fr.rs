@@ -27,7 +27,9 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Distance), regex("m((e|é|è)tres?)?")],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
-                Some(TokenData::Distance(d.clone().with_unit(DistanceUnit::Metre)))
+                Some(TokenData::Distance(
+                    d.clone().with_unit(DistanceUnit::Metre),
+                ))
             }),
         },
         Rule {
@@ -40,7 +42,10 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<latent dist> km".to_string(),
-            pattern: vec![dim(DimensionKind::Distance), regex("k(ilo)?m?((e|é|è)tre)?s?")],
+            pattern: vec![
+                dim(DimensionKind::Distance),
+                regex("k(ilo)?m?((e|é|è)tre)?s?"),
+            ],
             production: Box::new(|nodes| {
                 let d = distance_data(&nodes[0].token_data)?;
                 Some(TokenData::Distance(
