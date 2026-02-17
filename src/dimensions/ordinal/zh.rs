@@ -42,7 +42,7 @@ fn parse_zh_numeral(s: &str) -> Option<i64> {
         } else {
             zh_digit(right.chars().next()?)?
         };
-        return Some(tens.checked_mul(10)?.checked_add(ones)?);
+        return tens.checked_mul(10)?.checked_add(ones);
     }
     if s.chars().count() == 1 {
         return zh_digit(s.chars().next()?);

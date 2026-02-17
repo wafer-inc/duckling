@@ -88,10 +88,10 @@ fn parse_tr_number_word(s: &str) -> Option<u32> {
     }
     if tokens.len() == 2 {
         if let Some(tn) = tens(tokens[0]) {
-            return Some(tn.checked_add(unit(tokens[1]).unwrap_or(0))?);
+            return tn.checked_add(unit(tokens[1]).unwrap_or(0));
         }
         if tokens[0] == "on" {
-            return Some(unit(tokens[1])?.checked_add(10)?);
+            return unit(tokens[1])?.checked_add(10);
         }
     }
     None

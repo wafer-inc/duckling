@@ -38,7 +38,7 @@ fn parse_ja_numeral(s: &str) -> Option<i64> {
             _ => return None,
         }
     }
-    Some(total.checked_add(current)?)
+    total.checked_add(current)
 }
 
 pub fn rules() -> Vec<Rule> {

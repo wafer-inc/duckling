@@ -14,6 +14,7 @@ type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
 type SeenKey = (usize, usize, Option<String>, String);
 
 /// Parse text and resolve all entities.
+#[allow(dead_code)]
 pub fn parse_and_resolve(
     text: &str,
     rules: &[Rule],

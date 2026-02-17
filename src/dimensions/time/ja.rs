@@ -21,15 +21,15 @@ fn parse_kanji_under_60(s: &str) -> Option<u32> {
         return Some(10);
     }
     if let Some(rest) = s.strip_prefix('十') {
-        return Some(d(rest.chars().next()?)?.checked_add(10)?);
+        return d(rest.chars().next()?)?.checked_add(10);
     }
     if let Some(rest) = s.strip_suffix('十') {
-        return Some(d(rest.chars().next()?)?.checked_mul(10)?);
+        return d(rest.chars().next()?)?.checked_mul(10);
     }
     if let Some((a, b)) = s.split_once('十') {
         let aa = d(a.chars().next()?)?;
         let bb = d(b.chars().next()?)?;
-        return Some(aa.checked_mul(10)?.checked_add(bb)?);
+        return aa.checked_mul(10)?.checked_add(bb);
     }
     d(s.chars().next()?)
 }

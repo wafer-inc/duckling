@@ -41,7 +41,7 @@ fn parse_zh_num(s: &str) -> Option<u32> {
         } else {
             d(rest.chars().next()?)?
         };
-        return Some(20_u32.checked_add(tail)?);
+        return 20_u32.checked_add(tail);
     }
     if let Some(rest) = s.strip_prefix('卅') {
         let tail = if rest.is_empty() {
@@ -49,13 +49,13 @@ fn parse_zh_num(s: &str) -> Option<u32> {
         } else {
             d(rest.chars().next()?)?
         };
-        return Some(30_u32.checked_add(tail)?);
+        return 30_u32.checked_add(tail);
     }
     if let Some(rest) = s.strip_prefix('十') {
-        return Some(d(rest.chars().next()?)?.checked_add(10)?);
+        return d(rest.chars().next()?)?.checked_add(10);
     }
     if let Some(rest) = s.strip_suffix('十') {
-        return Some(d(rest.chars().next()?)?.checked_mul(10)?);
+        return d(rest.chars().next()?)?.checked_mul(10);
     }
     if let Some((a, b)) = s.split_once('十') {
         let aa = if a.is_empty() {
@@ -68,7 +68,7 @@ fn parse_zh_num(s: &str) -> Option<u32> {
         } else {
             d(b.chars().next()?)?
         };
-        return Some(aa.checked_mul(10)?.checked_add(bb)?);
+        return aa.checked_mul(10)?.checked_add(bb);
     }
     d(s.chars().next()?)
 }

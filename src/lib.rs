@@ -51,8 +51,18 @@ pub fn parse(
     options: &Options,
 ) -> Vec<Entity> {
     let rules = lang::rules_for(*locale, dims);
-    let mut entities = engine::parse_and_resolve(text, rules, context, options, dims);
-    ranking::rank(&mut entities);
+    let stash = engine::parse_string(text, rules);
+    let ranked_nodes = ranking::rank_nodes(stash.all_nodes().cloned().collect(), locale, dims);
+    let entities: Vec<Entity> = ranked_nodes
+        .iter()
+        .filter(|node| {
+            node.token_data
+                .dimension_kind()
+                .map(|dk| dims.is_empty() || dims.contains(&dk))
+                .unwrap_or(false)
+        })
+        .filter_map(|node| resolve::resolve(node, context, options, text))
+        .collect();
     ranking::remove_overlapping(entities)
 }
 
