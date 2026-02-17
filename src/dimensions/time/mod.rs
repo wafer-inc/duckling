@@ -1189,21 +1189,44 @@ fn resolve_simple_datetime(
         }
         TimeForm::RelativeGrain { n, grain } => resolve_relative_grain(*n, *grain, ref_time)?,
         TimeForm::DateMDY { month, day, year } => {
-            let y = year.unwrap_or_else(|| {
-                // If month has passed, use next year (unless year is explicit)
-                if *month < ref_time.month()
-                    || (*month == ref_time.month() && *day < ref_time.day())
-                {
-                    ref_time.year().saturating_add(1)
-                } else {
-                    ref_time.year()
+            let build = |y: i32| -> Option<DateTime<Utc>> {
+                Some(
+                    NaiveDate::from_ymd_opt(y, *month, *day)?
+                        .and_hms_opt(0, 0, 0)?
+                        .and_utc(),
+                )
+            };
+            let dt = if let Some(y) = year {
+                build(*y)?
+            } else {
+                let ref_year = ref_time.year();
+                let this_year = build(ref_year)?;
+                let this_date = this_year.date_naive();
+                let ref_date = ref_time.date_naive();
+                match direction {
+                    Some(Direction::Past) => {
+                        if this_date < ref_date {
+                            this_year
+                        } else {
+                            build(ref_year.checked_sub(1)?)?
+                        }
+                    }
+                    Some(Direction::Future) => {
+                        if this_date > ref_date {
+                            this_year
+                        } else {
+                            build(ref_year.checked_add(1)?)?
+                        }
+                    }
+                    _ => {
+                        if this_date < ref_date {
+                            build(ref_year.checked_add(1)?)?
+                        } else {
+                            this_year
+                        }
+                    }
                 }
-            });
-            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
-                .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc();
+            };
             (dt, "day")
         }
         TimeForm::GrainOffset { grain, offset } => resolve_grain_offset(*grain, *offset, ref_time)?,

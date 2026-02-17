@@ -406,12 +406,25 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Time(TimeData::new(TimeForm::Season(s))))
             }),
         },
-        // season (generic keyword)
+        // Haskell parity: only qualified generic season ("this/next/last season"),
+        // not bare "season" by itself.
         Rule {
             name: "last|this|next <season>".to_string(),
-            pattern: vec![regex(r"\bseasons?\b")],
-            production: Box::new(|_| {
-                Some(TokenData::Time(TimeData::new(TimeForm::Season(99)))) // 99 = generic "season"
+            pattern: vec![regex(r"\b(this|current|next|last|past|previous)\s+seasons?\b")],
+            production: Box::new(|nodes| {
+                let q = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m.group(1)?.to_lowercase(),
+                    _ => return None,
+                };
+                let mut td = TimeData::new(TimeForm::Season(99)); // generic "season"
+                td.direction = if q == "next" {
+                    Some(Direction::Future)
+                } else if q == "last" || q == "past" || q == "previous" {
+                    Some(Direction::Past)
+                } else {
+                    None
+                };
+                Some(TokenData::Time(td))
             }),
         },
         // ====================================================================
@@ -1239,6 +1252,53 @@ pub fn rules() -> Vec<Rule> {
                 }
             }),
         },
+        // Intentional extension beyond upstream Haskell EN:
+        // support ISO-8601 datetimes with a T separator and trailing Z, e.g.:
+        // "2018-04-01T18:03:40Z".
+        Rule {
+            name: "iso8601 datetime with T separator (en extension)".to_string(),
+            pattern: vec![regex(
+                r"\b(\d{4})-(0?[1-9]|1[0-2])-(3[01]|[12]\d|0?[1-9])[Tt]([01]?\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?(?:\.\d+)?([Zz])\b",
+            )],
+            production: Box::new(|nodes| {
+                let m = match &nodes[0].token_data {
+                    TokenData::RegexMatch(m) => m,
+                    _ => return None,
+                };
+                let year: i32 = m.group(1)?.parse().ok()?;
+                let month: u32 = m.group(2)?.parse().ok()?;
+                let day: u32 = m.group(3)?.parse().ok()?;
+                let hour: u32 = m.group(4)?.parse().ok()?;
+                let minute: u32 = m.group(5)?.parse().ok()?;
+                let second: u32 = match m.group(6) {
+                    Some(s) => s.parse().ok()?,
+                    None => 0,
+                };
+                if !(1..=12).contains(&month)
+                    || !(1..=31).contains(&day)
+                    || hour > 23
+                    || minute > 59
+                    || second > 59
+                {
+                    return None;
+                }
+                let date = TimeData::new(TimeForm::DateMDY {
+                    month,
+                    day,
+                    year: Some(year),
+                });
+                let tod = if m.group(6).is_some() {
+                    TimeData::new(TimeForm::HourMinuteSecond(hour, minute, second))
+                } else {
+                    TimeData::new(TimeForm::HourMinute(hour, minute, false))
+                };
+                let mut composed =
+                    TimeData::new(TimeForm::Composed(Box::new(date), Box::new(tod)));
+                // "Z" means UTC; resolver converts to Instant via timezone shift.
+                composed.timezone = Some("UTC".to_string());
+                Some(TokenData::Time(composed))
+            }),
+        },
         // YYYY-MM-DD
         Rule {
             name: "yyyy-mm-dd".to_string(),
@@ -1475,6 +1535,7 @@ pub fn rules() -> Vec<Rule> {
                 match &t.form {
                     TimeForm::DayOfWeek(_)
                     | TimeForm::Month(_)
+                    | TimeForm::DateMDY { year: None, .. }
                     | TimeForm::Holiday(..)
                     | TimeForm::Season(_)
                     | TimeForm::Weekend => {

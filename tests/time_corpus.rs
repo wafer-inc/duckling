@@ -3164,6 +3164,31 @@ fn test_iso_date_no_spurious_interval() {
 }
 
 #[test]
+fn test_iso8601_t_separator_z_parses_as_single_datetime() {
+    let text = "2018-04-01T18:03:40Z";
+    let locale = Locale::new(Lang::EN, None);
+    let context = Context {
+        reference_time: Utc.with_ymd_and_hms(2013, 2, 12, 4, 30, 0).unwrap(),
+        locale,
+        timezone_offset_minutes: 0,
+    };
+    let options = Options::default();
+    let entities = parse(text, &locale, &[DimensionKind::Time], &context, &options);
+    let found = entities.iter().any(|e| {
+        matches!(
+            &e.value,
+            DimensionValue::Time(TimeValue::Single(TimePoint::Instant { value, grain: Grain::Minute }))
+                if value.naive_utc() == dt(2018, 4, 1, 18, 3, 40)
+        )
+    });
+    assert!(
+        found,
+        "Expected ISO-8601 datetime parse for {:?}, got: {:?}",
+        text, entities
+    );
+}
+
+#[test]
 fn test_time_additional_regression_inputs() {
     let should_parse = [
         "On 2018-04-01 we met.",
@@ -3197,6 +3222,11 @@ fn test_time_additional_regression_inputs() {
 fn test_time_additional_regression_inputs_extreme_values() {
     let _ = parse_time("in 999999999 months");
     let _ = parse_time("in 9999999999999999 days");
+}
+
+#[test]
+fn test_last_april_first_is_previous_occurrence() {
+    check_time_naive("last April 1", dt(2012, 4, 1, 0, 0, 0), "day");
 }
 
 #[test]

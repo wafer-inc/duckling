@@ -178,21 +178,6 @@ fn test_real_world_event_listing_exact_entities() {
             grain,
         }))
     }
-    fn time_interval(
-        from: Option<(i32, u32, u32, u32, u32, u32, Grain)>,
-        to: Option<(i32, u32, u32, u32, u32, u32, Grain)>,
-    ) -> DimensionValue {
-        DimensionValue::Time(TimeValue::Interval {
-            from: from.map(|(y, m, d, h, mi, s, g)| TimePoint::Naive {
-                value: ndt(y, m, d, h, mi, s),
-                grain: g,
-            }),
-            to: to.map(|(y, m, d, h, mi, s, g)| TimePoint::Naive {
-                value: ndt(y, m, d, h, mi, s),
-                grain: g,
-            }),
-        })
-    }
     let l = Some(false);
 
     let expected = vec![
@@ -248,16 +233,6 @@ fn test_real_world_event_listing_exact_entities() {
         e("$17", 399, 402, money(17.0, "USD"), l),
         e("17 c", 400, 404, money(17.0, "cent"), l),
         e("l", 431, 432, num(100_000.0), l),
-        e(
-            "season",
-            437,
-            443,
-            time_interval(
-                Some((2024, 12, 21, 0, 0, 0, Grain::Day)),
-                Some((2025, 3, 19, 0, 0, 0, Grain::Day)),
-            ),
-            l,
-        ),
         e("l", 450, 451, num(100_000.0), l),
         e("l", 451, 452, num(100_000.0), l),
         e("9", 464, 465, num(9.0), l),
@@ -302,7 +277,69 @@ fn test_real_world_event_listing_exact_entities() {
 }
 
 #[test]
-fn test_iso_date_in_sentence_exact_entities() {
+fn test_email_like_marketing_text_no_time_entities_1() {
+    let text = "body: Dear Andre Popovitch, We'd love to learn more about why you chose AgelessRx as your partner in longevity. Your feedback may help inspire others to add healthy years to their life. How did we do? ○\nfrom: <noreply.invitations@trustpilotmail.com>\nsubject: Inspire others to add healthy years to their life ⭐⭐⭐⭐⭐";
+
+    let locale = Locale::new(Lang::EN, None);
+    let ctx = Context {
+        reference_time: Utc.with_ymd_and_hms(2025, 3, 5, 12, 0, 0).unwrap(),
+        locale: Locale::new(Lang::EN, None),
+        timezone_offset_minutes: -360,
+    };
+    let options = Options::default();
+    let dims = [
+        DimensionKind::Time,
+        DimensionKind::Email,
+        DimensionKind::PhoneNumber,
+        DimensionKind::Url,
+        DimensionKind::AmountOfMoney,
+        DimensionKind::Numeral,
+        DimensionKind::Ordinal,
+    ];
+    let entities = parse(text, &locale, &dims, &ctx, &options);
+    let has_time = entities
+        .iter()
+        .any(|e| matches!(e.value, DimensionValue::Time(_)));
+    assert!(
+        !has_time,
+        "expected no Time entity for {:?}, got {:?}",
+        text, entities
+    );
+}
+
+#[test]
+fn test_email_like_marketing_text_no_time_entities_2() {
+    let text = "body: Flowers all season long, from $24.95\nfrom: Fast-Growing-Trees.com <plantexperts@fast-growing-trees.com>\nsubject: 💌 A gift for you";
+
+    let locale = Locale::new(Lang::EN, None);
+    let ctx = Context {
+        reference_time: Utc.with_ymd_and_hms(2025, 3, 5, 12, 0, 0).unwrap(),
+        locale: Locale::new(Lang::EN, None),
+        timezone_offset_minutes: -360,
+    };
+    let options = Options::default();
+    let dims = [
+        DimensionKind::Time,
+        DimensionKind::Email,
+        DimensionKind::PhoneNumber,
+        DimensionKind::Url,
+        DimensionKind::AmountOfMoney,
+        DimensionKind::Numeral,
+        DimensionKind::Ordinal,
+    ];
+    let entities = parse(text, &locale, &dims, &ctx, &options);
+    let has_time = entities
+        .iter()
+        .any(|e| matches!(e.value, DimensionValue::Time(_)));
+    assert!(
+        !has_time,
+        "expected no Time entity for {:?}, got {:?}",
+        text, entities
+    );
+}
+
+#[test]
+fn test_iso_date_in_sentence_() {
     let text = "On 2018-04-01 we met.";
 
     let locale = Locale::new(Lang::EN, None);
