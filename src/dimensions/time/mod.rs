@@ -246,7 +246,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
         let (dt, grain_str) = catch_unwind(AssertUnwindSafe(|| {
             resolve_simple_datetime(&data.form, ref_time, data.direction)
         }))
-        .ok()?;
+        .ok()??;
         let grain = if has_tz {
             Grain::Minute
         } else {
@@ -289,7 +289,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     let (dt, grain_str) = catch_unwind(AssertUnwindSafe(|| {
         resolve_simple_datetime(&data.form, ref_time, data.direction)
     }))
-    .ok()?;
+    .ok()??;
     let grain = if has_tz {
         Grain::Minute
     } else {
@@ -321,28 +321,6 @@ fn duration_for_grain(n: i64, grain: Grain) -> Option<Duration> {
     }
 }
 
-fn try_add_months_checked(dt: DateTime<Utc>, months: i64) -> Option<DateTime<Utc>> {
-    let total = i64::from(dt.year())
-        .checked_mul(12)?
-        .checked_add(i64::from(dt.month()).checked_sub(1)?)?
-        .checked_add(months)?;
-    let year = i32::try_from(total.div_euclid(12)).ok()?;
-    let month = (total.rem_euclid(12).checked_add(1)?) as u32;
-    let day = dt.day().min(days_in_month(year, month));
-    let date = NaiveDate::from_ymd_opt(year, month, day)?;
-    let naive = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())?;
-    Some(naive.and_utc())
-}
-
-fn try_add_years_checked(dt: DateTime<Utc>, years: i64) -> Option<DateTime<Utc>> {
-    let year_i64 = i64::from(dt.year()).checked_add(years)?;
-    let year = i32::try_from(year_i64).ok()?;
-    let day = dt.day().min(days_in_month(year, dt.month()));
-    let date = NaiveDate::from_ymd_opt(year, dt.month(), day)?;
-    let naive = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())?;
-    Some(naive.and_utc())
-}
-
 fn relative_can_be_represented(base: DateTime<Utc>, n: i64, grain: Grain) -> bool {
     match grain {
         Grain::Second | Grain::Minute | Grain::Hour | Grain::Day | Grain::Week => {
@@ -350,12 +328,9 @@ fn relative_can_be_represented(base: DateTime<Utc>, n: i64, grain: Grain) -> boo
                 .and_then(|d| base.checked_add_signed(d))
                 .is_some()
         }
-        Grain::Month => try_add_months_checked(base, n).is_some(),
-        Grain::Quarter => n
-            .checked_mul(3)
-            .and_then(|m| try_add_months_checked(base, m))
-            .is_some(),
-        Grain::Year => try_add_years_checked(base, n).is_some(),
+        Grain::Month => add_months(base, n).is_some(),
+        Grain::Quarter => n.checked_mul(3).and_then(|m| add_months(base, m)).is_some(),
+        Grain::Year => add_years(base, n).is_some(),
     }
 }
 
@@ -447,12 +422,12 @@ fn try_resolve_as_interval(
                 let to_dt = match &to_data.form {
                     TimeForm::BeginEnd { begin, target } => {
                         let (_, end) =
-                            resolve_begin_end(*begin, target, ref_time, to_data.direction);
+                            resolve_begin_end(*begin, target, ref_time, to_data.direction)?;
                         end
                     }
                     _ => {
                         let (dt, _) =
-                            resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+                            resolve_simple_datetime(&to_data.form, ref_time, to_data.direction)?;
                         dt
                     }
                 };
@@ -477,9 +452,9 @@ fn try_resolve_as_interval(
             }
 
             let (mut from_dt, _from_grain) =
-                resolve_simple_datetime(&from_data.form, ref_time, from_data.direction);
+                resolve_simple_datetime(&from_data.form, ref_time, from_data.direction)?;
             let (mut to_dt, _) =
-                resolve_simple_datetime(&to_data.form, ref_time, to_data.direction);
+                resolve_simple_datetime(&to_data.form, ref_time, to_data.direction)?;
 
             // Apply per-endpoint timezone shifts (Haskell: each predicate carries its own shift)
             let from_tz = tz_shift_for(from_data, context);
@@ -557,7 +532,7 @@ fn try_resolve_as_interval(
             let to_dt = if *open {
                 to_dt
             } else {
-                adjust_interval_end_with_from(to_dt, &to_data.form, &from_data.form)
+                adjust_interval_end_with_from(to_dt, &to_data.form, &from_data.form)?
             };
 
             // Apply per-endpoint timezone shifts after all disambiguation
@@ -601,7 +576,7 @@ fn try_resolve_as_interval(
             past,
             interval: true,
         } => {
-            let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time);
+            let (from, to) = resolve_nth_grain_interval(*n, *grain, *past, ref_time)?;
             Some(make_interval(from, to, grain.as_str()))
         }
         TimeForm::PartOfDay(pod) => {
@@ -614,7 +589,7 @@ fn try_resolve_as_interval(
             Some(make_interval(from, to, "hour"))
         }
         TimeForm::AllGrain(g) => {
-            let (from, to) = resolve_all_grain(*g, ref_time);
+            let (from, to) = resolve_all_grain(*g, ref_time)?;
             let grain = grain_for_all_rest(*g);
             Some(make_interval(from, to, grain))
         }
@@ -622,7 +597,7 @@ fn try_resolve_as_interval(
             let from = grain_start(ref_time, g.lower());
             let to = {
                 let period_start = grain_start(ref_time, *g);
-                let next = add_grain(period_start, *g, 1);
+                let next = add_grain(period_start, *g, 1)?;
                 // For "rest of the week", end on Sunday (not Monday)
                 if *g == Grain::Week {
                     Duration::try_days(1)
@@ -642,7 +617,7 @@ fn try_resolve_as_interval(
             Some(make_interval(from, to, grain))
         }
         TimeForm::BeginEnd { begin, target } => {
-            let (from, to) = resolve_begin_end(*begin, target, ref_time, data.direction);
+            let (from, to) = resolve_begin_end(*begin, target, ref_time, data.direction)?;
             let grain = begin_end_grain(target);
             Some(make_interval(from, to, grain))
         }
@@ -652,7 +627,7 @@ fn try_resolve_as_interval(
         }
         // early/mid/late + Month → interval (e.g., "early March", "late October")
         TimeForm::Month(_m) if data.early_late.is_some() => {
-            let (month_start, _) = resolve_simple_datetime(&data.form, ref_time, data.direction);
+            let (month_start, _) = resolve_simple_datetime(&data.form, ref_time, data.direction)?;
             let y = month_start.year();
             let m = month_start.month();
             let month_end = add_grain(
@@ -663,7 +638,7 @@ fn try_resolve_as_interval(
                     .and_utc(),
                 Grain::Month,
                 1,
-            );
+            )?;
             let (from, to) = match data.early_late {
                 Some(EarlyLate::Early) => {
                     // Beginning of month: day 1 to day 11
@@ -702,7 +677,7 @@ fn try_resolve_as_interval(
             if let TimeForm::PartOfDay(pod) = &secondary.form {
                 if !has_clock_time(primary) {
                     let (date_dt, _) =
-                        resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                        resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                     let date = date_dt.date_naive();
                     let (from, to) =
                         pod_interval(*pod, date, data.early_late.or(secondary.early_late));
@@ -714,7 +689,7 @@ fn try_resolve_as_interval(
             if let TimeForm::PartOfDay(pod) = &primary.form {
                 if !has_clock_time(secondary) {
                     let (date_dt, _) =
-                        resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
                     let date = date_dt.date_naive();
                     let (from, to) =
                         pod_interval(*pod, date, data.early_late.or(primary.early_late));
@@ -727,7 +702,7 @@ fn try_resolve_as_interval(
                 if let TimeForm::PartOfDay(pod) = &sub_a.form {
                     if !has_clock_time(sub_b) && !has_clock_time(primary) {
                         let (date_dt, _) =
-                            resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                            resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                         let date = date_dt.date_naive();
                         let (from, to) =
                             pod_interval(*pod, date, data.early_late.or(sub_a.early_late));
@@ -737,7 +712,7 @@ fn try_resolve_as_interval(
                 if let TimeForm::PartOfDay(pod) = &sub_b.form {
                     if !has_clock_time(sub_a) && !has_clock_time(primary) {
                         let (date_dt, _) =
-                            resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                            resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                         let date = date_dt.date_naive();
                         let (from, to) =
                             pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
@@ -750,7 +725,7 @@ fn try_resolve_as_interval(
                     if !has_clock_time(sub_b) && !has_clock_time(secondary) {
                         // Combine the non-PartOfDay part (sub_b) with secondary to get the date
                         // e.g., Composed(Morning, Christmas) + Year(2013) → resolve Christmas+2013 first
-                        let (date_dt, _) = resolve_composed(sub_b, secondary, ref_time);
+                        let (date_dt, _) = resolve_composed(sub_b, secondary, ref_time)?;
                         let date = date_dt.date_naive();
                         let (from, to) =
                             pod_interval(*pod, date, data.early_late.or(sub_a.early_late));
@@ -760,7 +735,7 @@ fn try_resolve_as_interval(
                 if let TimeForm::PartOfDay(pod) = &sub_b.form {
                     if !has_clock_time(sub_a) && !has_clock_time(secondary) {
                         // Combine the non-PartOfDay part (sub_a) with secondary to get the date
-                        let (date_dt, _) = resolve_composed(sub_a, secondary, ref_time);
+                        let (date_dt, _) = resolve_composed(sub_a, secondary, ref_time)?;
                         let date = date_dt.date_naive();
                         let (from, to) =
                             pod_interval(*pod, date, data.early_late.or(sub_b.early_late));
@@ -790,14 +765,14 @@ fn try_resolve_as_interval(
             if let TimeForm::Interval(from_td, to_td, open) = &primary.form {
                 if is_date_form(&secondary.form) {
                     let (date_dt, _) =
-                        resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                        resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
                     let date = date_dt.date_naive();
                     let (from_dt, _from_grain) =
-                        resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
+                        resolve_on_date(&from_td.form, date, ref_time, from_td.direction)?;
                     let (mut to_dt, _) =
-                        resolve_on_date(&to_td.form, date, ref_time, to_td.direction);
+                        resolve_on_date(&to_td.form, date, ref_time, to_td.direction)?;
                     if !open {
-                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form);
+                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form)?;
                     }
                     let to_grain = form_grain(&to_td.form);
                     let from_g = form_grain(&from_td.form);
@@ -808,14 +783,14 @@ fn try_resolve_as_interval(
             if let TimeForm::Interval(from_td, to_td, open) = &secondary.form {
                 if is_date_form(&primary.form) {
                     let (date_dt, _) =
-                        resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                        resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                     let date = date_dt.date_naive();
                     let (from_dt, _) =
-                        resolve_on_date(&from_td.form, date, ref_time, from_td.direction);
+                        resolve_on_date(&from_td.form, date, ref_time, from_td.direction)?;
                     let (mut to_dt, _) =
-                        resolve_on_date(&to_td.form, date, ref_time, to_td.direction);
+                        resolve_on_date(&to_td.form, date, ref_time, to_td.direction)?;
                     if !open {
-                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form);
+                        to_dt = adjust_interval_end_with_from(to_dt, &to_td.form, &from_td.form)?;
                     }
                     let to_grain = form_grain(&to_td.form);
                     let from_g = form_grain(&from_td.form);
@@ -843,7 +818,7 @@ fn try_resolve_as_interval(
         // "last weekend of July" → weekend interval
         TimeForm::LastDOWOfTime { dow: 5, base } => {
             // dow=5 (Saturday) means weekend. Find last Saturday, build weekend interval.
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = match &base.form {
                 TimeForm::Month(_) => NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
                     .unwrap()
@@ -855,7 +830,7 @@ fn try_resolve_as_interval(
                     offset,
                 } => {
                     let first = start_of_month(ref_time);
-                    add_months(first, *offset)
+                    add_months(first, i64::from(*offset))?
                 }
                 _ => grain_start(base_dt, Grain::Month),
             };
@@ -880,8 +855,8 @@ fn resolve_on_date(
     date: NaiveDate,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
-) -> (DateTime<Utc>, &'static str) {
-    match form {
+) -> Option<(DateTime<Utc>, &'static str)> {
+    Some(match form {
         TimeForm::Hour(h, _is_12h) => {
             let dt = date
                 .and_hms_opt(*h, 0, 0)
@@ -905,7 +880,7 @@ fn resolve_on_date(
         }
         TimeForm::Composed(_primary, _secondary) => {
             // Resolve composed time on this date
-            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction);
+            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction)?;
             let new_dt = date
                 .and_hms_opt(dt.hour(), dt.minute(), dt.second())
                 .unwrap_or(date.and_hms_opt(0, 0, 0).unwrap())
@@ -914,10 +889,10 @@ fn resolve_on_date(
         }
         _ => {
             // For non-clock forms, resolve normally but override the date
-            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction);
+            let (dt, grain) = resolve_simple_datetime(form, ref_time, direction)?;
             (dt, grain)
         }
-    }
+    })
 }
 
 fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeValue {
@@ -940,7 +915,7 @@ fn adjust_interval_end_with_from(
     to: DateTime<Utc>,
     to_form: &TimeForm,
     from_form: &TimeForm,
-) -> DateTime<Utc> {
+) -> Option<DateTime<Utc>> {
     let to_grain = form_grain(to_form);
     let from_grain = form_grain(from_form);
     // Match Haskell: g2' = if g1 < Day && g2 < Day then min(g1,g2) else g2
@@ -953,7 +928,7 @@ fn adjust_interval_end_with_from(
     } else {
         to_grain
     };
-    match adjust_grain {
+    Some(match adjust_grain {
         Grain::Second => Duration::try_seconds(1)
             .and_then(|d| to.checked_add_signed(d))
             .unwrap_or(to),
@@ -969,10 +944,10 @@ fn adjust_interval_end_with_from(
         Grain::Week => Duration::try_weeks(1)
             .and_then(|d| to.checked_add_signed(d))
             .unwrap_or(to),
-        Grain::Month => add_months(to, 1),
-        Grain::Quarter => add_months(to, 3),
-        Grain::Year => add_years(to, 1),
-    }
+        Grain::Month => add_months(to, 1)?,
+        Grain::Quarter => add_months(to, 3)?,
+        Grain::Year => add_years(to, 1)?,
+    })
 }
 
 /// Get the grain of a TimeForm
@@ -1024,8 +999,8 @@ fn resolve_simple_datetime(
     form: &TimeForm,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
-) -> (DateTime<Utc>, &'static str) {
-    match form {
+) -> Option<(DateTime<Utc>, &'static str)> {
+    Some(match form {
         TimeForm::Now => (ref_time, "second"),
         TimeForm::Today => (midnight(ref_time), "day"),
         TimeForm::Tomorrow => (
@@ -1212,7 +1187,7 @@ fn resolve_simple_datetime(
                 .and_utc();
             (dt, "year")
         }
-        TimeForm::RelativeGrain { n, grain } => resolve_relative_grain(*n, *grain, ref_time),
+        TimeForm::RelativeGrain { n, grain } => resolve_relative_grain(*n, *grain, ref_time)?,
         TimeForm::DateMDY { month, day, year } => {
             let y = year.unwrap_or_else(|| {
                 // If month has passed, use next year (unless year is explicit)
@@ -1231,7 +1206,7 @@ fn resolve_simple_datetime(
                 .and_utc();
             (dt, "day")
         }
-        TimeForm::GrainOffset { grain, offset } => resolve_grain_offset(*grain, *offset, ref_time),
+        TimeForm::GrainOffset { grain, offset } => resolve_grain_offset(*grain, *offset, ref_time)?,
         TimeForm::Quarter(q) => {
             let month = q.saturating_sub(1).saturating_mul(3).saturating_add(1);
             let dt = NaiveDate::from_ymd_opt(ref_time.year(), month, 1)
@@ -1295,25 +1270,21 @@ fn resolve_simple_datetime(
         }
         TimeForm::BeginEnd { target, .. } => {
             // Fallback
-            resolve_simple_datetime(target, ref_time, direction)
+            resolve_simple_datetime(target, ref_time, direction)?
         }
         TimeForm::Interval(from, _, _) => {
-            resolve_simple_datetime(&from.form, ref_time, from.direction)
+            resolve_simple_datetime(&from.form, ref_time, from.direction)?
         }
         TimeForm::NthGrain { n, grain, past, .. } => {
             // "upcoming 2 days" = cycleNth Day 2 = start of the day 2 days from now
-            let signed_n = if *past {
-                i32::try_from(*n).unwrap_or(i32::MAX).saturating_neg()
-            } else {
-                i32::try_from(*n).unwrap_or(i32::MAX)
-            };
+            let signed_n = if *past { n.checked_neg()? } else { *n };
             let base = grain_start(ref_time, *grain);
-            let dt = add_grain(base, *grain, signed_n);
+            let dt = add_grain(base, *grain, signed_n)?;
             (dt, grain.as_str())
         }
         TimeForm::NthDOWOfTime { n, dow, base } => {
             // "first Monday of March" = find the Nth occurrence of DOW within base period
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = match &base.form {
                 TimeForm::Month(_) => NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
                     .unwrap()
@@ -1325,14 +1296,14 @@ fn resolve_simple_datetime(
                     offset,
                 } => {
                     let first = start_of_month(ref_time);
-                    add_months(first, *offset)
+                    add_months(first, i64::from(*offset))?
                 }
                 TimeForm::GrainOffset {
                     grain: Grain::Year,
                     offset,
                 } => {
                     let jan1 = start_of_year(ref_time);
-                    add_years(jan1, *offset)
+                    add_years(jan1, i64::from(*offset))?
                 }
                 _ => grain_start(base_dt, Grain::Month),
             };
@@ -1340,7 +1311,7 @@ fn resolve_simple_datetime(
             (dt.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")
         }
         TimeForm::LastDOWOfTime { dow, base } => {
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = match &base.form {
                 TimeForm::Month(_) => NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
                     .unwrap()
@@ -1352,7 +1323,7 @@ fn resolve_simple_datetime(
                     offset,
                 } => {
                     let first = start_of_month(ref_time);
-                    add_months(first, *offset)
+                    add_months(first, i64::from(*offset))?
                 }
                 _ => grain_start(base_dt, Grain::Month),
             };
@@ -1362,7 +1333,7 @@ fn resolve_simple_datetime(
         TimeForm::NDOWsFromTime { n, dow, base } => {
             // "2 Sundays from now" = find the Nth DOW after base
             // "2 Thursdays ago" = find the Nth DOW before base (n is negative)
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_dow = base_dt.weekday().num_days_from_monday();
             let target_dow = *dow;
             if *n > 0 {
@@ -1407,7 +1378,7 @@ fn resolve_simple_datetime(
             // Haskell: predNthClosest — merge past/future candidates sorted by distance
             // Generates past and future occurrences of target relative to base,
             // then picks the nth closest by absolute distance.
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let mut candidates: Vec<DateTime<Utc>> = Vec::new();
 
             // Determine the cyclic grain for generating candidates
@@ -1424,8 +1395,8 @@ fn resolve_simple_datetime(
             // Generate candidates in both directions from base
             let range = (*n).max(5).saturating_add(2); // enough to find nth closest
             for i in (range.saturating_neg())..=(range) {
-                let offset_ref = add_grain(base_dt, cycle_grain, i);
-                let (dt, _) = resolve_simple_datetime(&target.form, offset_ref, None);
+                let offset_ref = add_grain(base_dt, cycle_grain, i64::from(i))?;
+                let (dt, _) = resolve_simple_datetime(&target.form, offset_ref, None)?;
                 if !candidates
                     .iter()
                     .any(|c| c.signed_duration_since(dt).num_seconds().abs() < 86400)
@@ -1441,7 +1412,7 @@ fn resolve_simple_datetime(
         }
         TimeForm::NthGrainOfTime { n, grain, base } => {
             // "first week of October 2014" → first Monday-aligned week within October
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = grain_start(base_dt, target_grain(&base.form));
             if *grain == Grain::Week {
                 // Find first Monday on or after base_start
@@ -1459,16 +1430,16 @@ fn resolve_simple_datetime(
                 (dt, "week")
             } else if *grain == Grain::Day {
                 // "third day of october" = Oct 3
-                let dt = add_grain(base_start, Grain::Day, n.saturating_sub(1));
+                let dt = add_grain(base_start, Grain::Day, i64::from(n.checked_sub(1)?))?;
                 (dt, "day")
             } else {
-                let dt = add_grain(base_start, *grain, n.saturating_sub(1));
+                let dt = add_grain(base_start, *grain, i64::from(n.checked_sub(1)?))?;
                 (dt, grain.as_str())
             }
         }
         TimeForm::NthLastDayOfTime { n, base } => {
             // "last day of October 2015", "5th last day of May"
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = match &base.form {
                 TimeForm::Month(_) => NaiveDate::from_ymd_opt(base_dt.year(), base_dt.month(), 1)
                     .unwrap()
@@ -1480,21 +1451,19 @@ fn resolve_simple_datetime(
                     offset,
                 } => {
                     let first = start_of_month(ref_time);
-                    add_months(first, *offset)
+                    add_months(first, i64::from(*offset))?
                 }
                 _ => grain_start(base_dt, Grain::Month),
             };
-            let month_end = add_grain(base_start, Grain::Month, 1);
-            let dt = Duration::try_days(*n as i64)
-                .and_then(|d| month_end.checked_sub_signed(d))
-                .unwrap_or(month_end);
+            let month_end = add_grain(base_start, Grain::Month, 1)?;
+            let dt = Duration::try_days(*n as i64).and_then(|d| month_end.checked_sub_signed(d))?;
             (dt, "day")
         }
         TimeForm::LastCycleOfTime { grain, base } => {
             // "last week of September" → last full week within the period
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_start = grain_start(base_dt, target_grain(&base.form));
-            let base_end = add_grain(base_start, target_grain(&base.form), 1);
+            let base_end = add_grain(base_start, target_grain(&base.form), 1)?;
             if *grain == Grain::Week {
                 // Find last Monday such that the week (Mon-Sun) fits within the period
                 // Start from base_end and go backwards
@@ -1516,41 +1485,33 @@ fn resolve_simple_datetime(
                 };
                 (dt, "week")
             } else {
-                let dt = add_grain(base_end, *grain, -1);
+                let dt = add_grain(base_end, *grain, -1)?;
                 (dt, grain.as_str())
             }
         }
         TimeForm::DurationAfter { n, grain, base } => {
             // Haskell: durationAfter — shift each occurrence of base by duration, pick nearest future
-            let (future_base, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (future_base, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let (past_base, _) =
-                resolve_simple_datetime(&base.form, ref_time, Some(Direction::Past));
-            let add_dur = |dt: DateTime<Utc>| -> DateTime<Utc> {
+                resolve_simple_datetime(&base.form, ref_time, Some(Direction::Past))?;
+            let add_dur = |dt: DateTime<Utc>| -> Option<DateTime<Utc>> {
                 match grain {
-                    Grain::Year => add_years(dt, i32::try_from(*n).unwrap_or(i32::MAX)),
-                    Grain::Month => add_months(dt, i32::try_from(*n).unwrap_or(i32::MAX)),
-                    Grain::Quarter => {
-                        add_months(dt, i32::try_from(*n).unwrap_or(i32::MAX).saturating_mul(3))
+                    Grain::Year => add_years(dt, *n),
+                    Grain::Month => add_months(dt, *n),
+                    Grain::Quarter => add_months(dt, n.checked_mul(3)?),
+                    Grain::Week => Duration::try_weeks(*n).and_then(|d| dt.checked_add_signed(d)),
+                    Grain::Day => Duration::try_days(*n).and_then(|d| dt.checked_add_signed(d)),
+                    Grain::Hour => Duration::try_hours(*n).and_then(|d| dt.checked_add_signed(d)),
+                    Grain::Minute => {
+                        Duration::try_minutes(*n).and_then(|d| dt.checked_add_signed(d))
                     }
-                    Grain::Week => Duration::try_weeks(*n)
-                        .and_then(|d| dt.checked_add_signed(d))
-                        .unwrap_or(dt),
-                    Grain::Day => Duration::try_days(*n)
-                        .and_then(|d| dt.checked_add_signed(d))
-                        .unwrap_or(dt),
-                    Grain::Hour => Duration::try_hours(*n)
-                        .and_then(|d| dt.checked_add_signed(d))
-                        .unwrap_or(dt),
-                    Grain::Minute => Duration::try_minutes(*n)
-                        .and_then(|d| dt.checked_add_signed(d))
-                        .unwrap_or(dt),
-                    Grain::Second => Duration::try_seconds(*n)
-                        .and_then(|d| dt.checked_add_signed(d))
-                        .unwrap_or(dt),
+                    Grain::Second => {
+                        Duration::try_seconds(*n).and_then(|d| dt.checked_add_signed(d))
+                    }
                 }
             };
-            let future_result = add_dur(future_base);
-            let past_result = add_dur(past_base);
+            let future_result = add_dur(future_base)?;
+            let past_result = add_dur(past_base)?;
             // Pick nearest-future result
             let result = if past_result >= ref_time
                 && (future_result < ref_time || past_result <= future_result)
@@ -1571,47 +1532,40 @@ fn resolve_simple_datetime(
         TimeForm::NthLastCycleOfTime { n, grain, base } => {
             // Haskell: cycleNthAfter True grain (-n) $ cycleNthAfter True (timeGrain td) 1 td
             // Position at end of base period, count backward n complete cycles of grain
-            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction);
+            let (base_dt, _) = resolve_simple_datetime(&base.form, ref_time, base.direction)?;
             let base_grain = target_grain(&base.form);
             let base_start = grain_start(base_dt, base_grain);
-            let base_end = add_grain(base_start, base_grain, 1);
+            let base_end = add_grain(base_start, base_grain, 1)?;
             if *grain == Grain::Week {
                 // Find the last COMPLETE week within the period (Mon+7 <= base_end)
                 let end_dow = base_end.weekday().num_days_from_monday();
                 let last_mon = if end_dow == 0 {
-                    Duration::try_weeks(1)
-                        .and_then(|d| base_end.checked_sub_signed(d))
-                        .unwrap_or(base_end)
+                    Duration::try_weeks(1).and_then(|d| base_end.checked_sub_signed(d))?
                 } else {
                     Duration::try_days(end_dow as i64)
-                        .and_then(|d| base_end.checked_sub_signed(d))
-                        .unwrap_or(base_end)
+                        .and_then(|d| base_end.checked_sub_signed(d))?
                 };
                 // Check if this week fits completely
                 let last_complete_mon = if Duration::try_weeks(1)
-                    .and_then(|d| last_mon.checked_add_signed(d))
-                    .unwrap_or(last_mon)
+                    .and_then(|d| last_mon.checked_add_signed(d))?
                     <= base_end
                 {
                     last_mon
                 } else {
-                    Duration::try_weeks(1)
-                        .and_then(|d| last_mon.checked_sub_signed(d))
-                        .unwrap_or(last_mon)
+                    Duration::try_weeks(1).and_then(|d| last_mon.checked_sub_signed(d))?
                 };
                 // Go back (n-1) more weeks
                 let dt = Duration::try_weeks((*n as i64).saturating_sub(1))
-                    .and_then(|d| last_complete_mon.checked_sub_signed(d))
-                    .unwrap_or(last_complete_mon);
+                    .and_then(|d| last_complete_mon.checked_sub_signed(d))?;
                 (dt, "week")
             } else {
                 // For day grain: go back n grains from end of period
-                let dt = add_grain(base_end, *grain, n.checked_neg().unwrap_or(0));
+                let dt = add_grain(base_end, *grain, i64::from(n.checked_neg()?))?;
                 (dt, grain.as_str())
             }
         }
-        TimeForm::Composed(primary, secondary) => resolve_composed(primary, secondary, ref_time),
-    }
+        TimeForm::Composed(primary, secondary) => resolve_composed(primary, secondary, ref_time)?,
+    })
 }
 
 // ============================================================
@@ -1716,31 +1670,21 @@ fn resolve_relative_grain(
     n: i64,
     grain: Grain,
     ref_time: DateTime<Utc>,
-) -> (DateTime<Utc>, &'static str) {
+) -> Option<(DateTime<Utc>, &'static str)> {
     let lower = grain.lower();
     let result = match grain {
-        Grain::Second => Duration::try_seconds(n)
-            .and_then(|d| ref_time.checked_add_signed(d))
-            .unwrap_or(ref_time),
-        Grain::Minute => Duration::try_minutes(n)
-            .and_then(|d| ref_time.checked_add_signed(d))
-            .unwrap_or(ref_time),
-        Grain::Hour => Duration::try_hours(n)
-            .and_then(|d| ref_time.checked_add_signed(d))
-            .unwrap_or(ref_time),
-        Grain::Day => Duration::try_days(n)
-            .and_then(|d| ref_time.checked_add_signed(d))
-            .unwrap_or(ref_time),
-        Grain::Week => Duration::try_weeks(n)
-            .and_then(|d| ref_time.checked_add_signed(d))
-            .unwrap_or(ref_time),
-        Grain::Month => add_months(ref_time, n as i32),
-        Grain::Quarter => add_months(ref_time, (n as i32).saturating_mul(3)),
-        Grain::Year => add_years(ref_time, n as i32),
+        Grain::Second => Duration::try_seconds(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::Minute => Duration::try_minutes(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::Hour => Duration::try_hours(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::Day => Duration::try_days(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::Week => Duration::try_weeks(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::Month => add_months(ref_time, n)?,
+        Grain::Quarter => add_months(ref_time, n.checked_mul(3)?)?,
+        Grain::Year => add_years(ref_time, n)?,
     };
     // Truncate to lower grain boundary
     let truncated = grain_start(result, lower);
-    (truncated, lower.as_str())
+    Some((truncated, lower.as_str()))
 }
 
 // ============================================================
@@ -1751,38 +1695,33 @@ fn resolve_grain_offset(
     grain: Grain,
     offset: i32,
     ref_time: DateTime<Utc>,
-) -> (DateTime<Utc>, &'static str) {
+) -> Option<(DateTime<Utc>, &'static str)> {
     let result = match grain {
         Grain::Week => {
             let monday = start_of_week(ref_time);
-            Duration::try_weeks(offset as i64)
-                .and_then(|d| monday.checked_add_signed(d))
-                .unwrap_or(monday)
+            Duration::try_weeks(offset as i64).and_then(|d| monday.checked_add_signed(d))?
         }
         Grain::Month => {
             let first = start_of_month(ref_time);
-            add_months(first, offset)
+            add_months(first, i64::from(offset))?
         }
         Grain::Year => {
             let jan1 = start_of_year(ref_time);
-            add_years(jan1, offset)
+            add_years(jan1, i64::from(offset))?
         }
         Grain::Quarter => {
             let qstart = start_of_quarter(ref_time);
-            add_months(qstart, offset.saturating_mul(3))
+            add_months(qstart, i64::from(offset).checked_mul(3)?)?
         }
         Grain::Day => Duration::try_days(offset as i64)
-            .and_then(|d| midnight(ref_time).checked_add_signed(d))
-            .unwrap_or(midnight(ref_time)),
+            .and_then(|d| midnight(ref_time).checked_add_signed(d))?,
         _ => {
             // For smaller grains, just offset from ref_time
             let secs = grain.in_seconds(offset as i64).unwrap_or(0);
-            Duration::try_seconds(secs)
-                .and_then(|d| ref_time.checked_add_signed(d))
-                .unwrap_or(ref_time)
+            Duration::try_seconds(secs).and_then(|d| ref_time.checked_add_signed(d))?
         }
     };
-    (result, grain.as_str())
+    Some((result, grain.as_str()))
 }
 
 // ============================================================
@@ -1793,7 +1732,7 @@ fn resolve_composed(
     primary: &TimeData,
     secondary: &TimeData,
     ref_time: DateTime<Utc>,
-) -> (DateTime<Utc>, &'static str) {
+) -> Option<(DateTime<Utc>, &'static str)> {
     // Helper: disambiguate hour based on PartOfDay context
     fn disambiguate_hour(h: u32, is_12h: bool, pod: Option<&PartOfDay>) -> u32 {
         if !is_12h {
@@ -1836,7 +1775,7 @@ fn resolve_composed(
     }
 
     // Extract base date from a possibly nested Composed form
-    fn extract_date(td: &TimeData, ref_time: DateTime<Utc>) -> DateTime<Utc> {
+    fn extract_date(td: &TimeData, ref_time: DateTime<Utc>) -> Option<DateTime<Utc>> {
         match &td.form {
             TimeForm::Composed(a, b) => {
                 // Try to get the date part (non-PartOfDay component)
@@ -1845,14 +1784,14 @@ fn resolve_composed(
                     (_, TimeForm::PartOfDay(_)) => extract_date(a, ref_time),
                     _ => {
                         // Resolve full composition (e.g., DOW + DateMDY → proper intersection)
-                        let (dt, _) = resolve_composed(a, b, ref_time);
-                        dt
+                        let (dt, _) = resolve_composed(a, b, ref_time)?;
+                        Some(dt)
                     }
                 }
             }
             _ => {
-                let (dt, _) = resolve_simple_datetime(&td.form, ref_time, td.direction);
-                dt
+                let (dt, _) = resolve_simple_datetime(&td.form, ref_time, td.direction)?;
+                Some(dt)
             }
         }
     }
@@ -1862,7 +1801,7 @@ fn resolve_composed(
         TimeForm::Hour(h, is_12h) => {
             let pod = extract_pod(primary);
             let hour = disambiguate_hour(*h, *is_12h, pod);
-            let date_dt = extract_date(primary, ref_time);
+            let date_dt = extract_date(primary, ref_time)?;
             let mut dt = date_dt
                 .date_naive()
                 .and_hms_opt(hour, 0, 0)
@@ -1874,12 +1813,12 @@ fn resolve_composed(
                     .and_then(|d| dt.checked_add_signed(d))
                     .unwrap_or(dt);
             }
-            return (dt, "hour");
+            return Some((dt, "hour"));
         }
         TimeForm::HourMinute(h, m, is_12h) => {
             let pod = extract_pod(primary);
             let hour = disambiguate_hour(*h, *is_12h, pod);
-            let date_dt = extract_date(primary, ref_time);
+            let date_dt = extract_date(primary, ref_time)?;
             let mut dt = date_dt
                 .date_naive()
                 .and_hms_opt(hour, *m, 0)
@@ -1890,44 +1829,43 @@ fn resolve_composed(
                     .and_then(|d| dt.checked_add_signed(d))
                     .unwrap_or(dt);
             }
-            return (dt, "minute");
+            return Some((dt, "minute"));
         }
         TimeForm::HourMinuteSecond(h, m, s) => {
-            let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            let (date_dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
             let dt = date_dt
                 .date_naive()
                 .and_hms_opt(*h, *m, *s)
                 .unwrap_or(date_dt.naive_utc())
                 .and_utc();
-            return (dt, "second");
+            return Some((dt, "second"));
         }
         TimeForm::Now => {
             // "X from right now" — add duration to ref_time directly (no truncation)
             if let TimeForm::RelativeGrain { n, grain } = &primary.form {
-                let result = match grain {
-                    Grain::Year => add_years(ref_time, *n as i32),
-                    Grain::Month => add_months(ref_time, *n as i32),
-                    Grain::Week => Duration::try_weeks(*n)
-                        .and_then(|d| ref_time.checked_add_signed(d))
-                        .unwrap_or(ref_time),
-                    Grain::Day => Duration::try_days(*n)
-                        .and_then(|d| ref_time.checked_add_signed(d))
-                        .unwrap_or(ref_time),
-                    Grain::Hour => Duration::try_hours(*n)
-                        .and_then(|d| ref_time.checked_add_signed(d))
-                        .unwrap_or(ref_time),
-                    Grain::Minute => Duration::try_minutes(*n)
-                        .and_then(|d| ref_time.checked_add_signed(d))
-                        .unwrap_or(ref_time),
-                    Grain::Second => Duration::try_seconds(*n)
-                        .and_then(|d| ref_time.checked_add_signed(d))
-                        .unwrap_or(ref_time),
-                    Grain::Quarter => add_months(ref_time, (*n as i32).saturating_mul(3)),
-                };
-                return (result, "second");
+                let result =
+                    match grain {
+                        Grain::Year => add_years(ref_time, *n)?,
+                        Grain::Month => add_months(ref_time, *n)?,
+                        Grain::Week => {
+                            Duration::try_weeks(*n).and_then(|d| ref_time.checked_add_signed(d))?
+                        }
+                        Grain::Day => {
+                            Duration::try_days(*n).and_then(|d| ref_time.checked_add_signed(d))?
+                        }
+                        Grain::Hour => {
+                            Duration::try_hours(*n).and_then(|d| ref_time.checked_add_signed(d))?
+                        }
+                        Grain::Minute => Duration::try_minutes(*n)
+                            .and_then(|d| ref_time.checked_add_signed(d))?,
+                        Grain::Second => Duration::try_seconds(*n)
+                            .and_then(|d| ref_time.checked_add_signed(d))?,
+                        Grain::Quarter => add_months(ref_time, n.checked_mul(3)?)?,
+                    };
+                return Some((result, "second"));
             }
-            let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction);
-            return (dt, "second");
+            let (dt, _) = resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
+            return Some((dt, "second"));
         }
         _ => {}
     }
@@ -1937,7 +1875,7 @@ fn resolve_composed(
         TimeForm::Hour(h, is_12h) => {
             let pod = extract_pod(secondary);
             let hour = disambiguate_hour(*h, *is_12h, pod);
-            let date_dt = extract_date(secondary, ref_time);
+            let date_dt = extract_date(secondary, ref_time)?;
             let mut dt = date_dt
                 .date_naive()
                 .and_hms_opt(hour, 0, 0)
@@ -1949,12 +1887,12 @@ fn resolve_composed(
                     .and_then(|d| dt.checked_add_signed(d))
                     .unwrap_or(dt);
             }
-            return (dt, "hour");
+            return Some((dt, "hour"));
         }
         TimeForm::HourMinute(h, m, is_12h) => {
             let pod = extract_pod(secondary);
             let hour = disambiguate_hour(*h, *is_12h, pod);
-            let date_dt = extract_date(secondary, ref_time);
+            let date_dt = extract_date(secondary, ref_time)?;
             let mut dt = date_dt
                 .date_naive()
                 .and_hms_opt(hour, *m, 0)
@@ -1965,16 +1903,16 @@ fn resolve_composed(
                     .and_then(|d| dt.checked_add_signed(d))
                     .unwrap_or(dt);
             }
-            return (dt, "minute");
+            return Some((dt, "minute"));
         }
         TimeForm::HourMinuteSecond(h, m, s) => {
-            let date_dt = extract_date(secondary, ref_time);
+            let date_dt = extract_date(secondary, ref_time)?;
             let dt = date_dt
                 .date_naive()
                 .and_hms_opt(*h, *m, *s)
                 .unwrap_or(date_dt.naive_utc())
                 .and_utc();
-            return (dt, "second");
+            return Some((dt, "second"));
         }
         _ => {}
     }
@@ -2013,19 +1951,19 @@ fn resolve_composed(
                         } else {
                             future_result
                         };
-                        return (result, "day");
+                        return Some((result, "day"));
                     }
                     // For month/year/quarter durations: compute target time, find holiday in target year
                     // Matches Haskell's intersect(holiday, inDurationInterval(dd))
                     let target_time = match grain {
-                        Grain::Year => add_years(ref_time, *n as i32),
-                        Grain::Month => add_months(ref_time, *n as i32),
-                        Grain::Quarter => add_months(ref_time, (*n as i32).saturating_mul(3)),
+                        Grain::Year => add_years(ref_time, *n)?,
+                        Grain::Month => add_months(ref_time, *n)?,
+                        Grain::Quarter => add_months(ref_time, n.checked_mul(3)?)?,
                         _ => ref_time,
                     };
                     let target_year = target_time.year();
                     if let Some(date) = resolve_holiday(name, target_year) {
-                        return (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day");
+                        return Some((date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"));
                     }
                 }
             }
@@ -2045,26 +1983,20 @@ fn resolve_composed(
                     | TimeForm::Today
             );
 
-            fn apply_duration(base: DateTime<Utc>, n: i64, grain: &Grain) -> DateTime<Utc> {
+            fn apply_duration(base: DateTime<Utc>, n: i64, grain: &Grain) -> Option<DateTime<Utc>> {
                 match grain {
-                    Grain::Year => add_years(base, n as i32),
-                    Grain::Month => add_months(base, n as i32),
-                    Grain::Week => Duration::try_weeks(n)
-                        .and_then(|d| base.checked_add_signed(d))
-                        .unwrap_or(base),
-                    Grain::Day => Duration::try_days(n)
-                        .and_then(|d| base.checked_add_signed(d))
-                        .unwrap_or(base),
-                    Grain::Hour => Duration::try_hours(n)
-                        .and_then(|d| base.checked_add_signed(d))
-                        .unwrap_or(base),
-                    Grain::Minute => Duration::try_minutes(n)
-                        .and_then(|d| base.checked_add_signed(d))
-                        .unwrap_or(base),
-                    Grain::Second => Duration::try_seconds(n)
-                        .and_then(|d| base.checked_add_signed(d))
-                        .unwrap_or(base),
-                    Grain::Quarter => add_months(base, (n as i32).saturating_mul(3)),
+                    Grain::Year => add_years(base, n),
+                    Grain::Month => add_months(base, n),
+                    Grain::Week => Duration::try_weeks(n).and_then(|d| base.checked_add_signed(d)),
+                    Grain::Day => Duration::try_days(n).and_then(|d| base.checked_add_signed(d)),
+                    Grain::Hour => Duration::try_hours(n).and_then(|d| base.checked_add_signed(d)),
+                    Grain::Minute => {
+                        Duration::try_minutes(n).and_then(|d| base.checked_add_signed(d))
+                    }
+                    Grain::Second => {
+                        Duration::try_seconds(n).and_then(|d| base.checked_add_signed(d))
+                    }
+                    Grain::Quarter => add_months(base, n.checked_mul(3)?),
                 }
             }
 
@@ -2075,8 +2007,11 @@ fn resolve_composed(
                     // occurrences and pick the one whose result is nearest-future
                     if is_day_level_base && *n > 0 {
                         let future_base = {
-                            let (dt, _) =
-                                resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                            let (dt, _) = resolve_simple_datetime(
+                                &primary.form,
+                                ref_time,
+                                primary.direction,
+                            )?;
                             dt
                         };
                         let past_base = {
@@ -2084,11 +2019,11 @@ fn resolve_composed(
                                 &primary.form,
                                 ref_time,
                                 Some(Direction::Past),
-                            );
+                            )?;
                             dt
                         };
-                        let future_result = apply_duration(future_base, *n, grain);
-                        let past_result = apply_duration(past_base, *n, grain);
+                        let future_result = apply_duration(future_base, *n, grain)?;
+                        let past_result = apply_duration(past_base, *n, grain)?;
                         // Pick nearest future, or if both future, pick closest
                         if past_result >= ref_time
                             && (future_result < ref_time || past_result <= future_result)
@@ -2099,17 +2034,17 @@ fn resolve_composed(
                         }
                     } else {
                         let (dt, _) =
-                            resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                            resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                         dt
                     }
                 }
             };
-            let result = apply_duration(base, *n, grain);
+            let result = apply_duration(base, *n, grain)?;
             if is_day_level_base && *grain >= Grain::Day {
-                return (grain_start(result, Grain::Day), "day");
+                return Some((grain_start(result, Grain::Day), "day"));
             }
             let out_grain = grain.lower().as_str();
-            return (grain_start(result, grain.lower()), out_grain);
+            return Some((grain_start(result, grain.lower()), out_grain));
         }
         TimeForm::GrainOffset { grain, offset } => {
             // "Monday of this week", "20th of next month"
@@ -2122,11 +2057,11 @@ fn resolve_composed(
                 }
                 Grain::Month => {
                     let first = start_of_month(ref_time);
-                    add_months(first, *offset)
+                    add_months(first, i64::from(*offset))?
                 }
                 Grain::Year => {
                     let jan1 = start_of_year(ref_time);
-                    add_years(jan1, *offset)
+                    add_years(jan1, i64::from(*offset))?
                 }
                 _ => ref_time,
             };
@@ -2136,7 +2071,7 @@ fn resolve_composed(
                     let dt = Duration::try_days(*dow as i64)
                         .and_then(|d| offset_base.checked_add_signed(d))
                         .unwrap_or(offset_base);
-                    return (dt, "day");
+                    return Some((dt, "day"));
                 }
             }
             // For DayOfMonth within a specific month, directly compute
@@ -2147,13 +2082,13 @@ fn resolve_composed(
                         .and_hms_opt(0, 0, 0)
                         .unwrap()
                         .and_utc();
-                    return (dt, "day");
+                    return Some((dt, "day"));
                 }
             }
             // Resolve primary in the context of the offset base
             let (result, primary_grain) =
-                resolve_simple_datetime(&primary.form, offset_base, primary.direction);
-            return (result, primary_grain);
+                resolve_simple_datetime(&primary.form, offset_base, primary.direction)?;
+            return Some((result, primary_grain));
         }
         _ => {}
     }
@@ -2173,7 +2108,7 @@ fn resolve_composed(
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc();
-            return (dt, "day");
+            return Some((dt, "day"));
         }
     }
     if let TimeForm::Month(month) = &primary.form {
@@ -2190,7 +2125,7 @@ fn resolve_composed(
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc();
-            return (dt, "day");
+            return Some((dt, "day"));
         }
     }
 
@@ -2199,12 +2134,12 @@ fn resolve_composed(
         // Holiday + Year: re-resolve the holiday for the target year
         if let TimeForm::Holiday(name, _) = &primary.form {
             match resolve_holiday(name, *y) {
-                Some(date) => return (date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day"),
-                None => return (midnight(ref_time), "day"),
+                Some(date) => return Some((date.and_hms_opt(0, 0, 0).unwrap().and_utc(), "day")),
+                None => return Some((midnight(ref_time), "day")),
             }
         }
         let (base, base_grain) =
-            resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
         match &primary.form {
             TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. } => {
                 let dt = NaiveDate::from_ymd_opt(*y, base.month(), base.day())
@@ -2212,7 +2147,7 @@ fn resolve_composed(
                     .and_hms_opt(0, 0, 0)
                     .unwrap()
                     .and_utc();
-                return (dt, "day");
+                return Some((dt, "day"));
             }
             TimeForm::Month(m) => {
                 let dt = NaiveDate::from_ymd_opt(*y, *m, 1)
@@ -2220,7 +2155,7 @@ fn resolve_composed(
                     .and_hms_opt(0, 0, 0)
                     .unwrap()
                     .and_utc();
-                return (dt, "month");
+                return Some((dt, "month"));
             }
             _ => {
                 // Generic: just override the year
@@ -2229,7 +2164,7 @@ fn resolve_composed(
                     .and_hms_opt(base.hour(), base.minute(), base.second())
                     .unwrap()
                     .and_utc();
-                return (dt, base_grain);
+                return Some((dt, base_grain));
             }
         }
     }
@@ -2241,19 +2176,19 @@ fn resolve_composed(
                 .and_hms_opt(0, 0, 0)
                 .unwrap()
                 .and_utc();
-            return (dt, "month");
+            return Some((dt, "month"));
         }
     }
 
     // If primary is a PartOfDay and secondary has a date, combine
     if let TimeForm::PartOfDay(_) = &primary.form {
-        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
-        return (date_dt, "hour");
+        let (date_dt, _) = resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
+        return Some((date_dt, "hour"));
     }
 
     // Nested Composed: if one side is Composed, try to resolve it first
     if let TimeForm::Composed(a, b) = &primary.form {
-        let (primary_dt, _primary_grain) = resolve_composed(a, b, ref_time);
+        let (primary_dt, _primary_grain) = resolve_composed(a, b, ref_time)?;
         let new_primary = TimeData::new(TimeForm::DateMDY {
             month: primary_dt.month(),
             day: primary_dt.day(),
@@ -2262,7 +2197,7 @@ fn resolve_composed(
         return resolve_composed(&new_primary, secondary, ref_time);
     }
     if let TimeForm::Composed(a, b) = &secondary.form {
-        let (secondary_dt, _secondary_grain) = resolve_composed(a, b, ref_time);
+        let (secondary_dt, _secondary_grain) = resolve_composed(a, b, ref_time)?;
         let new_secondary = TimeData::new(TimeForm::DateMDY {
             month: secondary_dt.month(),
             day: secondary_dt.day(),
@@ -2277,17 +2212,17 @@ fn resolve_composed(
         match &secondary.form {
             TimeForm::DateMDY { month, day, year } => {
                 let (date_dt, _) =
-                    resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
-                return (
+                    resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
+                return Some((
                     find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
                     "day",
-                );
+                ));
             }
             TimeForm::Holiday(..) => {
                 return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
             }
             TimeForm::DayOfMonth(day) => {
-                return (find_dow_dom_intersection(*dow, *day, ref_time), "day");
+                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
             }
             _ => {}
         }
@@ -2297,17 +2232,17 @@ fn resolve_composed(
         match &primary.form {
             TimeForm::DateMDY { month, day, year } => {
                 let (date_dt, _) =
-                    resolve_simple_datetime(&primary.form, ref_time, primary.direction);
-                return (
+                    resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
+                return Some((
                     find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
                     "day",
-                );
+                ));
             }
             TimeForm::Holiday(..) => {
                 return resolve_simple_datetime(&primary.form, ref_time, primary.direction);
             }
             TimeForm::DayOfMonth(day) => {
-                return (find_dow_dom_intersection(*dow, *day, ref_time), "day");
+                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
             }
             // GrainOffset + DOW: find the DOW within the grain period
             // e.g., "last week's sunday" → Sunday of last week
@@ -2316,7 +2251,7 @@ fn resolve_composed(
                 offset: _,
             } => {
                 let (period_start, _) =
-                    resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+                    resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
                 // Find the target DOW within the period
                 let period_date = period_start.date_naive();
                 let current_dow = period_date.weekday().num_days_from_monday();
@@ -2329,7 +2264,7 @@ fn resolve_composed(
                     .and_then(|d| period_date.checked_add_signed(d))
                     .unwrap_or(period_date);
                 let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
-                return (dt, "day");
+                return Some((dt, "day"));
             }
             _ => {}
         }
@@ -2342,7 +2277,7 @@ fn resolve_composed(
         } = &secondary.form
         {
             let (period_start, _) =
-                resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+                resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
             let period_date = period_start.date_naive();
             let current_dow = period_date.weekday().num_days_from_monday();
             let days_to_target = if *dow >= current_dow {
@@ -2354,7 +2289,7 @@ fn resolve_composed(
                 .and_then(|d| period_date.checked_add_signed(d))
                 .unwrap_or(period_date);
             let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
-            return (dt, "day");
+            return Some((dt, "day"));
         }
     }
 
@@ -2392,17 +2327,17 @@ fn resolve_nth_grain_interval(
     grain: Grain,
     past: bool,
     ref_time: DateTime<Utc>,
-) -> (DateTime<Utc>, DateTime<Utc>) {
+) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
     let base = grain_start(ref_time, grain);
 
     if past {
-        let from = add_grain(base, grain, (n as i32).saturating_neg());
+        let from = add_grain(base, grain, n.checked_neg()?)?;
         let to = base;
-        (from, to)
+        Some((from, to))
     } else {
-        let from = add_grain(base, grain, 1);
-        let to = add_grain(base, grain, 1_i32.saturating_add(n as i32));
-        (from, to)
+        let from = add_grain(base, grain, 1)?;
+        let to = add_grain(base, grain, 1_i64.checked_add(n)?)?;
+        Some((from, to))
     }
 }
 
@@ -2467,7 +2402,10 @@ fn resolve_weekend_interval(
 // AllGrain interval
 // ============================================================
 
-fn resolve_all_grain(grain: Grain, ref_time: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
+fn resolve_all_grain(
+    grain: Grain,
+    ref_time: DateTime<Utc>,
+) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
     let from = grain_start(ref_time, grain);
     // "all week" end = start of next period minus 1 day for week
     // Actually: all week = [Mon, Sun) = 6 days
@@ -2475,9 +2413,9 @@ fn resolve_all_grain(grain: Grain, ref_time: DateTime<Utc>) -> (DateTime<Utc>, D
         Grain::Week => Duration::try_days(6)
             .and_then(|d| from.checked_add_signed(d))
             .unwrap_or(from), // Mon to Sun (not including next Mon)
-        _ => add_grain(from, grain, 1),
+        _ => add_grain(from, grain, 1)?,
     };
-    (from, to)
+    Some((from, to))
 }
 
 fn grain_for_all_rest(grain: Grain) -> &'static str {
@@ -2496,11 +2434,11 @@ fn resolve_begin_end(
     target: &TimeForm,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
-) -> (DateTime<Utc>, DateTime<Utc>) {
+) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
     // Resolve the target period start
     let (period_start, grain) = match target {
         TimeForm::GrainOffset { grain, offset } => {
-            let (dt, _) = resolve_grain_offset(*grain, *offset, ref_time);
+            let (dt, _) = resolve_grain_offset(*grain, *offset, ref_time)?;
             (dt, *grain)
         }
         TimeForm::Month(m) => {
@@ -2523,14 +2461,14 @@ fn resolve_begin_end(
             (dt, Grain::Year)
         }
         _ => {
-            let (dt, _) = resolve_simple_datetime(target, ref_time, direction);
+            let (dt, _) = resolve_simple_datetime(target, ref_time, direction)?;
             let g = target_grain(target);
             (grain_start(dt, g), g)
         }
     };
 
     // Use hardcoded boundaries matching Haskell Duckling
-    match grain {
+    Some(match grain {
         Grain::Week => {
             if begin {
                 // Beginning of week: Mon-Wed (dayOfWeek 1-3)
@@ -2562,7 +2500,7 @@ fn resolve_begin_end(
             } else {
                 // End of month: day 21 to end of month
                 let start = make_date(y, m, 21);
-                let end = add_grain(period_start, Grain::Month, 1);
+                let end = add_grain(period_start, Grain::Month, 1)?;
                 (start, end)
             }
         }
@@ -2599,7 +2537,7 @@ fn resolve_begin_end(
         }
         _ => {
             // Fallback: divide into thirds
-            let period_end = add_grain(period_start, grain, 1);
+            let period_end = add_grain(period_start, grain, 1)?;
             let total_secs = period_end.signed_duration_since(period_start).num_seconds();
             let portion = total_secs.checked_div(3).unwrap_or(0);
             if begin {
@@ -2616,7 +2554,7 @@ fn resolve_begin_end(
                 (from, period_end)
             }
         }
-    }
+    })
 }
 
 fn begin_end_grain(target: &TimeForm) -> &'static str {
@@ -2902,54 +2840,39 @@ fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
     }
 }
 
-fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i32) -> DateTime<Utc> {
+fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i64) -> Option<DateTime<Utc>> {
     match grain {
-        Grain::Second => Duration::try_seconds(n as i64)
-            .and_then(|d| dt.checked_add_signed(d))
-            .unwrap_or(dt),
-        Grain::Minute => Duration::try_minutes(n as i64)
-            .and_then(|d| dt.checked_add_signed(d))
-            .unwrap_or(dt),
-        Grain::Hour => Duration::try_hours(n as i64)
-            .and_then(|d| dt.checked_add_signed(d))
-            .unwrap_or(dt),
-        Grain::Day => Duration::try_days(n as i64)
-            .and_then(|d| dt.checked_add_signed(d))
-            .unwrap_or(dt),
-        Grain::Week => Duration::try_weeks(n as i64)
-            .and_then(|d| dt.checked_add_signed(d))
-            .unwrap_or(dt),
+        Grain::Second => Duration::try_seconds(n).and_then(|d| dt.checked_add_signed(d)),
+        Grain::Minute => Duration::try_minutes(n).and_then(|d| dt.checked_add_signed(d)),
+        Grain::Hour => Duration::try_hours(n).and_then(|d| dt.checked_add_signed(d)),
+        Grain::Day => Duration::try_days(n).and_then(|d| dt.checked_add_signed(d)),
+        Grain::Week => Duration::try_weeks(n).and_then(|d| dt.checked_add_signed(d)),
         Grain::Month => add_months(dt, n),
-        Grain::Quarter => add_months(dt, n.saturating_mul(3)),
+        Grain::Quarter => add_months(dt, n.checked_mul(3)?),
         Grain::Year => add_years(dt, n),
     }
 }
 
-fn add_months(dt: DateTime<Utc>, months: i32) -> DateTime<Utc> {
-    let total = dt
-        .year()
-        .saturating_mul(12)
-        .saturating_add(dt.month() as i32)
-        .saturating_sub(1)
-        .saturating_add(months);
-    let year = total.div_euclid(12);
-    let month = (total.rem_euclid(12).saturating_add(1)) as u32;
+fn add_months(dt: DateTime<Utc>, months: i64) -> Option<DateTime<Utc>> {
+    let total = i64::from(dt.year())
+        .checked_mul(12)?
+        .checked_add(i64::from(dt.month()).checked_sub(1)?)?
+        .checked_add(months)?;
+    let year = i32::try_from(total.div_euclid(12)).ok()?;
+    let month = (total.rem_euclid(12).checked_add(1)?) as u32;
     let day = dt.day().min(days_in_month(year, month));
-    NaiveDate::from_ymd_opt(year, month, day)
-        .unwrap_or(dt.date_naive())
-        .and_hms_opt(dt.hour(), dt.minute(), dt.second())
-        .unwrap()
-        .and_utc()
+    let date = NaiveDate::from_ymd_opt(year, month, day)?;
+    let naive = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())?;
+    Some(naive.and_utc())
 }
 
-fn add_years(dt: DateTime<Utc>, years: i32) -> DateTime<Utc> {
-    let year = dt.year().saturating_add(years);
+fn add_years(dt: DateTime<Utc>, years: i64) -> Option<DateTime<Utc>> {
+    let year_i64 = i64::from(dt.year()).checked_add(years)?;
+    let year = i32::try_from(year_i64).ok()?;
     let day = dt.day().min(days_in_month(year, dt.month()));
-    NaiveDate::from_ymd_opt(year, dt.month(), day)
-        .unwrap_or(dt.date_naive())
-        .and_hms_opt(dt.hour(), dt.minute(), dt.second())
-        .unwrap()
-        .and_utc()
+    let date = NaiveDate::from_ymd_opt(year, dt.month(), day)?;
+    let naive = date.and_hms_opt(dt.hour(), dt.minute(), dt.second())?;
+    Some(naive.and_utc())
 }
 
 #[allow(clippy::arithmetic_side_effects)]
@@ -3897,7 +3820,8 @@ fn find_dow_dom_intersection(dow: u32, day: u32, ref_time: DateTime<Utc>) -> Dat
                 .unwrap()
                 .and_utc(),
             1,
-        );
+        )
+        .unwrap_or(dt);
     }
     // Fallback: just return the next occurrence of that day
     midnight(ref_time)
