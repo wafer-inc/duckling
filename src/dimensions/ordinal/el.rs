@@ -12,10 +12,8 @@ fn normalize_greek(s: &str) -> String {
         .replace('ό', "ο")
         .replace('ύ', "υ")
         .replace('ώ', "ω")
-        .replace('ϊ', "ι")
-        .replace('ΐ', "ι")
-        .replace('ϋ', "υ")
-        .replace('ΰ', "υ")
+        .replace(['ϊ', 'ΐ'], "ι")
+        .replace(['ϋ', 'ΰ'], "υ")
 }
 
 fn ordinal_stem_value(stem: &str) -> Option<i64> {

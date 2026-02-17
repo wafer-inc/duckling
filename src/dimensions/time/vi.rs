@@ -1448,8 +1448,8 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut hour: u32 = h.parse().ok()?;
                 let minute: u32 = m.parse().ok()?;
-                if p == "chiều" || p == "tối" {
-                    if hour < 12 { hour += 12; }
+                if (p == "chiều" || p == "tối") && hour < 12 {
+                    hour += 12;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(hour, minute, false))))
             }),

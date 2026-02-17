@@ -2,10 +2,12 @@ use crate::engine;
 use crate::resolve::{Context, Options};
 use crate::types::{DimensionKind, Entity, Rule};
 
+type ExampleCheck = Box<dyn Fn(&Entity) -> bool>;
+
 /// A corpus is a collection of examples for testing.
 pub struct Corpus {
     pub context: Context,
-    pub examples: Vec<(Vec<String>, Box<dyn Fn(&Entity) -> bool>)>,
+    pub examples: Vec<(Vec<String>, ExampleCheck)>,
 }
 
 impl Corpus {
@@ -34,7 +36,7 @@ pub fn check_corpus(corpus: &Corpus, rules: &[Rule], dims: &[DimensionKind]) -> 
     for (texts, check) in &corpus.examples {
         for text in texts {
             let entities = engine::parse_and_resolve(text, rules, &corpus.context, &options, dims);
-            let any_match = entities.iter().any(|e| check(e));
+            let any_match = entities.iter().any(check);
             if !any_match {
                 let dim_str = dims
                     .iter()

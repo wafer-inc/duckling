@@ -103,8 +103,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let normalized = txt
                     .replace('ș', "s")
-                    .replace('ă', "a")
-                    .replace('â', "a")
+                    .replace(['ă', 'â'], "a")
                     .replace('î', "i");
                 let v = match normalized.as_str() {
                     s if s.starts_with("un") => 11.0,

@@ -21,7 +21,7 @@ pub fn rules_for(locale: Locale, dims: &[DimensionKind]) -> &'static [Rule] {
     let leaked: &'static [Rule] = Box::leak(built.into_boxed_slice());
 
     let mut guard = cache.lock().unwrap();
-    *guard.entry(key).or_insert(leaked)
+    guard.entry(key).or_insert(leaked)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

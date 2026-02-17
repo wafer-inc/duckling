@@ -197,13 +197,7 @@ fn ar_adjust_hour(hour12_or_24: u32, part: &str) -> Option<u32> {
     if hour12_or_24 > 12 {
         return Some(hour12_or_24);
     }
-    if is_pm {
-        if hour12_or_24 == 12 {
-            Some(12)
-        } else {
-            Some(hour12_or_24 + 12)
-        }
-    } else if is_noonish {
+    if is_pm || is_noonish {
         if hour12_or_24 == 12 {
             Some(12)
         } else {

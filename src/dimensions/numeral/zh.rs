@@ -153,7 +153,8 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::RegexMatch(m) => m,
                     _ => return None,
                 };
-                let v = if m.group(1).is_some() { 2.0 } else { 2.0 };
+                let _ = m.group(1);
+                let v = 2.0;
                 Some(TokenData::Numeral(NumeralData::new(v).with_quantifier()))
             }),
         },

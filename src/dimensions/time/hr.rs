@@ -490,11 +490,11 @@ pub fn rules() -> Vec<Rule> {
             name: "quarter/petnaest to noon (hr)".to_string(),
             pattern: vec![regex("(petnaest|cetvrt|četvrt)\\s+do\\s+podne(va)?")],
             production: Box::new(|nodes| {
-                let m_raw = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => rm.group(1)?.to_lowercase(),
+                match &nodes[0].token_data {
+                    TokenData::RegexMatch(_) => {}
                     _ => return None,
                 };
-                let minute = if m_raw.contains("čet") || m_raw.contains("cetv") { 45 } else { 45 };
+                let minute = 45;
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(11, minute, false))))
             }),
         },

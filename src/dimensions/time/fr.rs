@@ -680,7 +680,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![regex("(à|a)"), dim(DimensionKind::Numeral), regex("heures?")],
             production: Box::new(|nodes| {
                 let h = numeral_data(&nodes[1].token_data)?.value;
-                if h < 0.0 || h > 23.0 || h.fract() != 0.0 {
+                if !(0.0..=23.0).contains(&h) || h.fract() != 0.0 {
                     return None;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(
@@ -693,7 +693,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![dim(DimensionKind::Numeral), regex("heures?")],
             production: Box::new(|nodes| {
                 let h = numeral_data(&nodes[0].token_data)?.value;
-                if h < 0.0 || h > 23.0 || h.fract() != 0.0 {
+                if !(0.0..=23.0).contains(&h) || h.fract() != 0.0 {
                     return None;
                 }
                 Some(TokenData::Time(TimeData::new(TimeForm::HourMinute(

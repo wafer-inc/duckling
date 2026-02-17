@@ -2868,7 +2868,7 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
         "hazarat ali's birthday" => return rajab(year).map(|d| d + Duration::days(12)),
         "reconciliation day" => {
             let base = NaiveDate::from_ymd_opt(year, 5, 26)?;
-            let delta = (7 + 0_i64 - i64::from(base.weekday().num_days_from_monday())) % 7;
+            let delta = (7_i64 - i64::from(base.weekday().num_days_from_monday())) % 7;
             return Some(base + Duration::days(delta));
         }
         s if s.starts_with("day of") && (s.contains("vow") || s.contains("reconciliation")) => {
@@ -3172,7 +3172,7 @@ fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
 
     // Heroes' Day aliases
     if name == "heroes' day" || name == "heroes day" || name == "kruger day" {
-        return Some(NaiveDate::from_ymd_opt(year, 10, 10)?);
+        return NaiveDate::from_ymd_opt(year, 10, 10);
     }
 
     // Hosay (TT): Day of Ashura

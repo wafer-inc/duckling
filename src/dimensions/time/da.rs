@@ -602,22 +602,13 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "om eftermiddagen / efter frokost (da)".to_string(),
             pattern: vec![regex("om eftermiddagen|efter frokost")],
-            production: Box::new(|nodes| {
-                let s = match &nodes[0].token_data {
-                    TokenData::RegexMatch(m) => m.group(0)?,
-                    _ => return None,
-                };
-                if s.contains("efter frokost") {
-                    Some(TokenData::Time(TimeData::new(TimeForm::Composed(
-                        Box::new(TimeData::new(TimeForm::Today)),
-                        Box::new(TimeData::latent(TimeForm::PartOfDay(super::PartOfDay::Afternoon))),
-                    ))))
-                } else {
-                    Some(TokenData::Time(TimeData::new(TimeForm::Composed(
-                        Box::new(TimeData::new(TimeForm::Today)),
-                        Box::new(TimeData::latent(TimeForm::PartOfDay(super::PartOfDay::Afternoon))),
-                    ))))
-                }
+            production: Box::new(|_nodes| {
+                Some(TokenData::Time(TimeData::new(TimeForm::Composed(
+                    Box::new(TimeData::new(TimeForm::Today)),
+                    Box::new(TimeData::latent(TimeForm::PartOfDay(
+                        super::PartOfDay::Afternoon,
+                    ))),
+                ))))
             }),
         },
         Rule {

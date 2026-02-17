@@ -353,7 +353,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 Some(TokenData::Numeral(NumeralData::new(
-                    t.replace('.', "").replace(' ', "").parse().ok()?,
+                    t.replace(['.', ' '], "").parse().ok()?,
                 )))
             }),
         },

@@ -109,7 +109,7 @@ pub fn rules() -> Vec<Rule> {
 
                 // Count digits in the body
                 let body_digits = decimal_digit_count(body);
-                if body_digits < 7 || body_digits > 15 {
+                if !(7..=15).contains(&body_digits) {
                     return None;
                 }
 
