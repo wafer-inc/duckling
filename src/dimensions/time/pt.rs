@@ -535,13 +535,17 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "time-of-day (latent) (pt)".to_string(),
-            pattern: vec![regex("\\b([01]?\\d|2[0-3])\\b")],
+            pattern: vec![predicate(is_natural)],
             production: Box::new(|nodes| {
-                let h = match &nodes[0].token_data {
-                    TokenData::RegexMatch(rm) => rm.group(1)?,
-                    _ => return None,
-                };
-                let hour: u32 = h.parse().ok()?;
+                let n = numeral_data(&nodes[0].token_data)?.value;
+                if !n.is_finite() || n.fract() != 0.0 {
+                    return None;
+                }
+                let hour_i = n as i64;
+                if !(0..=23).contains(&hour_i) {
+                    return None;
+                }
+                let hour = u32::try_from(hour_i).ok()?;
                 let mut td = TimeData::new(TimeForm::HourMinute(hour, 0, true));
                 td.latent = true;
                 Some(TokenData::Time(td))
@@ -812,7 +816,7 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "<time-of-day> horas (pt)".to_string(),
-            pattern: vec![predicate(is_time_of_day), regex("horas?")],
+            pattern: vec![predicate(is_time_of_day), regex("h\\.?(ora)?s?")],
             production: Box::new(|nodes| match &nodes[0].token_data {
                 TokenData::Time(td) => {
                     let mut t = td.clone();
@@ -826,7 +830,11 @@ pub fn rules() -> Vec<Rule> {
             name: "às <hour-min>(time-of-day) (pt)".to_string(),
             pattern: vec![regex("(à|a)s?"), predicate(is_time_of_day), regex("horas?")],
             production: Box::new(|nodes| match &nodes[1].token_data {
-                TokenData::Time(td) => Some(TokenData::Time(td.clone())),
+                TokenData::Time(td) => {
+                    let mut t = td.clone();
+                    t.latent = false;
+                    Some(TokenData::Time(t))
+                }
                 _ => None,
             }),
         },
@@ -834,7 +842,11 @@ pub fn rules() -> Vec<Rule> {
             name: "às <time-of-day> (pt)".to_string(),
             pattern: vec![regex("[àa]s"), predicate(is_time_of_day)],
             production: Box::new(|nodes| match &nodes[1].token_data {
-                TokenData::Time(td) => Some(TokenData::Time(td.clone())),
+                TokenData::Time(td) => {
+                    let mut t = td.clone();
+                    t.latent = false;
+                    Some(TokenData::Time(t))
+                }
                 _ => None,
             }),
         },

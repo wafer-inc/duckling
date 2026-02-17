@@ -745,6 +745,28 @@ pub fn rules() -> Vec<Rule> {
             }),
         },
         Rule {
+            name: "year (es)".to_string(),
+            pattern: vec![predicate(is_integer_between(1000, 2100))],
+            production: Box::new(|nodes| {
+                let year = integer_value(&nodes[0].token_data)? as i32;
+                Some(TokenData::Time(TimeData::new(TimeForm::Year(year))))
+            }),
+        },
+        Rule {
+            name: "year by adding three numbers (es)".to_string(),
+            pattern: vec![
+                regex("mil"),
+                predicate(is_integer_between(100, 1000)),
+                predicate(is_integer_between(1, 100)),
+            ],
+            production: Box::new(|nodes| {
+                let v1 = integer_value(&nodes[1].token_data)? as i32;
+                let v2 = integer_value(&nodes[2].token_data)? as i32;
+                let year = 1000i32.checked_add(v1)?.checked_add(v2)?;
+                Some(TokenData::Time(TimeData::new(TimeForm::Year(year))))
+            }),
+        },
+        Rule {
             name: "en <duration> (es)".to_string(),
             pattern: vec![regex("en"), dim(DimensionKind::Duration)],
             production: Box::new(|nodes| match &nodes[1].token_data {

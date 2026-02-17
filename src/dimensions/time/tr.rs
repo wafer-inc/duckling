@@ -993,6 +993,11 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::Quarter(3))))),
         },
         Rule {
+            name: "dördüncü çeyrek yıl (tr)".to_string(),
+            pattern: vec![regex("d[öo]rd[üu]nc[üu]\\s+çeyrek\\s+y[ıi]l|dorduncu\\s+ceyrek\\s+yil")],
+            production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::Quarter(4))))),
+        },
+        Rule {
             name: "yılbaşı (tr)".to_string(),
             pattern: vec![regex("y[ıi]lba[şs][ıi](ndan|na)?|y[ıi]lba[şs][ıi]\\s+tatili(nden|ne)?")],
             production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month: 1, day: 1, year: None })))),

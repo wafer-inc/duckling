@@ -251,7 +251,7 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "Οκτ (el)".to_string(),
-            pattern: vec![regex("Οκτ\\.?|οκτ\\.?")],
+            pattern: vec![regex("οκτ([ωώ]βρ([ιί]ο([νυ]?)|η)ς?)?\\.?")],
             production: Box::new(|_| Some(TokenData::Time(TimeData::new(TimeForm::Month(10))))),
         },
         Rule {
@@ -1282,7 +1282,7 @@ pub fn rules() -> Vec<Rule> {
         },
         Rule {
             name: "σε 3/4ω (el)".to_string(),
-            pattern: vec![regex("σε\\s*3/4\\s*ω")],
+            pattern: vec![regex("σε\\s*(3/4\\s*(ω|της\\s+ώρας)|τρία\\s+τ(έ|ε)ταρτα\\s+της\\s+ώρας)")],
             production: Box::new(|_| {
                 Some(TokenData::Time(TimeData::new(TimeForm::RelativeGrain {
                     n: 45,
