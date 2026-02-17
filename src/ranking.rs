@@ -191,32 +191,53 @@ fn compare_candidate(a: &Candidate, b: &Candidate) -> Ordering {
     Ordering::Equal
 }
 
-fn classifiers_for_locale(_locale: &Locale) -> Classifiers {
+fn classifiers_for_locale(locale: &Locale) -> Classifiers {
     static EN_XX: OnceLock<Classifiers> = OnceLock::new();
-    if _locale.lang != Lang::EN {
-        return HashMap::new();
-    }
-    EN_XX
-        .get_or_init(|| {
-            let raw: HashMap<String, JsonClassData> =
-                serde_json::from_str(include_str!("ranking_classifiers/en_xx.json"))
-                    .unwrap_or_default();
-            raw.into_iter()
-                .map(|(rule, ok)| {
-                    (
-                        rule,
-                        Classifier {
-                            ok_data: ClassData {
-                                prior: ok.prior,
-                                unseen: ok.unseen,
-                                likelihoods: ok.likelihoods,
-                            },
+    static AR_XX: OnceLock<Classifiers> = OnceLock::new();
+    static EL_XX: OnceLock<Classifiers> = OnceLock::new();
+    static ES_XX: OnceLock<Classifiers> = OnceLock::new();
+    static PT_XX: OnceLock<Classifiers> = OnceLock::new();
+    static TR_XX: OnceLock<Classifiers> = OnceLock::new();
+
+    fn load(json: &str) -> Classifiers {
+        let raw: HashMap<String, JsonClassData> = serde_json::from_str(json).unwrap_or_default();
+        raw.into_iter()
+            .map(|(rule, ok)| {
+                (
+                    rule,
+                    Classifier {
+                        ok_data: ClassData {
+                            prior: ok.prior,
+                            unseen: ok.unseen,
+                            likelihoods: ok.likelihoods,
                         },
-                    )
-                })
-                .collect()
-        })
-        .clone()
+                    },
+                )
+            })
+            .collect()
+    }
+
+    match locale.lang {
+        Lang::EN => EN_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/en_xx.json")))
+            .clone(),
+        Lang::AR => AR_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/ar_xx.json")))
+            .clone(),
+        Lang::EL => EL_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/el_xx.json")))
+            .clone(),
+        Lang::ES => ES_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/es_xx.json")))
+            .clone(),
+        Lang::PT => PT_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/pt_xx.json")))
+            .clone(),
+        Lang::TR => TR_XX
+            .get_or_init(|| load(include_str!("ranking_classifiers/tr_xx.json")))
+            .clone(),
+        _ => HashMap::new(),
+    }
 }
 
 pub fn rank_nodes(nodes: Vec<Node>, locale: &Locale, dims: &[DimensionKind]) -> Vec<Node> {
