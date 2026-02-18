@@ -3227,16 +3227,43 @@ fn test_time_additional_regression_inputs_extreme_values() {
     let _ = parse_time("in 9999999999999999 days");
 }
 
-/// After aligning with Haskell's `isOkWithThisNext`, DateMDY forms are no
-/// longer gated by the "last <time>" rule (Haskell's `ruleLastTime` only
-/// matches forms with `okForThisNext = True`). "last April 1" now resolves
-/// as the next future April 1 since "last" doesn't apply to DateMDY forms.
-/// Use "last April" for month-level past reference.
 #[test]
 fn test_last_april_first_is_previous_occurrence() {
-    // DateMDY is not ok_for_this_next, so "last" doesn't attach;
-    // "April 1" resolves to the next future occurrence.
-    check_time_naive("last April 1", dt(2013, 4, 1, 0, 0, 0), "day");
+    // DateMDY without a year is a cyclic form (like DayOfWeek/Month), so
+    // ok_for_this_next is true and "last" attaches correctly.
+    check_time_naive("last April 1", dt(2012, 4, 1, 0, 0, 0), "day");
+}
+
+#[test]
+fn test_last_april_first_march_2018_ref() {
+    // Regression: with ref time in March 2018, "last April 1" should resolve
+    // to 2017-04-01 (the most recent past April 1), not 2018-04-01.
+    let locale = Locale::new(Lang::EN, None);
+    let context = Context {
+        reference_time: Utc.with_ymd_and_hms(2018, 3, 15, 12, 0, 0).unwrap(),
+        locale: locale.clone(),
+        timezone_offset_minutes: 0,
+    };
+    let options = Options::default();
+    let entities = parse(
+        "last April 1",
+        &locale,
+        &[DimensionKind::Time],
+        &context,
+        &options,
+    );
+    let expected = dt(2017, 4, 1, 0, 0, 0);
+    let found = entities.iter().any(|e| {
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain: Grain::Day }, .. }) if *value == expected)
+    });
+    assert!(
+        found,
+        "Expected 'last April 1' to resolve to 2017-04-01 with March 2018 ref, got: {:?}",
+        entities
+            .iter()
+            .map(|e| format!("{:?}", e.value))
+            .collect::<Vec<_>>()
+    );
 }
 
 #[test]

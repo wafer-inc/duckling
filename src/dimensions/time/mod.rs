@@ -206,6 +206,7 @@ impl TimeData {
             form,
             TimeForm::DayOfWeek(_)
                 | TimeForm::Month(_)
+                | TimeForm::DateMDY { year: None, .. }
                 | TimeForm::Weekend
                 | TimeForm::Season(_)
                 | TimeForm::Holiday(..)
@@ -230,6 +231,7 @@ impl TimeData {
             form,
             TimeForm::DayOfWeek(_)
                 | TimeForm::Month(_)
+                | TimeForm::DateMDY { year: None, .. }
                 | TimeForm::Weekend
                 | TimeForm::Season(_)
                 | TimeForm::Holiday(..)
