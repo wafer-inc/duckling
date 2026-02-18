@@ -24,14 +24,10 @@ let options = Options::default();
 
 // Time — "tomorrow at 3pm" parses as a naive (wall-clock) time
 let results = parse("tomorrow at 3pm", &locale, &[DimensionKind::Time], &context, &options);
-assert_eq!(results, vec![Entity {
-    body: "tomorrow at 3pm".into(),
-    start: 0, end: 15, latent: Some(false),
-    value: DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
-        value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap(),
-        grain: Grain::Hour,
-    })),
-}]);
+if let DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain }, .. }) = &results[0].value {
+    assert_eq!(*value, NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap());
+    assert_eq!(*grain, Grain::Hour);
+} else { panic!("expected Naive time point"); }
 
 // Temperature
 let results = parse("80 degrees fahrenheit", &locale, &[DimensionKind::Temperature], &context, &options);
@@ -61,10 +57,10 @@ Time values distinguish between absolute instants and wall-clock/calendar times:
 
 ```text
 // Naive: no timezone baked in
-TimeValue::Single(TimePoint::Naive { value: NaiveDateTime, grain })
+TimeValue::Single { value: TimePoint::Naive { value: NaiveDateTime, grain }, values: Vec<TimePoint> }
 
 // Instant: absolute UTC moment
-TimeValue::Single(TimePoint::Instant { value: DateTime<Utc>, grain })
+TimeValue::Single { value: TimePoint::Instant { value: DateTime<Utc>, grain }, values: Vec<TimePoint> }
 ```
 
 An explicit timezone (e.g. `"3pm CET"`) promotes any naive time to an instant.

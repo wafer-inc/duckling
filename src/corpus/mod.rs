@@ -40,14 +40,20 @@ type Check = Box<dyn Fn(&Entity) -> bool>;
 /// Checks that an entity resolves to a specific naive datetime with the given grain.
 pub fn datetime(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32, grain: Grain) -> Check {
     Box::new(move |e: &Entity| match &e.value {
-        DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, grain: g })) => {
+        DimensionValue::Time(TimeValue::Single {
+            value: TimePoint::Naive { value, grain: g },
+            ..
+        }) => {
             let expected = NaiveDate::from_ymd_opt(y, m, d)
                 .unwrap()
                 .and_hms_opt(h, mi, s)
                 .unwrap();
             *value == expected && *g == grain
         }
-        DimensionValue::Time(TimeValue::Single(TimePoint::Instant { value, grain: g })) => {
+        DimensionValue::Time(TimeValue::Single {
+            value: TimePoint::Instant { value, grain: g },
+            ..
+        }) => {
             let expected = NaiveDate::from_ymd_opt(y, m, d)
                 .unwrap()
                 .and_hms_opt(h, mi, s)
@@ -95,6 +101,7 @@ pub fn datetime_interval(
         DimensionValue::Time(TimeValue::Interval {
             from: Some(from),
             to: Some(to),
+            ..
         }) => {
             let expected_from = NaiveDate::from_ymd_opt(y1, m1, d1)
                 .unwrap()
@@ -154,6 +161,7 @@ pub fn datetime_open_interval_after(
         DimensionValue::Time(TimeValue::Interval {
             from: Some(from),
             to: None,
+            ..
         }) => {
             let expected = NaiveDate::from_ymd_opt(y, m, d)
                 .unwrap()
@@ -184,6 +192,7 @@ pub fn datetime_open_interval_before(
         DimensionValue::Time(TimeValue::Interval {
             from: None,
             to: Some(to),
+            ..
         }) => {
             let expected = NaiveDate::from_ymd_opt(y, m, d)
                 .unwrap()

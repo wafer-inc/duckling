@@ -5,7 +5,7 @@ use std::sync::OnceLock;
 use crate::dimensions::time::TimeForm;
 use crate::dimensions::time_grain::Grain;
 use crate::locale::{Lang, Locale};
-use crate::types::{DimensionKind, Entity, Node, TokenData};
+use crate::types::{DimensionKind, Entity, Node, ResolvedToken, TokenData};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "train")]
@@ -103,7 +103,7 @@ struct JsonClassifier {
 
 #[derive(Clone)]
 struct Candidate {
-    node: Node,
+    resolved: ResolvedToken,
     score: f64,
     target: bool,
 }
@@ -228,9 +228,14 @@ fn same_dimension(a: &Node, b: &Node) -> bool {
 }
 
 fn compare_candidate(a: &Candidate, b: &Candidate) -> Ordering {
-    if same_dimension(&a.node, &b.node) {
-        let starts = a.node.range.start.cmp(&b.node.range.start);
-        let ends = a.node.range.end.cmp(&b.node.range.end);
+    if same_dimension(&a.resolved.node, &b.resolved.node) {
+        let starts = a
+            .resolved
+            .node
+            .range
+            .start
+            .cmp(&b.resolved.node.range.start);
+        let ends = a.resolved.node.range.end.cmp(&b.resolved.node.range.end);
         return match starts {
             Ordering::Equal => match ends {
                 Ordering::Equal => a.score.partial_cmp(&b.score).unwrap_or(Ordering::Equal),
@@ -247,7 +252,7 @@ fn compare_candidate(a: &Candidate, b: &Candidate) -> Ordering {
         };
     }
 
-    let cr = comp_range(&a.node, &b.node);
+    let cr = comp_range(&a.resolved.node, &b.resolved.node);
     if a.target == b.target {
         return cr;
     }
@@ -321,49 +326,56 @@ fn classifiers_for_locale(locale: &Locale) -> Classifiers {
     }
 }
 
-pub fn rank_nodes(nodes: Vec<Node>, locale: &Locale, dims: &[DimensionKind]) -> Vec<Node> {
+pub(crate) fn rank_resolved(
+    tokens: Vec<ResolvedToken>,
+    locale: &Locale,
+    dims: &[DimensionKind],
+) -> Vec<ResolvedToken> {
     let classifiers = classifiers_for_locale(locale);
-    let candidates: Vec<Candidate> = nodes
+    let candidates: Vec<Candidate> = tokens
         .into_iter()
-        .filter(|n| n.token_data.dimension_kind().is_some())
-        .map(|node| {
-            let dim = node.token_data.dimension_kind();
+        .map(|resolved| {
+            let dim = resolved.node.token_data.dimension_kind();
             Candidate {
-                score: score_node(&classifiers, &node),
+                score: score_node(&classifiers, &resolved.node),
                 target: dims.is_empty() || dim.map(|d| dims.contains(&d)).unwrap_or(false),
-                node,
+                resolved,
             }
         })
         .collect();
 
-    let winners: Vec<Node> = candidates
+    let winners: Vec<ResolvedToken> = candidates
         .iter()
         .filter(|x| {
             !candidates
                 .iter()
                 .any(|y| compare_candidate(x, y) == Ordering::Less)
         })
-        .map(|c| c.node.clone())
+        .map(|c| c.resolved.clone())
         .collect();
 
     // Dedup matching Haskell's Set.fromList on ResolvedToken, which uses
-    // (range, rval, latent) — notably excluding the rule/node.
-    // Since we operate on unresolved Nodes, we use token_data debug string
-    // as a proxy for the resolved value.
+    // Ord instance comparing (range, toJText rval, latent).
+    // Now that we have resolved entities, we dedup on actual resolved values.
     let mut uniq = Vec::new();
     let mut seen = HashSet::new();
-    for n in winners {
-        let key = (n.range.start, n.range.end, format!("{:?}", n.token_data));
+    for rt in winners {
+        let key = (
+            rt.entity.start,
+            rt.entity.end,
+            format!("{:?}", rt.entity.value),
+            rt.entity.latent,
+        );
         if seen.insert(key) {
-            uniq.push(n);
+            uniq.push(rt);
         }
     }
 
     uniq.sort_by(|a, b| {
-        a.range
+        a.entity
             .start
-            .cmp(&b.range.start)
-            .then_with(|| a.range.end.cmp(&b.range.end))
+            .cmp(&b.entity.start)
+            .then_with(|| a.entity.end.cmp(&b.entity.end))
     });
     uniq
 }

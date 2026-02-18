@@ -125,17 +125,17 @@ pub struct MeasurementPoint {
 ///
 /// // Wall-clock times are Naive (no timezone baked in)
 /// let results = parse("tomorrow at 3pm", &locale, &[DimensionKind::Time], &context, &options);
-/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
-///     value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap(),
-///     grain: Grain::Hour,
-/// })));
+/// if let DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain }, .. }) = &results[0].value {
+///     assert_eq!(*value, NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(15, 0, 0).unwrap());
+///     assert_eq!(*grain, Grain::Hour);
+/// } else { panic!("expected Naive time point"); }
 ///
 /// // Relative offsets from now are Instant (pinned to UTC)
 /// let results = parse("in one hour", &locale, &[DimensionKind::Time], &context, &options);
-/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Instant {
-///     value: Utc.with_ymd_and_hms(2013, 2, 12, 5, 30, 0).unwrap(),
-///     grain: Grain::Minute,
-/// })));
+/// if let DimensionValue::Time(TimeValue::Single { value: TimePoint::Instant { value, grain }, .. }) = &results[0].value {
+///     assert_eq!(*value, Utc.with_ymd_and_hms(2013, 2, 12, 5, 30, 0).unwrap());
+///     assert_eq!(*grain, Grain::Minute);
+/// } else { panic!("expected Instant time point"); }
 /// ```
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimePoint {
@@ -180,34 +180,50 @@ impl TimePoint {
 ///
 /// // Single time point
 /// let results = parse("tomorrow", &locale, &[DimensionKind::Time], &context, &options);
-/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
-///     value: NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(0, 0, 0).unwrap(),
-///     grain: Grain::Day,
-/// })));
+/// if let DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain }, .. }) = &results[0].value {
+///     assert_eq!(*value, NaiveDate::from_ymd_opt(2013, 2, 13).unwrap().and_hms_opt(0, 0, 0).unwrap());
+///     assert_eq!(*grain, Grain::Day);
+/// } else { panic!("expected Naive time point"); }
 ///
 /// // Time interval
 /// let results = parse("from 3pm to 5pm", &locale, &[DimensionKind::Time], &context, &options);
-/// assert_eq!(results[0].value, DimensionValue::Time(TimeValue::Interval {
-///     from: Some(TimePoint::Naive {
-///         value: NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(15, 0, 0).unwrap(),
-///         grain: Grain::Hour,
-///     }),
-///     to: Some(TimePoint::Naive {
-///         value: NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(18, 0, 0).unwrap(),
-///         grain: Grain::Hour,
-///     }),
-/// }));
+/// if let DimensionValue::Time(TimeValue::Interval { from: Some(f), to: Some(t), .. }) = &results[0].value {
+///     assert!(matches!(f, TimePoint::Naive { value, grain: Grain::Hour }
+///         if *value == NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(15, 0, 0).unwrap()));
+///     assert!(matches!(t, TimePoint::Naive { value, grain: Grain::Hour }
+///         if *value == NaiveDate::from_ymd_opt(2013, 2, 12).unwrap().and_hms_opt(18, 0, 0).unwrap()));
+/// } else { panic!("expected Interval time value"); }
 /// ```
+/// A pair of interval endpoints, used in the `values` array for intervals.
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct IntervalEndpoints {
+    /// The start of the interval, if bounded.
+    pub from: Option<TimePoint>,
+    /// The end of the interval, if bounded.
+    pub to: Option<TimePoint>,
+}
+
+/// A resolved time value — either a single point or an interval.
+/// Includes a `values` array of up to 3 next occurrences, matching Haskell's
+/// `TimeValue SingleTimeValue [SingleTimeValue]`.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TimeValue {
-    /// A single time point.
-    Single(TimePoint),
-    /// A time interval.
+    /// A single time point with additional future occurrences.
+    /// Matches Haskell's `TimeValue (SimpleValue v) [v1, v2, v3] holiday`.
+    Single {
+        /// The primary resolved time point.
+        value: TimePoint,
+        /// Up to 3 next occurrences (including the primary as first element).
+        values: Vec<TimePoint>,
+    },
+    /// A time interval with additional future occurrences.
     Interval {
         /// The start of the interval, if bounded.
         from: Option<TimePoint>,
         /// The end of the interval, if bounded.
         to: Option<TimePoint>,
+        /// Up to 3 next interval occurrences.
+        values: Vec<IntervalEndpoints>,
     },
 }
 
@@ -427,6 +443,14 @@ impl fmt::Debug for Rule {
             .field("pattern", &self.pattern)
             .finish()
     }
+}
+
+/// Internal resolved token pairing a parse Node with its resolved Entity.
+/// Matches Haskell's `Resolved { range, node, rval, isLatent }`.
+#[derive(Debug, Clone)]
+pub(crate) struct ResolvedToken {
+    pub(crate) node: Node,
+    pub(crate) entity: Entity,
 }
 
 /// A parsed entity extracted from text, with its position, matched text, and resolved value.

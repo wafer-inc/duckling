@@ -24,7 +24,8 @@ pub use dimensions::time_grain::Grain;
 pub use locale::{Lang, Locale, Region};
 pub use resolve::{Context, Options};
 pub use types::{
-    DimensionKind, DimensionValue, Entity, MeasurementPoint, MeasurementValue, TimePoint, TimeValue,
+    DimensionKind, DimensionValue, Entity, IntervalEndpoints, MeasurementPoint, MeasurementValue,
+    TimePoint, TimeValue,
 };
 
 #[cfg(feature = "train")]
@@ -71,26 +72,32 @@ pub fn parse(
     context: &Context,
     options: &Options,
 ) -> Vec<Entity> {
+    use types::ResolvedToken;
+
     let rules = lang::rules_for(*locale, dims);
     let stash = engine::parse_string(text, rules);
-    let ranked_nodes = ranking::rank_nodes(stash.all_nodes().cloned().collect(), locale, dims);
-    let resolved: Vec<Entity> = ranked_nodes
-        .iter()
+
+    // Resolve all nodes first, then rank — matching Haskell's
+    // parseAndResolve → rank pipeline from Api.hs/Engine.hs.
+    let resolved_tokens: Vec<ResolvedToken> = stash
+        .all_nodes()
         .filter(|node| {
             node.token_data
                 .dimension_kind()
                 .map(|dk| dims.is_empty() || dims.contains(&dk))
                 .unwrap_or(false)
         })
-        .filter_map(|node| resolve::resolve(node, context, options, text))
+        .filter_map(|node| {
+            let entity = resolve::resolve(node, context, options, text)?;
+            Some(ResolvedToken {
+                node: node.clone(),
+                entity,
+            })
+        })
         .collect();
-    // Dedup resolved entities by (range, value, latent), matching Haskell's
-    // Set.fromList on ResolvedToken which compares (range, rval, isLatent).
-    let mut seen = std::collections::HashSet::new();
-    let entities: Vec<Entity> = resolved
-        .into_iter()
-        .filter(|e| seen.insert((e.start, e.end, format!("{:?}", e.value), e.latent)))
-        .collect();
+
+    let ranked = ranking::rank_resolved(resolved_tokens, locale, dims);
+    let entities: Vec<Entity> = ranked.into_iter().map(|rt| rt.entity).collect();
     ranking::remove_overlapping(entities)
 }
 
@@ -360,7 +367,7 @@ mod integration_tests {
         let found = entities.iter().any(|e| {
             matches!(
                 &e.value,
-                DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, .. }))
+                DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, .. }, .. })
                     if value.date() == chrono::NaiveDate::from_ymd_opt(2013, 2, 15).unwrap()
             )
         });
@@ -391,7 +398,7 @@ mod integration_tests {
         let found = entities.iter().any(|e| {
             matches!(
                 &e.value,
-                DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, .. }))
+                DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, .. }, .. })
                     if value.date() == chrono::NaiveDate::from_ymd_opt(1974, 10, 31).unwrap()
             )
         });

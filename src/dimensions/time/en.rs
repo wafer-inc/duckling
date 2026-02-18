@@ -1551,6 +1551,7 @@ pub fn rules() -> Vec<Rule> {
                 }
             }),
         },
+        // Haskell: predNth 0 True td → notImmediate = True
         Rule {
             name: "next <time>".to_string(),
             pattern: vec![
@@ -1568,6 +1569,7 @@ pub fn rules() -> Vec<Rule> {
                         let mut new_t = t.clone();
                         new_t.direction = Some(Direction::Future);
                         new_t.latent = false;
+                        new_t.not_immediate = true;
                         Some(TokenData::Time(new_t))
                     }
                     _ => None,
@@ -1575,6 +1577,7 @@ pub fn rules() -> Vec<Rule> {
             }),
         },
         // this <dow/month/season/weekend/holiday>
+        // Haskell: predNth 0 True dow → notImmediate = True
         Rule {
             name: "this <time>".to_string(),
             pattern: vec![regex(r"\b(this|current)\b"), dim(DimensionKind::Time)],
@@ -1588,6 +1591,7 @@ pub fn rules() -> Vec<Rule> {
                     | TimeForm::Weekend => {
                         let mut new_t = t.clone();
                         new_t.latent = false;
+                        new_t.not_immediate = true;
                         Some(TokenData::Time(new_t))
                     }
                     _ => None,
@@ -5159,7 +5163,7 @@ mod tests {
             let entities =
                 engine::parse_and_resolve(day, &rules, &context, &options, &[DimensionKind::Time]);
             let found = entities.iter().any(|e| {
-                matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single(tp)) if tp.grain() == crate::dimensions::time_grain::Grain::Day)
+                matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single { value: tp, .. }) if tp.grain() == crate::dimensions::time_grain::Grain::Day)
             });
             assert!(found, "Expected time for '{}', got: {:?}", day, entities);
         }
@@ -5190,7 +5194,7 @@ mod tests {
         let entities =
             engine::parse_and_resolve("3:30", &rules, &context, &options, &[DimensionKind::Time]);
         let found = entities.iter().any(|e| {
-            matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single(tp)) if tp.grain() == crate::dimensions::time_grain::Grain::Minute)
+            matches!(&e.value, crate::types::DimensionValue::Time(crate::types::TimeValue::Single { value: tp, .. }) if tp.grain() == crate::dimensions::time_grain::Grain::Minute)
         });
         assert!(found, "Expected time for '3:30', got: {:?}", entities);
     }

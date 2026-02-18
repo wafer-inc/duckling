@@ -45,7 +45,7 @@ fn check_time_naive(text: &str, expected_value: NaiveDateTime, expected_grain: &
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, grain })) if *value == expected_value && *grain == eg)
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain }, .. }) if *value == expected_value && *grain == eg)
     });
     assert!(
         found,
@@ -64,7 +64,7 @@ fn check_time_instant(text: &str, expected_value: NaiveDateTime, expected_grain:
     let entities = parse_time(text);
     let eg = grain(expected_grain);
     let found = entities.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Instant { value, grain })) if value.naive_utc() == expected_value && *grain == eg)
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single { value: TimePoint::Instant { value, grain }, .. }) if value.naive_utc() == expected_value && *grain == eg)
     });
     assert!(
         found,
@@ -99,6 +99,7 @@ fn check_time_interval(
         DimensionValue::Time(TimeValue::Interval {
             from: Some(f),
             to: Some(t),
+            ..
         }) => {
             let (fv, fg) = tp_value_grain(f);
             let (tv, tg) = tp_value_grain(t);
@@ -127,6 +128,7 @@ fn check_time_open_interval_after(text: &str, expected_value: NaiveDateTime, exp
         DimensionValue::Time(TimeValue::Interval {
             from: Some(f),
             to: None,
+            ..
         }) => {
             let (fv, fg) = tp_value_grain(f);
             fv == expected_value && fg == eg
@@ -157,6 +159,7 @@ fn check_time_open_interval_before(
         DimensionValue::Time(TimeValue::Interval {
             from: None,
             to: Some(t),
+            ..
         }) => {
             let (tv, tg) = tp_value_grain(t);
             tv == expected_value && tg == eg
@@ -3148,7 +3151,7 @@ fn test_iso_date_no_spurious_interval() {
         .filter(|e| matches!(&e.value, DimensionValue::Time(_)))
         .count();
     let has_correct_date = results.iter().any(|e| {
-        matches!(&e.value, DimensionValue::Time(TimeValue::Single(TimePoint::Naive { value, grain: Grain::Day }))
+        matches!(&e.value, DimensionValue::Time(TimeValue::Single { value: TimePoint::Naive { value, grain: Grain::Day }, .. })
             if value.date() == chrono::NaiveDate::from_ymd_opt(2018, 4, 1).unwrap())
     });
     assert!(
@@ -3177,7 +3180,7 @@ fn test_iso8601_t_separator_z_parses_as_single_datetime() {
     let found = entities.iter().any(|e| {
         matches!(
             &e.value,
-            DimensionValue::Time(TimeValue::Single(TimePoint::Instant { value, grain: Grain::Minute }))
+            DimensionValue::Time(TimeValue::Single { value: TimePoint::Instant { value, grain: Grain::Minute }, .. })
                 if value.naive_utc() == dt(2018, 4, 1, 18, 3, 40)
         )
     });
@@ -5013,6 +5016,7 @@ fn check_time_interval_with_context(
         DimensionValue::Time(TimeValue::Interval {
             from: Some(f),
             to: Some(t),
+            ..
         }) => {
             let (fv, fg) = tp_value_grain(f);
             let (tv, tg) = tp_value_grain(t);

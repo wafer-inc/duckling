@@ -21,6 +21,7 @@ pub mod pl;
 pub mod pt;
 pub mod ro;
 pub mod ru;
+pub(crate) mod series;
 pub mod sv;
 pub mod tr;
 pub mod uk;
@@ -29,7 +30,7 @@ pub mod zh;
 
 use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
-use crate::types::{DimensionValue, TimePoint, TimeValue};
+use crate::types::{DimensionValue, IntervalEndpoints, TimePoint, TimeValue};
 use chrono::{DateTime, Datelike, Duration, NaiveDate, Timelike, Utc};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
@@ -64,6 +65,10 @@ pub struct TimeData {
     pub early_late: Option<EarlyLate>,
     /// Timezone name (e.g., "CET", "GMT", "PST") — set by timezone rule
     pub timezone: Option<String>,
+    /// Haskell's notImmediate: if true and the first future value coincides with
+    /// the reference time, skip to the next occurrence.
+    /// Used by "this Monday" (predNth 0 True) when today is Monday.
+    pub not_immediate: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -184,6 +189,7 @@ impl TimeData {
             open_interval_direction: None,
             early_late: None,
             timezone: None,
+            not_immediate: false,
         }
     }
 
@@ -195,6 +201,7 @@ impl TimeData {
             open_interval_direction: None,
             early_late: None,
             timezone: None,
+            not_immediate: false,
         }
     }
 }
@@ -212,6 +219,120 @@ fn is_instant_form(form: &TimeForm) -> bool {
         TimeForm::DurationAfter { base, .. } => is_instant_form(&base.form),
         TimeForm::Composed(primary, _) => is_instant_form(&primary.form),
         _ => false,
+    }
+}
+
+// ============================================================
+// Values array generation (Haskell's values = take 3 $ future)
+// ============================================================
+
+/// Generate the values array (up to 3 TimePoints) using the series generator.
+/// Matches Haskell's `values <- Just $ take 3 $ if null future then past else future`.
+fn generate_extra_values(
+    data: &TimeData,
+    ref_time: DateTime<Utc>,
+    primary: &TimePoint,
+) -> Vec<TimePoint> {
+    let is_instant = is_instant_form(&data.form);
+
+    let (past, future) = series::generate_series(data, ref_time);
+    let source = if future.is_empty() { &past } else { &future };
+
+    let to_time_point = |obj: &series::TimeObject| -> TimePoint {
+        match obj.end {
+            None => {
+                // Simple value
+                if is_instant {
+                    TimePoint::Instant {
+                        value: obj.start,
+                        grain: obj.grain,
+                    }
+                } else {
+                    TimePoint::Naive {
+                        value: obj.start.naive_utc(),
+                        grain: obj.grain,
+                    }
+                }
+            }
+            Some(_) => {
+                // Interval start point (use start)
+                if is_instant {
+                    TimePoint::Instant {
+                        value: obj.start,
+                        grain: obj.grain,
+                    }
+                } else {
+                    TimePoint::Naive {
+                        value: obj.start.naive_utc(),
+                        grain: obj.grain,
+                    }
+                }
+            }
+        }
+    };
+
+    let values: Vec<TimePoint> = source.iter().take(3).map(to_time_point).collect();
+
+    // If the series produced values, use them; otherwise just wrap the primary
+    if values.is_empty() {
+        vec![primary.clone()]
+    } else {
+        values
+    }
+}
+
+/// Generate interval values array (up to 3 interval endpoint pairs).
+#[allow(dead_code)]
+fn generate_interval_values(
+    data: &TimeData,
+    ref_time: DateTime<Utc>,
+    primary_from: &Option<TimePoint>,
+    primary_to: &Option<TimePoint>,
+    is_instant: bool,
+) -> Vec<IntervalEndpoints> {
+    let (past, future) = series::generate_series(data, ref_time);
+    let source = if future.is_empty() { &past } else { &future };
+
+    let to_endpoints = |obj: &series::TimeObject| -> IntervalEndpoints {
+        let from_point = if is_instant {
+            Some(TimePoint::Instant {
+                value: obj.start,
+                grain: obj.grain,
+            })
+        } else {
+            Some(TimePoint::Naive {
+                value: obj.start.naive_utc(),
+                grain: obj.grain,
+            })
+        };
+        let to_point = obj.end.map(|e| {
+            if is_instant {
+                TimePoint::Instant {
+                    value: e,
+                    grain: obj.grain,
+                }
+            } else {
+                TimePoint::Naive {
+                    value: e.naive_utc(),
+                    grain: obj.grain,
+                }
+            }
+        });
+        IntervalEndpoints {
+            from: from_point,
+            to: to_point,
+        }
+    };
+
+    let values: Vec<IntervalEndpoints> = source.iter().take(3).map(to_endpoints).collect();
+
+    if values.is_empty() {
+        vec![IntervalEndpoints {
+            from: primary_from.clone(),
+            to: primary_to.clone(),
+        }]
+    } else {
+        values
     }
 }
 
@@ -264,14 +385,22 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
             }
         };
         return match dir {
-            IntervalDirection::After => Some(DimensionValue::Time(TimeValue::Interval {
-                from: Some(point),
-                to: None,
-            })),
-            IntervalDirection::Before => Some(DimensionValue::Time(TimeValue::Interval {
-                from: None,
-                to: Some(point),
-            })),
+            IntervalDirection::After => {
+                let from = Some(point);
+                Some(DimensionValue::Time(TimeValue::Interval {
+                    from: from.clone(),
+                    to: None,
+                    values: vec![IntervalEndpoints { from, to: None }],
+                }))
+            }
+            IntervalDirection::Before => {
+                let to = Some(point);
+                Some(DimensionValue::Time(TimeValue::Interval {
+                    from: None,
+                    to: to.clone(),
+                    values: vec![IntervalEndpoints { from: None, to }],
+                }))
+            }
         };
     }
 
@@ -307,7 +436,12 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
             grain,
         }
     };
-    Some(DimensionValue::Time(TimeValue::Single(point)))
+    // Generate additional values from the series
+    let extra_values = generate_extra_values(data, context.reference_time, &point);
+    Some(DimensionValue::Time(TimeValue::Single {
+        value: point.clone(),
+        values: extra_values,
+    }))
 }
 
 fn duration_for_grain(n: i64, grain: Grain) -> Option<Duration> {
@@ -432,22 +566,28 @@ fn try_resolve_as_interval(
                     }
                 };
                 let g = Grain::Second;
-                return Some(TimeValue::Interval {
-                    from: Some(TimePoint::Instant {
-                        value: from_dt,
+                let from_point = Some(TimePoint::Instant {
+                    value: from_dt,
+                    grain: g,
+                });
+                let to_point = Some(if is_instant_form(&to_data.form) {
+                    TimePoint::Instant {
+                        value: to_dt,
                         grain: g,
-                    }),
-                    to: Some(if is_instant_form(&to_data.form) {
-                        TimePoint::Instant {
-                            value: to_dt,
-                            grain: g,
-                        }
-                    } else {
-                        TimePoint::Naive {
-                            value: to_dt.naive_utc(),
-                            grain: g,
-                        }
-                    }),
+                    }
+                } else {
+                    TimePoint::Naive {
+                        value: to_dt.naive_utc(),
+                        grain: g,
+                    }
+                });
+                return Some(TimeValue::Interval {
+                    from: from_point.clone(),
+                    to: to_point.clone(),
+                    values: vec![IntervalEndpoints {
+                        from: from_point,
+                        to: to_point,
+                    }],
                 });
             }
 
@@ -556,15 +696,21 @@ fn try_resolve_as_interval(
             };
             if has_endpoint_tz {
                 let g = Grain::from_str(interval_grain);
+                let from_point = Some(TimePoint::Instant {
+                    value: from_dt,
+                    grain: g,
+                });
+                let to_point = Some(TimePoint::Instant {
+                    value: to_dt,
+                    grain: g,
+                });
                 Some(TimeValue::Interval {
-                    from: Some(TimePoint::Instant {
-                        value: from_dt,
-                        grain: g,
-                    }),
-                    to: Some(TimePoint::Instant {
-                        value: to_dt,
-                        grain: g,
-                    }),
+                    from: from_point.clone(),
+                    to: to_point.clone(),
+                    values: vec![IntervalEndpoints {
+                        from: from_point,
+                        to: to_point,
+                    }],
                 })
             } else {
                 Some(make_interval(from_dt, to_dt, interval_grain))
@@ -780,10 +926,16 @@ fn try_resolve_as_interval(
                                     .and_then(|d| dt.checked_add_signed(d))
                                     .unwrap_or(dt);
                             }
-                            return Some(TimeValue::Single(TimePoint::Naive {
-                                value: dt.naive_utc(),
-                                grain: Grain::Hour,
-                            }));
+                            {
+                                let point = TimePoint::Naive {
+                                    value: dt.naive_utc(),
+                                    grain: Grain::Hour,
+                                };
+                                return Some(TimeValue::Single {
+                                    value: point.clone(),
+                                    values: vec![point],
+                                });
+                            }
                         }
                         TimeForm::HourMinute(h, m, is_12h) => {
                             let hour = disambiguate_hour(*h, *is_12h, Some(pod));
@@ -793,10 +945,16 @@ fn try_resolve_as_interval(
                                     .and_then(|d| dt.checked_add_signed(d))
                                     .unwrap_or(dt);
                             }
-                            return Some(TimeValue::Single(TimePoint::Naive {
-                                value: dt.naive_utc(),
-                                grain: Grain::Minute,
-                            }));
+                            {
+                                let point = TimePoint::Naive {
+                                    value: dt.naive_utc(),
+                                    grain: Grain::Minute,
+                                };
+                                return Some(TimeValue::Single {
+                                    value: point.clone(),
+                                    values: vec![point],
+                                });
+                            }
                         }
                         _ => {}
                     }
@@ -854,10 +1012,16 @@ fn try_resolve_as_interval(
                                     .and_then(|d| dt.checked_add_signed(d))
                                     .unwrap_or(dt);
                             }
-                            return Some(TimeValue::Single(TimePoint::Naive {
-                                value: dt.naive_utc(),
-                                grain: Grain::Hour,
-                            }));
+                            {
+                                let point = TimePoint::Naive {
+                                    value: dt.naive_utc(),
+                                    grain: Grain::Hour,
+                                };
+                                return Some(TimeValue::Single {
+                                    value: point.clone(),
+                                    values: vec![point],
+                                });
+                            }
                         }
                         TimeForm::HourMinute(h, m, is_12h) => {
                             let hour = disambiguate_hour(*h, *is_12h, Some(pod));
@@ -867,10 +1031,16 @@ fn try_resolve_as_interval(
                                     .and_then(|d| dt.checked_add_signed(d))
                                     .unwrap_or(dt);
                             }
-                            return Some(TimeValue::Single(TimePoint::Naive {
-                                value: dt.naive_utc(),
-                                grain: Grain::Minute,
-                            }));
+                            {
+                                let point = TimePoint::Naive {
+                                    value: dt.naive_utc(),
+                                    grain: Grain::Minute,
+                                };
+                                return Some(TimeValue::Single {
+                                    value: point.clone(),
+                                    values: vec![point],
+                                });
+                            }
                         }
                         _ => {}
                     }
@@ -1030,15 +1200,21 @@ fn resolve_on_date(
 
 fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeValue {
     let g = Grain::from_str(grain);
+    let from_point = Some(TimePoint::Naive {
+        value: from.naive_utc(),
+        grain: g,
+    });
+    let to_point = Some(TimePoint::Naive {
+        value: to.naive_utc(),
+        grain: g,
+    });
     TimeValue::Interval {
-        from: Some(TimePoint::Naive {
-            value: from.naive_utc(),
-            grain: g,
-        }),
-        to: Some(TimePoint::Naive {
-            value: to.naive_utc(),
-            grain: g,
-        }),
+        from: from_point.clone(),
+        to: to_point.clone(),
+        values: vec![IntervalEndpoints {
+            from: from_point,
+            to: to_point,
+        }],
     }
 }
 
@@ -1084,7 +1260,7 @@ fn adjust_interval_end_with_from(
 }
 
 /// Get the grain of a TimeForm
-fn form_grain(f: &TimeForm) -> Grain {
+pub(super) fn form_grain(f: &TimeForm) -> Grain {
     match f {
         TimeForm::Year(_) => Grain::Year,
         TimeForm::Month(_) => Grain::Month,
@@ -1128,7 +1304,7 @@ fn form_grain(f: &TimeForm) -> Grain {
 // Simple datetime resolution (returns DateTime + grain string)
 // ============================================================
 
-fn resolve_simple_datetime(
+pub(super) fn resolve_simple_datetime(
     form: &TimeForm,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
@@ -2501,7 +2677,7 @@ fn resolve_nth_grain_interval(
 // Weekend interval
 // ============================================================
 
-fn resolve_weekend_interval(
+pub(super) fn resolve_weekend_interval(
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
 ) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
@@ -2775,7 +2951,7 @@ fn target_grain(form: &TimeForm) -> Grain {
 // Season interval
 // ============================================================
 
-fn resolve_season_interval(
+pub(super) fn resolve_season_interval(
     season: u32,
     ref_time: DateTime<Utc>,
     direction: Option<Direction>,
@@ -2916,7 +3092,7 @@ fn generic_season_dates(season: u32, year: i32) -> (DateTime<Utc>, DateTime<Utc>
 // Part of day interval
 // ============================================================
 
-fn pod_interval(
+pub(super) fn pod_interval(
     pod: PartOfDay,
     date: NaiveDate,
     early_late: Option<EarlyLate>,
@@ -2950,7 +3126,7 @@ fn pod_interval(
 // Helper functions
 // ============================================================
 
-fn midnight(dt: DateTime<Utc>) -> DateTime<Utc> {
+pub(super) fn midnight(dt: DateTime<Utc>) -> DateTime<Utc> {
     dt.date_naive().and_hms_opt(0, 0, 0).unwrap().and_utc()
 }
 
@@ -2997,7 +3173,7 @@ fn start_of_quarter(dt: DateTime<Utc>) -> DateTime<Utc> {
         .and_utc()
 }
 
-fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
+pub(super) fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
     match grain {
         Grain::Second => dt,
         Grain::Minute => dt
@@ -3018,7 +3194,7 @@ fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
     }
 }
 
-fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i64) -> Option<DateTime<Utc>> {
+pub(super) fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i64) -> Option<DateTime<Utc>> {
     match grain {
         Grain::Second => Duration::try_seconds(n).and_then(|d| dt.checked_add_signed(d)),
         Grain::Minute => Duration::try_minutes(n).and_then(|d| dt.checked_add_signed(d)),
@@ -3031,7 +3207,7 @@ fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i64) -> Option<DateTime<Utc>> {
     }
 }
 
-fn add_months(dt: DateTime<Utc>, months: i64) -> Option<DateTime<Utc>> {
+pub(super) fn add_months(dt: DateTime<Utc>, months: i64) -> Option<DateTime<Utc>> {
     let total = i64::from(dt.year())
         .checked_mul(12)?
         .checked_add(i64::from(dt.month()).checked_sub(1)?)?
@@ -3044,7 +3220,7 @@ fn add_months(dt: DateTime<Utc>, months: i64) -> Option<DateTime<Utc>> {
     Some(naive.and_utc())
 }
 
-fn add_years(dt: DateTime<Utc>, years: i64) -> Option<DateTime<Utc>> {
+pub(super) fn add_years(dt: DateTime<Utc>, years: i64) -> Option<DateTime<Utc>> {
     let year_i64 = i64::from(dt.year()).checked_add(years)?;
     let year = i32::try_from(year_i64).ok()?;
     let day = dt.day().min(days_in_month(year, dt.month()));
@@ -3134,7 +3310,7 @@ fn resolve_holiday_with_direction(
 
 /// Resolve a holiday that is an interval of days. Returns (start_date, end_date_exclusive).
 #[allow(clippy::arithmetic_side_effects)]
-fn resolve_holiday_interval(name: &str, year: i32) -> Option<(NaiveDate, NaiveDate)> {
+pub(super) fn resolve_holiday_interval(name: &str, year: i32) -> Option<(NaiveDate, NaiveDate)> {
     let name_lower = name.to_lowercase();
     let name = name_lower.as_str();
 
@@ -3293,7 +3469,7 @@ fn resolve_holiday_interval(name: &str, year: i32) -> Option<(NaiveDate, NaiveDa
 
 /// Resolve a holiday that is a minute-level interval (e.g., Earth Hour).
 #[allow(clippy::arithmetic_side_effects)]
-fn resolve_holiday_minute_interval(
+pub(super) fn resolve_holiday_minute_interval(
     name: &str,
     year: i32,
 ) -> Option<(DateTime<Utc>, DateTime<Utc>)> {
@@ -3319,7 +3495,7 @@ fn resolve_holiday_minute_interval(
 }
 
 #[allow(clippy::arithmetic_side_effects)]
-fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
+pub(super) fn resolve_holiday(name: &str, year: i32) -> Option<NaiveDate> {
     let name_lower = name.to_lowercase();
     let name = name_lower.as_str();
 

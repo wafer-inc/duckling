@@ -172,11 +172,23 @@ fn test_real_world_event_listing_exact_entities() {
         mi: u32,
         s: u32,
         grain: Grain,
+        extra_values: &[(i32, u32, u32, u32, u32, u32)],
     ) -> DimensionValue {
-        DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
+        let point = TimePoint::Naive {
             value: ndt(y, m, d, h, mi, s),
             grain,
-        }))
+        };
+        let mut values = vec![point.clone()];
+        for &(ey, em, ed, eh, emi, es) in extra_values {
+            values.push(TimePoint::Naive {
+                value: ndt(ey, em, ed, eh, emi, es),
+                grain,
+            });
+        }
+        DimensionValue::Time(TimeValue::Single {
+            value: point,
+            values,
+        })
     }
     let l = Some(false);
 
@@ -194,14 +206,23 @@ fn test_real_world_event_listing_exact_entities() {
             "Mon",
             45,
             48,
-            time_single(2025, 3, 10, 0, 0, 0, Grain::Day),
+            time_single(
+                2025,
+                3,
+                10,
+                0,
+                0,
+                0,
+                Grain::Day,
+                &[(2025, 3, 17, 0, 0, 0), (2025, 3, 24, 0, 0, 0)],
+            ),
             l,
         ),
         e(
             "Tuesday, March 11, 2025 at 8:15 PM",
             58,
             92,
-            time_single(2025, 3, 11, 20, 15, 0, Grain::Minute),
+            time_single(2025, 3, 11, 20, 15, 0, Grain::Minute, &[]),
             l,
         ),
         e("cl", 102, 104, money(100_000.0, "cent"), l),
@@ -209,13 +230,23 @@ fn test_real_world_event_listing_exact_entities() {
             "Mon",
             126,
             129,
-            time_single(2025, 3, 10, 0, 0, 0, Grain::Day),
+            time_single(
+                2025,
+                3,
+                10,
+                0,
+                0,
+                0,
+                Grain::Day,
+                &[(2025, 3, 17, 0, 0, 0), (2025, 3, 24, 0, 0, 0)],
+            ),
             l,
         ),
         e("l", 154, 155, num(100_000.0), l),
         e("l", 170, 171, num(100_000.0), l),
         e("L", 194, 195, num(100_000.0), l),
         e("l", 199, 200, num(100_000.0), l),
+        e("l", 230, 231, num(100_000.0), l),
         e("cl", 247, 249, money(100_000.0, "cent"), l),
         e("l", 314, 315, num(100_000.0), l),
         e("l", 315, 316, num(100_000.0), l),
@@ -223,16 +254,24 @@ fn test_real_world_event_listing_exact_entities() {
         e("l", 341, 342, num(100_000.0), l),
         e("L", 366, 367, num(100_000.0), l),
         e("l", 371, 372, num(100_000.0), l),
+        e("l", 390, 391, num(100_000.0), l),
         e("$17", 399, 402, money(17.0, "USD"), l),
         e("17 c", 400, 404, money(17.0, "cent"), l),
+        e("l", 413, 414, num(100_000.0), l),
+        e("l", 414, 415, num(100_000.0), l),
         e("l", 431, 432, num(100_000.0), l),
         e("l", 450, 451, num(100_000.0), l),
         e("l", 451, 452, num(100_000.0), l),
         e("9", 464, 465, num(9.0), l),
         e("l", 498, 499, num(100_000.0), l),
         e("l", 499, 500, num(100_000.0), l),
+        e("l", 522, 523, num(100_000.0), l),
+        e("L", 579, 580, num(100_000.0), l),
         e("l", 617, 618, num(100_000.0), l),
         e("lac", 631, 634, num(100_000.0), l),
+        e("L", 655, 656, num(100_000.0), l),
+        e("L", 676, 677, num(100_000.0), l),
+        e("L", 699, 700, num(100_000.0), l),
         e(
             "(773) 348-8886",
             727,
@@ -261,7 +300,16 @@ fn test_real_world_event_listing_exact_entities() {
             "Mon",
             891,
             894,
-            time_single(2025, 3, 10, 0, 0, 0, Grain::Day),
+            time_single(
+                2025,
+                3,
+                10,
+                0,
+                0,
+                0,
+                Grain::Day,
+                &[(2025, 3, 17, 0, 0, 0), (2025, 3, 24, 0, 0, 0)],
+            ),
             l,
         ),
     ];
@@ -358,13 +406,19 @@ fn test_iso_date_in_sentence_() {
         body: "On 2018-04-01".to_string(),
         start: 0,
         end: 13,
-        value: DimensionValue::Time(TimeValue::Single(TimePoint::Naive {
-            value: NaiveDate::from_ymd_opt(2018, 4, 1)
-                .unwrap()
-                .and_hms_opt(0, 0, 0)
-                .unwrap(),
-            grain: Grain::Day,
-        })),
+        value: {
+            let point = TimePoint::Naive {
+                value: NaiveDate::from_ymd_opt(2018, 4, 1)
+                    .unwrap()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap(),
+                grain: Grain::Day,
+            };
+            DimensionValue::Time(TimeValue::Single {
+                value: point.clone(),
+                values: vec![point],
+            })
+        },
         latent: Some(false),
     }];
 
