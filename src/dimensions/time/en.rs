@@ -97,6 +97,72 @@ fn get_dom_value(td: &TokenData) -> Option<u32> {
     }
 }
 
+/// Matches Haskell's `intersectDOM td token`.
+/// `intersectDOM td token = intersect (dayOfMonth n) td`
+/// Creates Composed(month_td, DayOfMonth(day)) with direction propagation
+/// (Haskell's `direction = d1 <|> d2` in `intersect'`).
+fn intersect_dom(month_td: &TimeData, day: u32) -> TokenData {
+    let dom_td = TimeData::new(TimeForm::DayOfMonth(day));
+    let mut composed = TimeData::new(TimeForm::Composed(
+        Box::new(month_td.clone()),
+        Box::new(dom_td),
+    ));
+    // Haskell's intersect' propagates direction: d1 <|> d2
+    composed.direction = month_td.direction;
+    TokenData::Time(composed)
+}
+
+/// Matches Haskell's `monthDay m d = intersect' (month m, dayOfMonth d)`.
+/// Creates Composed(Month(m), DayOfMonth(d)) from raw numbers (no direction).
+fn month_day(month: u32, day: u32) -> TimeForm {
+    TimeForm::Composed(
+        Box::new(TimeData::new(TimeForm::Month(month))),
+        Box::new(TimeData::new(TimeForm::DayOfMonth(day))),
+    )
+}
+
+/// Check if a token is a month-day without year — matches either
+/// `DateMDY { year: None }` (from regex rules) or `Composed(Month, DayOfMonth)`
+/// (from token-based rules matching Haskell's intersectDOM).
+fn is_month_day_no_year(td: &TokenData) -> bool {
+    match td {
+        TokenData::Time(d) => match &d.form {
+            TimeForm::DateMDY { year: None, .. } => true,
+            TimeForm::Composed(a, b) => {
+                (matches!(a.form, TimeForm::Month(_)) && matches!(b.form, TimeForm::DayOfMonth(_)))
+                    || (matches!(b.form, TimeForm::Month(_))
+                        && matches!(a.form, TimeForm::DayOfMonth(_)))
+            }
+            _ => false,
+        },
+        _ => false,
+    }
+}
+
+/// Extract (month, day) from either `DateMDY { year: None }` or `Composed(Month, DayOfMonth)`.
+fn extract_month_day(td: &TokenData) -> Option<(u32, u32)> {
+    match td {
+        TokenData::Time(d) => match &d.form {
+            TimeForm::DateMDY {
+                month,
+                day,
+                year: None,
+            } => Some((*month, *day)),
+            TimeForm::Composed(a, b) => {
+                if let (TimeForm::Month(m), TimeForm::DayOfMonth(d)) = (&a.form, &b.form) {
+                    Some((*m, *d))
+                } else if let (TimeForm::DayOfMonth(d), TimeForm::Month(m)) = (&a.form, &b.form) {
+                    Some((*m, *d))
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
 pub fn rules() -> Vec<Rule> {
     vec![
         // ====================================================================
@@ -2098,19 +2164,12 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(d) => d.value as u32,
                     _ => return None,
                 };
-                let month = match &nodes[2].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let month_td = time_data(&nodes[2].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
                 if (1..=31).contains(&ord) {
-                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                        month,
-                        day: ord,
-                        year: None,
-                    })))
+                    Some(intersect_dom(month_td, ord))
                 } else {
                     None
                 }
@@ -2126,23 +2185,13 @@ pub fn rules() -> Vec<Rule> {
                 dim(DimensionKind::Ordinal),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[0].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let month_td = time_data(&nodes[0].token_data)?;
                 let day = match &nodes[1].token_data {
                     TokenData::Ordinal(d) => d.value as u32,
                     _ => return None,
                 };
                 if (1..=31).contains(&day) {
-                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                        month,
-                        day,
-                        year: None,
-                    })))
+                    Some(intersect_dom(month_td, day))
                 } else {
                     None
                 }
@@ -2158,20 +2207,10 @@ pub fn rules() -> Vec<Rule> {
                 predicate(is_integer_between(1, 31)),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[0].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let month_td = time_data(&nodes[0].token_data)?;
                 let day = numeral_data(&nodes[1].token_data)?.value as u32;
                 if (1..=31).contains(&day) {
-                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                        month,
-                        day,
-                        year: None,
-                    })))
+                    Some(intersect_dom(month_td, day))
                 } else {
                     None
                 }
@@ -2198,23 +2237,20 @@ pub fn rules() -> Vec<Rule> {
                     },
                     _ => return None,
                 };
-                let month = match &nodes[2].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
+                let month_td = time_data(&nodes[2].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                let day = get_dom_value(&nodes[3].token_data)?;
+                // Haskell: intersect(dow, intersectDOM(month, day))
+                let date_td = match intersect_dom(month_td, day) {
+                    TokenData::Time(td) => td,
                     _ => return None,
                 };
-                let day = get_dom_value(&nodes[3].token_data)?;
-                let date = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day,
-                    year: None,
-                });
                 let dow_td = TimeData::new(TimeForm::DayOfWeek(dow));
                 Some(TokenData::Time(TimeData::new(TimeForm::Composed(
                     Box::new(dow_td),
-                    Box::new(date),
+                    Box::new(date_td),
                 ))))
             }),
         },
@@ -2230,18 +2266,11 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let day = numeral_data(&nodes[0].token_data)?.value as u32;
-                let month = match &nodes[2].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day,
-                    year: None,
-                })))
+                let month_td = time_data(&nodes[2].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                Some(intersect_dom(month_td, day))
             }),
         },
         // <month> <integer> (e.g., "march 3", "Aug 8")
@@ -2257,18 +2286,11 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let day = numeral_data(&nodes[0].token_data)?.value as u32;
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day,
-                    year: None,
-                })))
+                let month_td = time_data(&nodes[1].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                Some(intersect_dom(month_td, day))
             }),
         },
         // ordinal + <month> (e.g., "15th february", "1st of march")
@@ -2285,19 +2307,12 @@ pub fn rules() -> Vec<Rule> {
                     TokenData::Ordinal(d) => d.value as u32,
                     _ => return None,
                 };
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let month_td = time_data(&nodes[1].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
                 if (1..=31).contains(&day) {
-                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                        month,
-                        day,
-                        year: None,
-                    })))
+                    Some(intersect_dom(month_td, day))
                 } else {
                     None
                 }
@@ -2356,11 +2371,9 @@ pub fn rules() -> Vec<Rule> {
                 ),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
+                let month_td = time_data(&nodes[1].token_data)?;
+                let month = match &month_td.form {
+                    TimeForm::Month(m) => *m,
                     _ => return None,
                 };
                 let day = if month == 3 || month == 5 || month == 7 || month == 10 {
@@ -2368,11 +2381,7 @@ pub fn rules() -> Vec<Rule> {
                 } else {
                     13
                 };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day,
-                    year: None,
-                })))
+                Some(intersect_dom(month_td, day))
             }),
         },
         // ordinal (latent day of month) - for "20th of this month" etc.
@@ -2456,21 +2465,13 @@ pub fn rules() -> Vec<Rule> {
         Rule {
             name: "<date> <year>".to_string(),
             pattern: vec![
-                predicate(
-                    |td| matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::DateMDY { year: None, .. })),
-                ),
+                predicate(is_month_day_no_year),
                 predicate(
                     |td| matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::Year(_))),
                 ),
             ],
             production: Box::new(|nodes| {
-                let (month, day) = match &nodes[0].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::DateMDY { month, day, .. } => (*month, *day),
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let (month, day) = extract_month_day(&nodes[0].token_data)?;
                 let year = match &nodes[1].token_data {
                     TokenData::Time(d) => match &d.form {
                         TimeForm::Year(y) => *y,
@@ -3149,12 +3150,18 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let t1 = time_data(&nodes[0].token_data)?;
                 let t2 = time_data(&nodes[2].token_data)?;
-                // Don't form interval between Year and DateMDY without year
+                // Don't form interval between Year and month-day without year
                 // (fragments of ISO dates like "On 2018" + "-" + "04-01")
+                fn is_md_no_year(f: &TimeForm) -> bool {
+                    matches!(f, TimeForm::DateMDY { year: None, .. })
+                        || matches!(f, TimeForm::Composed(a, b)
+                            if (matches!(a.form, TimeForm::Month(_)) && matches!(b.form, TimeForm::DayOfMonth(_)))
+                            || (matches!(b.form, TimeForm::Month(_)) && matches!(a.form, TimeForm::DayOfMonth(_))))
+                }
                 let year_date_fragment = (matches!(t1.form, TimeForm::Year(_))
-                    && matches!(t2.form, TimeForm::DateMDY { year: None, .. }))
+                    && is_md_no_year(&t2.form))
                     || (matches!(t2.form, TimeForm::Year(_))
-                        && matches!(t1.form, TimeForm::DateMDY { year: None, .. }));
+                        && is_md_no_year(&t1.form));
                 if year_date_fragment {
                     return None;
                 }
@@ -3252,26 +3259,19 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let d1 = get_dom_value(&nodes[0].token_data)?;
                 let d2 = get_dom_value(&nodes[2].token_data)?;
-                let month = match &nodes[3].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                if !(1..=31).contains(&d1) || !(1..=31).contains(&d2) {
+                let month_td = time_data(&nodes[3].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
                     return None;
                 }
-                let from = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d1,
-                    year: None,
-                });
-                let to = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d2,
-                    year: None,
-                });
+                // Haskell: dom1 <- intersectDOM td token1; dom2 <- intersectDOM td token2
+                let from = match intersect_dom(month_td, d1) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
+                let to = match intersect_dom(month_td, d2) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
                     Box::new(from),
                     Box::new(to),
@@ -3291,28 +3291,20 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|td| matches!(td, TokenData::Numeral(_) | TokenData::Ordinal(_))),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[0].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                let d1 = get_dom_value(&nodes[1].token_data)?;
-                let d2 = get_dom_value(&nodes[3].token_data)?;
-                if !(1..=31).contains(&d1) || !(1..=31).contains(&d2) {
+                let month_td = time_data(&nodes[0].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
                     return None;
                 }
-                let from = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d1,
-                    year: None,
-                });
-                let to = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d2,
-                    year: None,
-                });
+                let d1 = get_dom_value(&nodes[1].token_data)?;
+                let d2 = get_dom_value(&nodes[3].token_data)?;
+                let from = match intersect_dom(month_td, d1) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
+                let to = match intersect_dom(month_td, d2) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
                     Box::new(from),
                     Box::new(to),
@@ -3336,26 +3328,18 @@ pub fn rules() -> Vec<Rule> {
             production: Box::new(|nodes| {
                 let d1 = get_dom_value(&nodes[1].token_data)?;
                 let d2 = get_dom_value(&nodes[3].token_data)?;
-                let month = match &nodes[5].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                if !(1..=31).contains(&d1) || !(1..=31).contains(&d2) {
+                let month_td = time_data(&nodes[5].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
                     return None;
                 }
-                let from = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d1,
-                    year: None,
-                });
-                let to = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d2,
-                    year: None,
-                });
+                let from = match intersect_dom(month_td, d1) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
+                let to = match intersect_dom(month_td, d2) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
                     Box::new(from),
                     Box::new(to),
@@ -3377,28 +3361,20 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|td| matches!(td, TokenData::Numeral(_) | TokenData::Ordinal(_))),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match &d.form {
-                        TimeForm::Month(m) => *m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                let d1 = get_dom_value(&nodes[2].token_data)?;
-                let d2 = get_dom_value(&nodes[4].token_data)?;
-                if !(1..=31).contains(&d1) || !(1..=31).contains(&d2) {
+                let month_td = time_data(&nodes[1].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
                     return None;
                 }
-                let from = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d1,
-                    year: None,
-                });
-                let to = TimeData::new(TimeForm::DateMDY {
-                    month,
-                    day: d2,
-                    year: None,
-                });
+                let d1 = get_dom_value(&nodes[2].token_data)?;
+                let d2 = get_dom_value(&nodes[4].token_data)?;
+                let from = match intersect_dom(month_td, d1) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
+                let to = match intersect_dom(month_td, d2) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
                     Box::new(from),
                     Box::new(to),
@@ -3733,11 +3709,8 @@ pub fn rules() -> Vec<Rule> {
                 let month_str = m.group(2)?;
                 let month = month_name_to_num(month_str)?;
                 if (1..=31).contains(&day) {
-                    Some(TokenData::Time(TimeData::new(TimeForm::DateMDY {
-                        month,
-                        day,
-                        year: None,
-                    })))
+                    // Haskell: monthDay m d
+                    Some(TokenData::Time(TimeData::new(month_day(month, day))))
                 } else {
                     None
                 }
@@ -3889,14 +3862,11 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let day = get_dom_value(&nodes[0].token_data)?;
-                let month = match &nodes[2].token_data {
-                    TokenData::Time(d) => match d.form {
-                        TimeForm::Month(m) => m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: None })))
+                let month_td = time_data(&nodes[2].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                Some(intersect_dom(month_td, day))
             }),
         },
         Rule {
@@ -3907,14 +3877,11 @@ pub fn rules() -> Vec<Rule> {
             ],
             production: Box::new(|nodes| {
                 let day = get_dom_value(&nodes[0].token_data)?;
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match d.form {
-                        TimeForm::Month(m) => m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: None })))
+                let month_td = time_data(&nodes[1].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                Some(intersect_dom(month_td, day))
             }),
         },
         Rule {
@@ -4394,14 +4361,11 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(|td| get_dom_value(td).is_some()), regex(r"\bof( the)?\b"), predicate(is_month_token)],
             production: Box::new(|nodes| {
                 let day = get_dom_value(&nodes[0].token_data)?;
-                let month = match &nodes[2].token_data {
-                    TokenData::Time(d) => match d.form {
-                        TimeForm::Month(m) => m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
-                Some(TokenData::Time(TimeData::new(TimeForm::DateMDY { month, day, year: None })))
+                let month_td = time_data(&nodes[2].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
+                Some(intersect_dom(month_td, day))
             }),
         },
         Rule {
@@ -4766,18 +4730,23 @@ pub fn rules() -> Vec<Rule> {
                 predicate(|td| matches!(td, TokenData::Numeral(_) | TokenData::Ordinal(_))),
             ],
             production: Box::new(|nodes| {
-                let month = match &nodes[1].token_data {
-                    TokenData::Time(d) => match d.form {
-                        TimeForm::Month(m) => m,
-                        _ => return None,
-                    },
-                    _ => return None,
-                };
+                let month_td = time_data(&nodes[1].token_data)?;
+                if !matches!(month_td.form, TimeForm::Month(_)) {
+                    return None;
+                }
                 let d1 = get_dom_value(&nodes[2].token_data)?;
                 let d2 = get_dom_value(&nodes[4].token_data)?;
+                let from = match intersect_dom(month_td, d1) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
+                let to = match intersect_dom(month_td, d2) {
+                    TokenData::Time(td) => td,
+                    _ => return None,
+                };
                 Some(TokenData::Time(TimeData::new(TimeForm::Interval(
-                    Box::new(TimeData::new(TimeForm::DateMDY { month, day: d1, year: None })),
-                    Box::new(TimeData::new(TimeForm::DateMDY { month, day: d2, year: None })),
+                    Box::new(from),
+                    Box::new(to),
                     false,
                 ))))
             }),

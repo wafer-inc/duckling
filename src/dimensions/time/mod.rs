@@ -206,7 +206,6 @@ impl TimeData {
             form,
             TimeForm::DayOfWeek(_)
                 | TimeForm::Month(_)
-                | TimeForm::DateMDY { year: None, .. }
                 | TimeForm::Weekend
                 | TimeForm::Season(_)
                 | TimeForm::Holiday(..)
@@ -231,7 +230,6 @@ impl TimeData {
             form,
             TimeForm::DayOfWeek(_)
                 | TimeForm::Month(_)
-                | TimeForm::DateMDY { year: None, .. }
                 | TimeForm::Weekend
                 | TimeForm::Season(_)
                 | TimeForm::Holiday(..)
@@ -1137,6 +1135,7 @@ fn try_resolve_as_interval(
                         | TimeForm::DayOfWeek(_)
                         | TimeForm::DayOfMonth(_)
                         | TimeForm::DateMDY { .. }
+                        | TimeForm::Composed(..)
                         | TimeForm::Today
                         | TimeForm::DayAfterTomorrow
                         | TimeForm::DayBeforeYesterday
@@ -1801,6 +1800,7 @@ pub(super) fn resolve_simple_datetime(
                 TimeForm::Holiday(..)
                 | TimeForm::Month(_)
                 | TimeForm::DateMDY { .. }
+                | TimeForm::Composed(..)
                 | TimeForm::DayOfMonth(_) => Grain::Year,
                 TimeForm::DayOfWeek(_) => Grain::Week,
                 _ => form_grain(&target.form),
@@ -2509,39 +2509,63 @@ fn resolve_composed(
         _ => {}
     }
 
-    // DayOfMonth + Month (or vice versa) → resolve as DateMDY
+    // DayOfMonth + Month (or vice versa) → resolve as month-day intersection.
+    // Matches Haskell's `monthDay m d = intersect' (month m, dayOfMonth d)`.
+    // Propagates direction from inner components (Haskell's `direction = d1 <|> d2`).
+    fn resolve_month_day(
+        month: u32,
+        day: u32,
+        direction: Option<Direction>,
+        ref_time: DateTime<Utc>,
+    ) -> Option<(DateTime<Utc>, &'static str)> {
+        let build = |y: i32| -> Option<DateTime<Utc>> {
+            Some(
+                NaiveDate::from_ymd_opt(y, month, day)?
+                    .and_hms_opt(0, 0, 0)?
+                    .and_utc(),
+            )
+        };
+        let ref_year = ref_time.year();
+        let this_year = build(ref_year)?;
+        let this_date = this_year.date_naive();
+        let ref_date = ref_time.date_naive();
+        let dt = match direction {
+            Some(Direction::Past) => {
+                if this_date < ref_date {
+                    this_year
+                } else {
+                    build(ref_year.checked_sub(1)?)?
+                }
+            }
+            Some(Direction::Future) => {
+                if this_date > ref_date {
+                    this_year
+                } else {
+                    build(ref_year.checked_add(1)?)?
+                }
+            }
+            _ => {
+                // Future-first default
+                if this_date < ref_date {
+                    build(ref_year.checked_add(1)?)?
+                } else {
+                    this_year
+                }
+            }
+        };
+        Some((dt, "day"))
+    }
+
     if let TimeForm::DayOfMonth(day) = &primary.form {
         if let TimeForm::Month(month) = &secondary.form {
-            let y = if *month < ref_time.month()
-                || (*month == ref_time.month() && *day < ref_time.day())
-            {
-                ref_time.year().saturating_add(1)
-            } else {
-                ref_time.year()
-            };
-            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
-                .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc();
-            return Some((dt, "day"));
+            let direction = primary.direction.or(secondary.direction);
+            return resolve_month_day(*month, *day, direction, ref_time);
         }
     }
     if let TimeForm::Month(month) = &primary.form {
         if let TimeForm::DayOfMonth(day) = &secondary.form {
-            let y = if *month < ref_time.month()
-                || (*month == ref_time.month() && *day < ref_time.day())
-            {
-                ref_time.year().saturating_add(1)
-            } else {
-                ref_time.year()
-            };
-            let dt = NaiveDate::from_ymd_opt(y, *month, *day)
-                .unwrap_or(ref_time.date_naive())
-                .and_hms_opt(0, 0, 0)
-                .unwrap()
-                .and_utc();
-            return Some((dt, "day"));
+            let direction = primary.direction.or(secondary.direction);
+            return resolve_month_day(*month, *day, direction, ref_time);
         }
     }
 
@@ -2557,7 +2581,7 @@ fn resolve_composed(
         let (base, base_grain) =
             resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
         match &primary.form {
-            TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. } => {
+            TimeForm::DayOfMonth(_) | TimeForm::DateMDY { .. } | TimeForm::Composed(..) => {
                 let dt = NaiveDate::from_ymd_opt(*y, base.month(), base.day())
                     .unwrap_or(ref_time.date_naive())
                     .and_hms_opt(0, 0, 0)
@@ -2602,6 +2626,79 @@ fn resolve_composed(
         return Some((date_dt, "hour"));
     }
 
+    // Helper: extract (month, day) from a Composed(Month, DayOfMonth) form
+    fn extract_md_from_composed(form: &TimeForm) -> Option<(u32, u32)> {
+        if let TimeForm::Composed(a, b) = form {
+            if let (TimeForm::Month(m), TimeForm::DayOfMonth(d)) = (&a.form, &b.form) {
+                return Some((*m, *d));
+            }
+            if let (TimeForm::DayOfMonth(d), TimeForm::Month(m)) = (&a.form, &b.form) {
+                return Some((*m, *d));
+            }
+        }
+        None
+    }
+
+    // DOW + specific date → use the date, validating DOW match
+    // If DOW doesn't match, find the next year where it does
+    // Must come BEFORE the nested Composed handler to avoid premature year-fixing
+    if let TimeForm::DayOfWeek(dow) = &primary.form {
+        match &secondary.form {
+            TimeForm::DateMDY { month, day, year } => {
+                let (date_dt, _) =
+                    resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
+                return Some((
+                    find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
+                    "day",
+                ));
+            }
+            TimeForm::Holiday(..) => {
+                return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
+            }
+            TimeForm::DayOfMonth(day) => {
+                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
+            }
+            _ => {
+                // Handle Composed(Month, DayOfMonth) — use year: None so DOW search works
+                if let Some((month, day)) = extract_md_from_composed(&secondary.form) {
+                    let (date_dt, _) = resolve_month_day(month, day, None, ref_time)?;
+                    return Some((
+                        find_dow_date_intersection(*dow, date_dt, month, day, None),
+                        "day",
+                    ));
+                }
+            }
+        }
+    }
+    // Specific date + DOW → use the date, validating DOW match
+    if let TimeForm::DayOfWeek(dow) = &secondary.form {
+        match &primary.form {
+            TimeForm::DateMDY { month, day, year } => {
+                let (date_dt, _) =
+                    resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
+                return Some((
+                    find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
+                    "day",
+                ));
+            }
+            TimeForm::Holiday(..) => {
+                return resolve_simple_datetime(&primary.form, ref_time, primary.direction);
+            }
+            TimeForm::DayOfMonth(day) => {
+                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
+            }
+            _ => {
+                if let Some((month, day)) = extract_md_from_composed(&primary.form) {
+                    let (date_dt, _) = resolve_month_day(month, day, None, ref_time)?;
+                    return Some((
+                        find_dow_date_intersection(*dow, date_dt, month, day, None),
+                        "day",
+                    ));
+                }
+            }
+        }
+    }
+
     // Nested Composed: if one side is Composed, try to resolve it first
     if let TimeForm::Composed(a, b) = &primary.form {
         let (primary_dt, _primary_grain) = resolve_composed(a, b, ref_time)?;
@@ -2622,67 +2719,24 @@ fn resolve_composed(
         return resolve_composed(primary, &new_secondary, ref_time);
     }
 
-    // DOW + specific date → use the date, validating DOW match
-    // If DOW doesn't match, find the next year where it does
-    if let TimeForm::DayOfWeek(dow) = &primary.form {
-        match &secondary.form {
-            TimeForm::DateMDY { month, day, year } => {
-                let (date_dt, _) =
-                    resolve_simple_datetime(&secondary.form, ref_time, secondary.direction)?;
-                return Some((
-                    find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
-                    "day",
-                ));
-            }
-            TimeForm::Holiday(..) => {
-                return resolve_simple_datetime(&secondary.form, ref_time, secondary.direction);
-            }
-            TimeForm::DayOfMonth(day) => {
-                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
-            }
-            _ => {}
-        }
-    }
-    // Specific date + DOW → use the date, validating DOW match
+    // GrainOffset + DOW: find the DOW within the grain period
+    // e.g., "last week's sunday" → Sunday of last week
     if let TimeForm::DayOfWeek(dow) = &secondary.form {
-        match &primary.form {
-            TimeForm::DateMDY { month, day, year } => {
-                let (date_dt, _) =
-                    resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
-                return Some((
-                    find_dow_date_intersection(*dow, date_dt, *month, *day, *year),
-                    "day",
-                ));
-            }
-            TimeForm::Holiday(..) => {
-                return resolve_simple_datetime(&primary.form, ref_time, primary.direction);
-            }
-            TimeForm::DayOfMonth(day) => {
-                return Some((find_dow_dom_intersection(*dow, *day, ref_time), "day"));
-            }
-            // GrainOffset + DOW: find the DOW within the grain period
-            // e.g., "last week's sunday" → Sunday of last week
-            TimeForm::GrainOffset {
-                grain: _,
-                offset: _,
-            } => {
-                let (period_start, _) =
-                    resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
-                // Find the target DOW within the period
-                let period_date = period_start.date_naive();
-                let current_dow = period_date.weekday().num_days_from_monday();
-                let days_to_target = if *dow >= current_dow {
-                    dow.saturating_sub(current_dow) as i64
-                } else {
-                    dow.saturating_add(7).saturating_sub(current_dow) as i64
-                };
-                let target_date = chrono::Duration::try_days(days_to_target)
-                    .and_then(|d| period_date.checked_add_signed(d))
-                    .unwrap_or(period_date);
-                let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
-                return Some((dt, "day"));
-            }
-            _ => {}
+        if let TimeForm::GrainOffset { .. } = &primary.form {
+            let (period_start, _) =
+                resolve_simple_datetime(&primary.form, ref_time, primary.direction)?;
+            let period_date = period_start.date_naive();
+            let current_dow = period_date.weekday().num_days_from_monday();
+            let days_to_target = if *dow >= current_dow {
+                dow.saturating_sub(current_dow) as i64
+            } else {
+                dow.saturating_add(7).saturating_sub(current_dow) as i64
+            };
+            let target_date = chrono::Duration::try_days(days_to_target)
+                .and_then(|d| period_date.checked_add_signed(d))
+                .unwrap_or(period_date);
+            let dt = target_date.and_hms_opt(0, 0, 0).unwrap().and_utc();
+            return Some((dt, "day"));
         }
     }
     // DOW + GrainOffset: same as above but reversed
@@ -2716,7 +2770,7 @@ fn resolve_composed(
     fn form_specificity(f: &TimeForm) -> u32 {
         match f {
             TimeForm::DateMDY { year: Some(_), .. } => 6,
-            TimeForm::DateMDY { .. } => 5,
+            TimeForm::DateMDY { .. } | TimeForm::Composed(..) => 5,
             TimeForm::DayOfMonth(_) => 4,
             TimeForm::Month(_) => 3,
             TimeForm::DayOfWeek(_) => 2,
