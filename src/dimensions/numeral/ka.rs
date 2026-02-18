@@ -27,10 +27,10 @@ fn lex_0_19(s: &str) -> Option<NumeralData> {
         "თვრამეტი" | "თვრამეტ" => 18.0,
         "ცხრამეტი" | "ცხრამეტ" => 19.0,
         "წყვილი" | "წყვილები" => {
-            return Some(NumeralData::new(2.0).with_quantifier())
+            return Some(NumeralData::new(2.0).not_ok_for_any_time())
         }
         "ცოტა" | "რამდენიმე" | "რამოდენიმე" => {
-            return Some(NumeralData::new(3.0).with_quantifier())
+            return Some(NumeralData::new(3.0).not_ok_for_any_time())
         }
         _ => return None,
     };

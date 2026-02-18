@@ -112,7 +112,7 @@ fn power_word(s: &str) -> Option<NumeralData> {
             NumeralData::new(12.0)
                 .with_grain(1)
                 .with_multipliable(true)
-                .with_quantifier(),
+                .not_ok_for_any_time(),
         ),
         _ => None,
     }
@@ -161,8 +161,8 @@ pub fn rules() -> Vec<Rule> {
                     if let Some(g) = b.grain {
                         out = out.with_grain(g);
                     }
-                    if b.quantifier {
-                        out = out.with_quantifier();
+                    if !b.ok_for_any_time {
+                        out = out.not_ok_for_any_time();
                     }
                     Some(TokenData::Numeral(out))
                 } else {

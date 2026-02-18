@@ -155,7 +155,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let _ = m.group(1);
                 let v = 2.0;
-                Some(TokenData::Numeral(NumeralData::new(v).with_quantifier()))
+                Some(TokenData::Numeral(NumeralData::new(v).not_ok_for_any_time()))
             }),
         },
         Rule {
@@ -170,7 +170,7 @@ pub fn rules() -> Vec<Rule> {
                     Some(s) => parse_chinese_integer(s)?,
                     None => 1.0,
                 };
-                Some(TokenData::Numeral(NumeralData::new(mult * 12.0).with_quantifier()))
+                Some(TokenData::Numeral(NumeralData::new(mult * 12.0).not_ok_for_any_time()))
             }),
         },
         Rule {

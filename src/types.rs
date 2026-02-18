@@ -215,6 +215,10 @@ pub enum TimeValue {
         value: TimePoint,
         /// Up to 3 next occurrences (including the primary as first element).
         values: Vec<TimePoint>,
+        /// Matches Haskell's `holiday :: Maybe Text` in TimeValue.
+        /// Serialized as `"holidayBeta"` when present.
+        #[serde(skip_serializing_if = "Option::is_none", rename = "holidayBeta")]
+        holiday: Option<String>,
     },
     /// A time interval with additional future occurrences.
     Interval {
@@ -224,6 +228,10 @@ pub enum TimeValue {
         to: Option<TimePoint>,
         /// Up to 3 next interval occurrences.
         values: Vec<IntervalEndpoints>,
+        /// Matches Haskell's `holiday :: Maybe Text` in TimeValue.
+        /// Serialized as `"holidayBeta"` when present.
+        #[serde(skip_serializing_if = "Option::is_none", rename = "holidayBeta")]
+        holiday: Option<String>,
     },
 }
 

@@ -3227,9 +3227,16 @@ fn test_time_additional_regression_inputs_extreme_values() {
     let _ = parse_time("in 9999999999999999 days");
 }
 
+/// After aligning with Haskell's `isOkWithThisNext`, DateMDY forms are no
+/// longer gated by the "last <time>" rule (Haskell's `ruleLastTime` only
+/// matches forms with `okForThisNext = True`). "last April 1" now resolves
+/// as the next future April 1 since "last" doesn't apply to DateMDY forms.
+/// Use "last April" for month-level past reference.
 #[test]
 fn test_last_april_first_is_previous_occurrence() {
-    check_time_naive("last April 1", dt(2012, 4, 1, 0, 0, 0), "day");
+    // DateMDY is not ok_for_this_next, so "last" doesn't attach;
+    // "April 1" resolves to the next future occurrence.
+    check_time_naive("last April 1", dt(2013, 4, 1, 0, 0, 0), "day");
 }
 
 #[test]

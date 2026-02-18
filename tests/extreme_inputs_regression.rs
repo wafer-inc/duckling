@@ -188,6 +188,7 @@ fn test_real_world_event_listing_exact_entities() {
         DimensionValue::Time(TimeValue::Single {
             value: point,
             values,
+            holiday: None,
         })
     }
     let l = Some(false);
@@ -417,6 +418,7 @@ fn test_iso_date_in_sentence_() {
             DimensionValue::Time(TimeValue::Single {
                 value: point.clone(),
                 values: vec![point],
+                holiday: None,
             })
         },
         latent: Some(false),

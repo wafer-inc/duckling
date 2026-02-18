@@ -84,7 +84,7 @@ pub fn rules() -> Vec<Rule> {
                     _ => return None,
                 };
                 let seconds = match g {
-                    Grain::Second => v,
+                    Grain::NoGrain | Grain::Second => v,
                     Grain::Minute => v * 60.0,
                     Grain::Hour => v * 3600.0,
                     Grain::Day => v * 86400.0,

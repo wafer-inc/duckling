@@ -52,6 +52,11 @@ fn is_year_token(td: &TokenData) -> bool {
     matches!(td, TokenData::Time(d) if matches!(d.form, TimeForm::Year(_)))
 }
 
+/// Matches Haskell's `isOkWithThisNext` predicate.
+fn is_ok_with_this_next(td: &TokenData) -> bool {
+    matches!(td, TokenData::Time(d) if d.ok_for_this_next)
+}
+
 fn is_not_latent_time(td: &TokenData) -> bool {
     matches!(td, TokenData::Time(d) if !d.latent)
 }
@@ -721,7 +726,7 @@ pub fn rules() -> Vec<Rule> {
             pattern: vec![predicate(|td| {
                 if let Some(data) = numeral_data(td) {
                     let v = data.value;
-                    (1.0..=12.0).contains(&v) && v == v.floor() && !data.quantifier
+                    (1.0..=12.0).contains(&v) && v == v.floor() && data.ok_for_any_time
                 } else {
                     false
                 }
@@ -1528,27 +1533,20 @@ pub fn rules() -> Vec<Rule> {
             }),
         },
         // ====================================================================
-        // last/next <day-of-week or month>
+        // last/next/this <time> — gated by ok_for_this_next (Haskell's isOkWithThisNext)
         // ====================================================================
         Rule {
             name: "last <time>".to_string(),
-            pattern: vec![regex(r"\b(last|past|previous)\b"), dim(DimensionKind::Time)],
+            pattern: vec![
+                regex(r"\b(this past|last|past|previous)\b"),
+                predicate(is_ok_with_this_next),
+            ],
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[1].token_data)?;
-                match &t.form {
-                    TimeForm::DayOfWeek(_)
-                    | TimeForm::Month(_)
-                    | TimeForm::DateMDY { year: None, .. }
-                    | TimeForm::Holiday(..)
-                    | TimeForm::Season(_)
-                    | TimeForm::Weekend => {
-                        let mut new_t = t.clone();
-                        new_t.direction = Some(Direction::Past);
-                        new_t.latent = false;
-                        Some(TokenData::Time(new_t))
-                    }
-                    _ => None,
-                }
+                let mut new_t = t.clone();
+                new_t.direction = Some(Direction::Past);
+                new_t.latent = false;
+                Some(TokenData::Time(new_t))
             }),
         },
         // Haskell: predNth 0 True td → notImmediate = True
@@ -1556,63 +1554,45 @@ pub fn rules() -> Vec<Rule> {
             name: "next <time>".to_string(),
             pattern: vec![
                 regex(r"\b(next|following|upcoming|coming)\b"),
-                dim(DimensionKind::Time),
+                predicate(is_ok_with_this_next),
             ],
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[1].token_data)?;
-                match &t.form {
-                    TimeForm::DayOfWeek(_)
-                    | TimeForm::Month(_)
-                    | TimeForm::Holiday(..)
-                    | TimeForm::Season(_)
-                    | TimeForm::Weekend => {
-                        let mut new_t = t.clone();
-                        new_t.direction = Some(Direction::Future);
-                        new_t.latent = false;
-                        new_t.not_immediate = true;
-                        Some(TokenData::Time(new_t))
-                    }
-                    _ => None,
-                }
+                let mut new_t = t.clone();
+                new_t.direction = Some(Direction::Future);
+                new_t.latent = false;
+                new_t.not_immediate = true;
+                Some(TokenData::Time(new_t))
             }),
         },
-        // this <dow/month/season/weekend/holiday>
-        // Haskell: predNth 0 True dow → notImmediate = True
+        // Haskell: predNth 0 False td
         Rule {
             name: "this <time>".to_string(),
-            pattern: vec![regex(r"\b(this|current)\b"), dim(DimensionKind::Time)],
+            pattern: vec![
+                regex(r"\b(this|current|coming)\b"),
+                predicate(is_ok_with_this_next),
+            ],
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[1].token_data)?;
-                match &t.form {
-                    TimeForm::DayOfWeek(_)
-                    | TimeForm::Month(_)
-                    | TimeForm::Holiday(..)
-                    | TimeForm::Season(_)
-                    | TimeForm::Weekend => {
-                        let mut new_t = t.clone();
-                        new_t.latent = false;
-                        new_t.not_immediate = true;
-                        Some(TokenData::Time(new_t))
-                    }
-                    _ => None,
-                }
+                let mut new_t = t.clone();
+                new_t.latent = false;
+                new_t.not_immediate = true;
+                Some(TokenData::Time(new_t))
             }),
         },
         // <time> after next (e.g., "friday after next")
         Rule {
             name: "<time> before last|after next".to_string(),
-            pattern: vec![dim(DimensionKind::Time), regex(r"\bafter next\b")],
+            pattern: vec![
+                predicate(is_ok_with_this_next),
+                regex(r"\bafter next\b"),
+            ],
             production: Box::new(|nodes| {
                 let t = time_data(&nodes[0].token_data)?;
-                match &t.form {
-                    TimeForm::DayOfWeek(_) | TimeForm::Month(_) => {
-                        let mut new_t = t.clone();
-                        new_t.direction = Some(Direction::FarFuture);
-                        new_t.latent = false;
-                        Some(TokenData::Time(new_t))
-                    }
-                    _ => None,
-                }
+                let mut new_t = t.clone();
+                new_t.direction = Some(Direction::FarFuture);
+                new_t.latent = false;
+                Some(TokenData::Time(new_t))
             }),
         },
         // ====================================================================

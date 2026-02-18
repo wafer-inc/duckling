@@ -63,12 +63,21 @@ pub struct TimeData {
     pub latent: bool,
     pub open_interval_direction: Option<IntervalDirection>,
     pub early_late: Option<EarlyLate>,
-    /// Timezone name (e.g., "CET", "GMT", "PST") — set by timezone rule
+    /// Intentional deviation from Haskell's `hasTimezone :: Bool`:
+    /// We store the actual timezone name (e.g. "CET", "EST") instead of just a flag,
+    /// preserving more information for downstream consumers.
     pub timezone: Option<String>,
     /// Haskell's notImmediate: if true and the first future value coincides with
     /// the reference time, skip to the next occurrence.
     /// Used by "this Monday" (predNth 0 True) when today is Monday.
     pub not_immediate: bool,
+    /// Matches Haskell's `okForThisNext :: Bool` (default `False`).
+    /// Set to `true` on DayOfWeek, Month, Weekend, Season, Holiday, and select
+    /// PartOfDay forms. Gates "this/next/last <time>" rules via `is_ok_with_this_next`.
+    pub ok_for_this_next: bool,
+    /// Matches Haskell's `holiday :: Maybe Text`.
+    /// Set from `TimeForm::Holiday(name, _)` and propagated through composition.
+    pub holiday: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -180,8 +189,29 @@ pub enum Direction {
     FarFuture, // "after next" — skip one extra occurrence
 }
 
+/// Extract holiday name from a TimeForm, propagating through Composed/Interval
+/// forms using Haskell's `h1 <|> h2` semantics (first non-None wins).
+fn extract_holiday(form: &TimeForm) -> Option<String> {
+    match form {
+        TimeForm::Holiday(name, _) => Some(name.clone()),
+        TimeForm::Composed(a, b) => a.holiday.clone().or_else(|| b.holiday.clone()),
+        TimeForm::Interval(a, b, _) => a.holiday.clone().or_else(|| b.holiday.clone()),
+        _ => None,
+    }
+}
+
 impl TimeData {
     pub fn new(form: TimeForm) -> Self {
+        let ok_for_this_next = matches!(
+            form,
+            TimeForm::DayOfWeek(_)
+                | TimeForm::Month(_)
+                | TimeForm::Weekend
+                | TimeForm::Season(_)
+                | TimeForm::Holiday(..)
+                | TimeForm::PartOfDay(_)
+        );
+        let holiday = extract_holiday(&form);
         TimeData {
             form,
             direction: None,
@@ -190,10 +220,22 @@ impl TimeData {
             early_late: None,
             timezone: None,
             not_immediate: false,
+            ok_for_this_next,
+            holiday,
         }
     }
 
     pub fn latent(form: TimeForm) -> Self {
+        let ok_for_this_next = matches!(
+            form,
+            TimeForm::DayOfWeek(_)
+                | TimeForm::Month(_)
+                | TimeForm::Weekend
+                | TimeForm::Season(_)
+                | TimeForm::Holiday(..)
+                | TimeForm::PartOfDay(_)
+        );
+        let holiday = extract_holiday(&form);
         TimeData {
             form,
             direction: None,
@@ -202,7 +244,16 @@ impl TimeData {
             early_late: None,
             timezone: None,
             not_immediate: false,
+            ok_for_this_next,
+            holiday,
         }
+    }
+
+    /// Manually mark this TimeData as ok for "this/next/last" rules.
+    /// Matches Haskell's `mkOkForThisNext`.
+    pub fn mk_ok_for_this_next(mut self) -> Self {
+        self.ok_for_this_next = true;
+        self
     }
 }
 
@@ -391,6 +442,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
                     from: from.clone(),
                     to: None,
                     values: vec![IntervalEndpoints { from, to: None }],
+                    holiday: data.holiday.clone(),
                 }))
             }
             IntervalDirection::Before => {
@@ -399,18 +451,29 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
                     from: None,
                     to: to.clone(),
                     values: vec![IntervalEndpoints { from: None, to }],
+                    holiday: data.holiday.clone(),
                 }))
             }
         };
     }
 
     // 2. Try to resolve as interval (pass context for per-endpoint timezone)
-    if let Some(tv) = catch_unwind(AssertUnwindSafe(|| {
+    if let Some(mut tv) = catch_unwind(AssertUnwindSafe(|| {
         try_resolve_as_interval(data, ref_time, context)
     }))
     .ok()
     .flatten()
     {
+        // Propagate holiday from TimeData into the resolved TimeValue
+        if data.holiday.is_some() {
+            match &mut tv {
+                TimeValue::Single { holiday, .. } | TimeValue::Interval { holiday, .. } => {
+                    if holiday.is_none() {
+                        *holiday = data.holiday.clone();
+                    }
+                }
+            }
+        }
         return Some(DimensionValue::Time(tv));
     }
 
@@ -441,6 +504,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     Some(DimensionValue::Time(TimeValue::Single {
         value: point.clone(),
         values: extra_values,
+        holiday: data.holiday.clone(),
     }))
 }
 
@@ -457,7 +521,7 @@ fn duration_for_grain(n: i64, grain: Grain) -> Option<Duration> {
 
 fn relative_can_be_represented(base: DateTime<Utc>, n: i64, grain: Grain) -> bool {
     match grain {
-        Grain::Second | Grain::Minute | Grain::Hour | Grain::Day | Grain::Week => {
+        Grain::NoGrain | Grain::Second | Grain::Minute | Grain::Hour | Grain::Day | Grain::Week => {
             duration_for_grain(n, grain)
                 .and_then(|d| base.checked_add_signed(d))
                 .is_some()
@@ -588,6 +652,7 @@ fn try_resolve_as_interval(
                         from: from_point,
                         to: to_point,
                     }],
+                    holiday: data.holiday.clone(),
                 });
             }
 
@@ -711,9 +776,17 @@ fn try_resolve_as_interval(
                         from: from_point,
                         to: to_point,
                     }],
+                    holiday: data.holiday.clone(),
                 })
             } else {
-                Some(make_interval(from_dt, to_dt, interval_grain))
+                let mut iv = make_interval(from_dt, to_dt, interval_grain);
+                if let TimeValue::Interval {
+                    ref mut holiday, ..
+                } = iv
+                {
+                    *holiday = data.holiday.clone();
+                }
+                Some(iv)
             }
         }
         TimeForm::NthGrain {
@@ -934,6 +1007,7 @@ fn try_resolve_as_interval(
                                 return Some(TimeValue::Single {
                                     value: point.clone(),
                                     values: vec![point],
+                                    holiday: data.holiday.clone(),
                                 });
                             }
                         }
@@ -953,6 +1027,7 @@ fn try_resolve_as_interval(
                                 return Some(TimeValue::Single {
                                     value: point.clone(),
                                     values: vec![point],
+                                    holiday: data.holiday.clone(),
                                 });
                             }
                         }
@@ -1020,6 +1095,7 @@ fn try_resolve_as_interval(
                                 return Some(TimeValue::Single {
                                     value: point.clone(),
                                     values: vec![point],
+                                    holiday: data.holiday.clone(),
                                 });
                             }
                         }
@@ -1039,6 +1115,7 @@ fn try_resolve_as_interval(
                                 return Some(TimeValue::Single {
                                     value: point.clone(),
                                     values: vec![point],
+                                    holiday: data.holiday.clone(),
                                 });
                             }
                         }
@@ -1215,6 +1292,7 @@ fn make_interval(from: DateTime<Utc>, to: DateTime<Utc>, grain: &str) -> TimeVal
             from: from_point,
             to: to_point,
         }],
+        holiday: None,
     }
 }
 
@@ -1238,7 +1316,7 @@ fn adjust_interval_end_with_from(
         to_grain
     };
     Some(match adjust_grain {
-        Grain::Second => Duration::try_seconds(1)
+        Grain::NoGrain | Grain::Second => Duration::try_seconds(1)
             .and_then(|d| to.checked_add_signed(d))
             .unwrap_or(to),
         Grain::Minute => Duration::try_minutes(1)
@@ -1274,6 +1352,7 @@ pub(super) fn form_grain(f: &TimeForm) -> Grain {
         | TimeForm::DayAfterTomorrow
         | TimeForm::DayBeforeYesterday
         | TimeForm::Holiday(_, _) => Grain::Day,
+        TimeForm::Now => Grain::NoGrain,
         TimeForm::Hour(_, _) | TimeForm::PartOfDay(_) => Grain::Hour,
         TimeForm::HourMinute(_, _, _) => Grain::Minute,
         TimeForm::HourMinuteSecond(_, _, _) => Grain::Second,
@@ -1837,7 +1916,7 @@ pub(super) fn resolve_simple_datetime(
                     Grain::Minute => {
                         Duration::try_minutes(*n).and_then(|d| dt.checked_add_signed(d))
                     }
-                    Grain::Second => {
+                    Grain::NoGrain | Grain::Second => {
                         Duration::try_seconds(*n).and_then(|d| dt.checked_add_signed(d))
                     }
                 }
@@ -2005,7 +2084,9 @@ fn resolve_relative_grain(
 ) -> Option<(DateTime<Utc>, &'static str)> {
     let lower = grain.lower();
     let result = match grain {
-        Grain::Second => Duration::try_seconds(n).and_then(|d| ref_time.checked_add_signed(d))?,
+        Grain::NoGrain | Grain::Second => {
+            Duration::try_seconds(n).and_then(|d| ref_time.checked_add_signed(d))?
+        }
         Grain::Minute => Duration::try_minutes(n).and_then(|d| ref_time.checked_add_signed(d))?,
         Grain::Hour => Duration::try_hours(n).and_then(|d| ref_time.checked_add_signed(d))?,
         Grain::Day => Duration::try_days(n).and_then(|d| ref_time.checked_add_signed(d))?,
@@ -2190,7 +2271,7 @@ fn resolve_composed(
                         }
                         Grain::Minute => Duration::try_minutes(*n)
                             .and_then(|d| ref_time.checked_add_signed(d))?,
-                        Grain::Second => Duration::try_seconds(*n)
+                        Grain::NoGrain | Grain::Second => Duration::try_seconds(*n)
                             .and_then(|d| ref_time.checked_add_signed(d))?,
                         Grain::Quarter => add_months(ref_time, n.checked_mul(3)?)?,
                     };
@@ -2325,7 +2406,7 @@ fn resolve_composed(
                     Grain::Minute => {
                         Duration::try_minutes(n).and_then(|d| base.checked_add_signed(d))
                     }
-                    Grain::Second => {
+                    Grain::NoGrain | Grain::Second => {
                         Duration::try_seconds(n).and_then(|d| base.checked_add_signed(d))
                     }
                     Grain::Quarter => add_months(base, n.checked_mul(3)?),
@@ -3175,7 +3256,7 @@ fn start_of_quarter(dt: DateTime<Utc>) -> DateTime<Utc> {
 
 pub(super) fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
     match grain {
-        Grain::Second => dt,
+        Grain::NoGrain | Grain::Second => dt,
         Grain::Minute => dt
             .date_naive()
             .and_hms_opt(dt.hour(), dt.minute(), 0)
@@ -3196,7 +3277,9 @@ pub(super) fn grain_start(dt: DateTime<Utc>, grain: Grain) -> DateTime<Utc> {
 
 pub(super) fn add_grain(dt: DateTime<Utc>, grain: Grain, n: i64) -> Option<DateTime<Utc>> {
     match grain {
-        Grain::Second => Duration::try_seconds(n).and_then(|d| dt.checked_add_signed(d)),
+        Grain::NoGrain | Grain::Second => {
+            Duration::try_seconds(n).and_then(|d| dt.checked_add_signed(d))
+        }
         Grain::Minute => Duration::try_minutes(n).and_then(|d| dt.checked_add_signed(d)),
         Grain::Hour => Duration::try_hours(n).and_then(|d| dt.checked_add_signed(d)),
         Grain::Day => Duration::try_days(n).and_then(|d| dt.checked_add_signed(d)),

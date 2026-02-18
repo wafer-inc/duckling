@@ -43,7 +43,7 @@ pub fn rules() -> Vec<Rule> {
                 };
                 let mut data = NumeralData::new(val);
                 if low == "single" {
-                    data = data.with_quantifier();
+                    data = data.not_ok_for_any_time();
                 }
                 Some(TokenData::Numeral(data))
             }),
@@ -105,7 +105,9 @@ pub fn rules() -> Vec<Rule> {
             name: "a few".to_string(),
             pattern: vec![regex(r#"(a )?few"#)],
             production: Box::new(|_| {
-                Some(TokenData::Numeral(NumeralData::new(3.0).with_quantifier()))
+                Some(TokenData::Numeral(
+                    NumeralData::new(3.0).not_ok_for_any_time(),
+                ))
             }),
         },
         // Compose tens and units: twenty one, thirty-two
@@ -334,7 +336,9 @@ pub fn rules() -> Vec<Rule> {
             name: "a pair / a couple".to_string(),
             pattern: vec![regex(r#"(a\s+)?(pair|couple)s?(\s+of)?"#)],
             production: Box::new(|_nodes| {
-                Some(TokenData::Numeral(NumeralData::new(2.0).with_quantifier()))
+                Some(TokenData::Numeral(
+                    NumeralData::new(2.0).not_ok_for_any_time(),
+                ))
             }),
         },
         // a dozen (multipliable)
@@ -345,7 +349,7 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(
                     NumeralData::new(12.0)
                         .with_multipliable(true)
-                        .with_quantifier(),
+                        .not_ok_for_any_time(),
                 ))
             }),
         },

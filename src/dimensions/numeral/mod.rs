@@ -56,9 +56,10 @@ pub struct NumeralData {
     pub value: f64,
     pub grain: Option<u8>,
     pub multipliable: bool,
-    /// True for quantifier words like "single", "couple", "few", "dozen"
-    /// that should not be interpreted as clock hours.
-    pub quantifier: bool,
+    /// Matches Haskell's `okForAnyTime :: Bool` (default `True`).
+    /// Set to `false` via `not_ok_for_any_time()` on words like "single", "couple",
+    /// "few", "dozen" that should not be interpreted as clock hours.
+    pub ok_for_any_time: bool,
 }
 
 impl NumeralData {
@@ -67,7 +68,7 @@ impl NumeralData {
             value,
             grain: None,
             multipliable: false,
-            quantifier: false,
+            ok_for_any_time: true,
         }
     }
 
@@ -81,8 +82,8 @@ impl NumeralData {
         self
     }
 
-    pub fn with_quantifier(mut self) -> Self {
-        self.quantifier = true;
+    pub fn not_ok_for_any_time(mut self) -> Self {
+        self.ok_for_any_time = false;
         self
     }
 }

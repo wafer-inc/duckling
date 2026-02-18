@@ -84,7 +84,7 @@ pub fn rules() -> Vec<Rule> {
                 Some(TokenData::Numeral(
                     NumeralData::new(12.0)
                         .with_multipliable(true)
-                        .with_quantifier(),
+                        .not_ok_for_any_time(),
                 ))
             }),
         },

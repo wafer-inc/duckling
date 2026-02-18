@@ -30,6 +30,9 @@ use crate::types::DimensionValue;
 /// Ordering matches Haskell Duckling's derived Ord.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Grain {
+    /// No grain — used only for `now` to mark it as a reference instant.
+    /// Matches Haskell's `NoGrain` variant.
+    NoGrain,
     /// Seconds.
     Second,
     /// Minutes.
@@ -52,6 +55,7 @@ impl Grain {
     /// Returns the grain as a string (e.g. `"hour"`, `"day"`).
     pub fn as_str(&self) -> &'static str {
         match self {
+            Grain::NoGrain => "no_grain",
             Grain::Second => "second",
             Grain::Minute => "minute",
             Grain::Hour => "hour",
@@ -67,6 +71,7 @@ impl Grain {
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Grain {
         match s {
+            "no_grain" => Grain::NoGrain,
             "second" => Grain::Second,
             "minute" => Grain::Minute,
             "hour" => Grain::Hour,
@@ -81,14 +86,15 @@ impl Grain {
 
     fn order(&self) -> u8 {
         match self {
-            Grain::Second => 0,
-            Grain::Minute => 1,
-            Grain::Hour => 2,
-            Grain::Day => 3,
-            Grain::Week => 4,
-            Grain::Month => 5,
-            Grain::Quarter => 6,
-            Grain::Year => 7,
+            Grain::NoGrain => 0,
+            Grain::Second => 1,
+            Grain::Minute => 2,
+            Grain::Hour => 3,
+            Grain::Day => 4,
+            Grain::Week => 5,
+            Grain::Month => 6,
+            Grain::Quarter => 7,
+            Grain::Year => 8,
         }
     }
 
@@ -103,6 +109,7 @@ impl Grain {
             Grain::Hour => Grain::Minute,
             Grain::Minute => Grain::Second,
             Grain::Second => Grain::Second,
+            Grain::NoGrain => Grain::Second,
         }
     }
 
@@ -110,6 +117,7 @@ impl Grain {
     /// Matches Haskell Duckling's `inSeconds`.
     pub fn in_seconds(&self, n: i64) -> Option<i64> {
         match self {
+            Grain::NoGrain => Some(n),
             Grain::Second => Some(n),
             Grain::Minute => n.checked_mul(60),
             Grain::Hour => n.checked_mul(3600),
@@ -124,6 +132,7 @@ impl Grain {
     /// Number of seconds in one unit of this grain, as f64.
     pub fn one_in_seconds_f64(&self) -> f64 {
         match self {
+            Grain::NoGrain => 1.0,
             Grain::Second => 1.0,
             Grain::Minute => 60.0,
             Grain::Hour => 3600.0,
