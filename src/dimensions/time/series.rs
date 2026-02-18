@@ -1,5 +1,6 @@
 // Port of Haskell's series generators from Duckling/Time/Types.hs.
 // Generates multiple occurrences for cyclic TimeForm variants.
+#![allow(clippy::arithmetic_side_effects)]
 
 use super::{
     add_grain, grain_start, pod_interval, resolve_holiday, resolve_holiday_interval,
@@ -115,18 +116,15 @@ fn time_sequence(
     }
 
     // Past: anchor-step, anchor-2step, ...
-    match time_plus(anchor, grain, -step) {
-        Some(first_past) => {
-            let mut t = first_past;
-            for _ in 0..SAFE_MAX {
-                past.push(t.clone());
-                match time_plus(&t, grain, -step) {
-                    Some(next) => t = next,
-                    None => break,
-                }
+    if let Some(first_past) = time_plus(anchor, grain, -step) {
+        let mut t = first_past;
+        for _ in 0..SAFE_MAX {
+            past.push(t.clone());
+            match time_plus(&t, grain, -step) {
+                Some(next) => t = next,
+                None => break,
             }
         }
-        None => {}
     }
 
     (past, future)
@@ -255,25 +253,22 @@ fn series_day_of_month(d: u32, ref_time: &TimeObject) -> (Vec<TimeObject>, Vec<T
     }
 
     let mut past = Vec::new();
-    match time_plus(&anchor, Grain::Month, -1) {
-        Some(first_past) => {
-            let mut t = first_past;
-            for _ in 0..SAFE_MAX * 2 {
-                if enough_days(&t) {
-                    if let Some(obj) = add_days(&t) {
-                        past.push(obj);
-                        if past.len() >= SAFE_MAX {
-                            break;
-                        }
+    if let Some(first_past) = time_plus(&anchor, Grain::Month, -1) {
+        let mut t = first_past;
+        for _ in 0..SAFE_MAX * 2 {
+            if enough_days(&t) {
+                if let Some(obj) = add_days(&t) {
+                    past.push(obj);
+                    if past.len() >= SAFE_MAX {
+                        break;
                     }
                 }
-                match time_plus(&t, Grain::Month, -1) {
-                    Some(next) => t = next,
-                    None => break,
-                }
+            }
+            match time_plus(&t, Grain::Month, -1) {
+                Some(next) => t = next,
+                None => break,
             }
         }
-        None => {}
     }
 
     (past, future)
@@ -329,21 +324,18 @@ fn series_part_of_day(
         }
     }
     // Generate past from anchor going backwards
-    match shift_interval(&anchor, Grain::Day, -1) {
-        Some(first_past) => {
-            if past.is_empty() {
-                past.push(anchor.clone());
-            }
-            let mut t = first_past;
-            for _ in 0..SAFE_MAX {
-                past.push(t.clone());
-                match shift_interval(&t, Grain::Day, -1) {
-                    Some(next) => t = next,
-                    None => break,
-                }
+    if let Some(first_past) = shift_interval(&anchor, Grain::Day, -1) {
+        if past.is_empty() {
+            past.push(anchor.clone());
+        }
+        let mut t = first_past;
+        for _ in 0..SAFE_MAX {
+            past.push(t.clone());
+            match shift_interval(&t, Grain::Day, -1) {
+                Some(next) => t = next,
+                None => break,
             }
         }
-        None => {}
     }
     (past, future)
 }
@@ -381,21 +373,18 @@ fn series_weekend(
             None => break,
         }
     }
-    match shift_interval(&anchor, Grain::Week, -1) {
-        Some(first_past) => {
-            if past.is_empty() {
-                past.push(anchor.clone());
-            }
-            let mut t = first_past;
-            for _ in 0..SAFE_MAX {
-                past.push(t.clone());
-                match shift_interval(&t, Grain::Week, -1) {
-                    Some(next) => t = next,
-                    None => break,
-                }
+    if let Some(first_past) = shift_interval(&anchor, Grain::Week, -1) {
+        if past.is_empty() {
+            past.push(anchor.clone());
+        }
+        let mut t = first_past;
+        for _ in 0..SAFE_MAX {
+            past.push(t.clone());
+            match shift_interval(&t, Grain::Week, -1) {
+                Some(next) => t = next,
+                None => break,
             }
         }
-        None => {}
     }
     (past, future)
 }
@@ -430,21 +419,18 @@ fn series_season(
             None => break,
         }
     }
-    match shift_interval(&anchor, Grain::Year, -1) {
-        Some(first_past) => {
-            if past.is_empty() {
-                past.push(anchor.clone());
-            }
-            let mut t = first_past;
-            for _ in 0..SAFE_MAX {
-                past.push(t.clone());
-                match shift_interval(&t, Grain::Year, -1) {
-                    Some(next) => t = next,
-                    None => break,
-                }
+    if let Some(first_past) = shift_interval(&anchor, Grain::Year, -1) {
+        if past.is_empty() {
+            past.push(anchor.clone());
+        }
+        let mut t = first_past;
+        for _ in 0..SAFE_MAX {
+            past.push(t.clone());
+            match shift_interval(&t, Grain::Year, -1) {
+                Some(next) => t = next,
+                None => break,
             }
         }
-        None => {}
     }
     (past, future)
 }
@@ -626,6 +612,7 @@ fn single_interval(
 
 /// Port of Haskell's `runCompose pred1 pred2`.
 /// For each occurrence of pred2, find the first match of pred1 within it.
+#[allow(clippy::type_complexity)]
 fn run_compose(
     pred1: &dyn Fn(&TimeObject) -> (Vec<TimeObject>, Vec<TimeObject>),
     pred2: &dyn Fn(&TimeObject) -> (Vec<TimeObject>, Vec<TimeObject>),

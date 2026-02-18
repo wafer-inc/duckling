@@ -251,6 +251,7 @@ impl TimeData {
 
     /// Manually mark this TimeData as ok for "this/next/last" rules.
     /// Matches Haskell's `mkOkForThisNext`.
+    #[allow(dead_code)]
     pub fn mk_ok_for_this_next(mut self) -> Self {
         self.ok_for_this_next = true;
         self
