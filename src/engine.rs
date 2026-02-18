@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use regex::Regex;
@@ -11,7 +12,7 @@ use crate::types::{
 };
 
 type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
-type SeenKey = (usize, usize, Option<String>, String);
+type SeenKey = (usize, usize, Option<String>, u64);
 
 /// Parse text and resolve all entities.
 #[allow(dead_code)]
@@ -103,33 +104,47 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
         let key = dedup_key(node);
         seen.insert(key);
     }
-    stash.merge(&initial);
+    stash.merge_from(initial);
 
     // Phase 2: Saturation loop - keep applying rules until no new tokens
     loop {
         let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache);
         let mut actually_new = Stash::new();
-        for node in new_stash.all_nodes() {
-            let key = dedup_key(node);
+        for node in new_stash.into_nodes() {
+            let key = dedup_key(&node);
             if seen.insert(key) {
-                actually_new.add(node.clone());
+                actually_new.add(node);
             }
         }
         if actually_new.is_empty() {
             break;
         }
-        stash.merge(&actually_new);
+        stash.merge_from(actually_new);
     }
 
     stash
 }
 
 fn dedup_key(node: &Node) -> SeenKey {
+    use std::collections::hash_map::DefaultHasher;
+    let mut hasher = DefaultHasher::new();
+    // Hash the Debug representation without allocating a String
+    struct HashWriter<'a>(&'a mut DefaultHasher);
+    impl std::fmt::Write for HashWriter<'_> {
+        fn write_str(&mut self, s: &str) -> std::fmt::Result {
+            s.hash(self.0);
+            Ok(())
+        }
+    }
+    let _ = std::fmt::Write::write_fmt(
+        &mut HashWriter(&mut hasher),
+        format_args!("{:?}", node.token_data),
+    );
     (
         node.range.start,
         node.range.end,
         node.rule_name.clone(),
-        format!("{:?}", node.token_data),
+        hasher.finish(),
     )
 }
 
@@ -317,7 +332,7 @@ fn match_remaining(
     stash: &Stash,
     pattern_idx: usize,
     after_pos: usize,
-    matched_so_far: Vec<Node>,
+    mut matched_so_far: Vec<Node>,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
@@ -338,6 +353,7 @@ fn match_remaining(
     match &rule.pattern[pattern_idx] {
         PatternItem::Regex(re) => {
             // Try to match regex starting near after_pos
+            // At most one match, so we can move matched_so_far directly
             let text = doc.lower();
             let original = doc.text();
             if after_pos <= text.len() {
@@ -368,15 +384,14 @@ fn match_remaining(
                             children: Vec::new(),
                             rule_name: None,
                         };
-                        let mut next_matched = matched_so_far.clone();
-                        next_matched.push(regex_node);
+                        matched_so_far.push(regex_node);
                         let cont = match_remaining(
                             doc,
                             rule,
                             stash,
                             pattern_idx.saturating_add(1),
                             abs_end,
-                            next_matched,
+                            matched_so_far,
                         );
                         results.extend(cont);
                     }
@@ -384,41 +399,58 @@ fn match_remaining(
             }
         }
         PatternItem::Dimension(dim) => {
-            // Use position-filtered iteration instead of scanning all nodes
-            for node in stash.nodes_starting_from(after_pos) {
-                if node.token_data.dimension_kind() == Some(*dim)
-                    && doc.is_adjacent(after_pos, node.range.start)
-                {
-                    let mut next_matched = matched_so_far.clone();
-                    next_matched.push(node.clone());
-                    let cont = match_remaining(
-                        doc,
-                        rule,
-                        stash,
-                        pattern_idx.saturating_add(1),
-                        node.range.end,
-                        next_matched,
-                    );
-                    results.extend(cont);
-                }
+            // Collect matching nodes to allow move on the last one
+            let matching: Vec<&Node> = stash
+                .nodes_starting_from(after_pos)
+                .filter(|node| {
+                    node.token_data.dimension_kind() == Some(*dim)
+                        && doc.is_adjacent(after_pos, node.range.start)
+                })
+                .collect();
+            let last_idx = matching.len().saturating_sub(1);
+            for (i, node) in matching.into_iter().enumerate() {
+                let mut next_matched = if i == last_idx {
+                    std::mem::take(&mut matched_so_far)
+                } else {
+                    matched_so_far.clone()
+                };
+                next_matched.push(node.clone());
+                let cont = match_remaining(
+                    doc,
+                    rule,
+                    stash,
+                    pattern_idx.saturating_add(1),
+                    node.range.end,
+                    next_matched,
+                );
+                results.extend(cont);
             }
         }
         PatternItem::Predicate(pred) => {
-            // Use position-filtered iteration instead of scanning all nodes
-            for node in stash.nodes_starting_from(after_pos) {
-                if pred(&node.token_data) && doc.is_adjacent(after_pos, node.range.start) {
-                    let mut next_matched = matched_so_far.clone();
-                    next_matched.push(node.clone());
-                    let cont = match_remaining(
-                        doc,
-                        rule,
-                        stash,
-                        pattern_idx.saturating_add(1),
-                        node.range.end,
-                        next_matched,
-                    );
-                    results.extend(cont);
-                }
+            // Collect matching nodes to allow move on the last one
+            let matching: Vec<&Node> = stash
+                .nodes_starting_from(after_pos)
+                .filter(|node| {
+                    pred(&node.token_data) && doc.is_adjacent(after_pos, node.range.start)
+                })
+                .collect();
+            let last_idx = matching.len().saturating_sub(1);
+            for (i, node) in matching.into_iter().enumerate() {
+                let mut next_matched = if i == last_idx {
+                    std::mem::take(&mut matched_so_far)
+                } else {
+                    matched_so_far.clone()
+                };
+                next_matched.push(node.clone());
+                let cont = match_remaining(
+                    doc,
+                    rule,
+                    stash,
+                    pattern_idx.saturating_add(1),
+                    node.range.end,
+                    next_matched,
+                );
+                results.extend(cont);
             }
         }
     }

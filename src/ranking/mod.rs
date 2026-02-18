@@ -46,7 +46,7 @@ fn deserialize_f64_with_inf<'de, D: serde::Deserializer<'de>>(d: D) -> Result<f6
     use serde::de;
 
     struct F64Visitor;
-    impl<'de> de::Visitor<'de> for F64Visitor {
+    impl de::Visitor<'_> for F64Visitor {
         type Value = f64;
         fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             f.write_str("f64 or infinity string")
@@ -265,13 +265,14 @@ fn compare_candidate(a: &Candidate, b: &Candidate) -> Ordering {
     Ordering::Equal
 }
 
-fn classifiers_for_locale(locale: &Locale) -> Classifiers {
+fn classifiers_for_locale(locale: &Locale) -> &'static Classifiers {
     static EN_XX: OnceLock<Classifiers> = OnceLock::new();
     static AR_XX: OnceLock<Classifiers> = OnceLock::new();
     static EL_XX: OnceLock<Classifiers> = OnceLock::new();
     static ES_XX: OnceLock<Classifiers> = OnceLock::new();
     static PT_XX: OnceLock<Classifiers> = OnceLock::new();
     static TR_XX: OnceLock<Classifiers> = OnceLock::new();
+    static EMPTY: OnceLock<Classifiers> = OnceLock::new();
 
     fn load(json: &str) -> Classifiers {
         let raw: HashMap<String, JsonClassifier> =
@@ -304,25 +305,13 @@ fn classifiers_for_locale(locale: &Locale) -> Classifiers {
     }
 
     match locale.lang {
-        Lang::EN => EN_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/en_xx.json")))
-            .clone(),
-        Lang::AR => AR_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/ar_xx.json")))
-            .clone(),
-        Lang::EL => EL_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/el_xx.json")))
-            .clone(),
-        Lang::ES => ES_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/es_xx.json")))
-            .clone(),
-        Lang::PT => PT_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/pt_xx.json")))
-            .clone(),
-        Lang::TR => TR_XX
-            .get_or_init(|| load(include_str!("../ranking_classifiers/tr_xx.json")))
-            .clone(),
-        _ => HashMap::new(),
+        Lang::EN => EN_XX.get_or_init(|| load(include_str!("../ranking_classifiers/en_xx.json"))),
+        Lang::AR => AR_XX.get_or_init(|| load(include_str!("../ranking_classifiers/ar_xx.json"))),
+        Lang::EL => EL_XX.get_or_init(|| load(include_str!("../ranking_classifiers/el_xx.json"))),
+        Lang::ES => ES_XX.get_or_init(|| load(include_str!("../ranking_classifiers/es_xx.json"))),
+        Lang::PT => PT_XX.get_or_init(|| load(include_str!("../ranking_classifiers/pt_xx.json"))),
+        Lang::TR => TR_XX.get_or_init(|| load(include_str!("../ranking_classifiers/tr_xx.json"))),
+        _ => EMPTY.get_or_init(HashMap::new),
     }
 }
 
@@ -337,7 +326,7 @@ pub(crate) fn rank_resolved(
         .map(|resolved| {
             let dim = resolved.node.token_data.dimension_kind();
             Candidate {
-                score: score_node(&classifiers, &resolved.node),
+                score: score_node(classifiers, &resolved.node),
                 target: dims.is_empty() || dim.map(|d| dims.contains(&d)).unwrap_or(false),
                 resolved,
             }

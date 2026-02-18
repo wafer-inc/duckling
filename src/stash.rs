@@ -30,10 +30,18 @@ impl Stash {
         self.count == 0
     }
 
-    pub fn merge(&mut self, other: &Stash) {
-        for node in other.all_nodes() {
-            self.add(node.clone());
+    pub fn merge_from(&mut self, other: Stash) {
+        for (_pos, nodes) in other.nodes {
+            for node in nodes {
+                self.nodes.entry(node.range.start).or_default().push(node);
+                self.count = self.count.saturating_add(1);
+            }
         }
+    }
+
+    /// Consume the stash and return an iterator over all owned nodes.
+    pub fn into_nodes(self) -> impl Iterator<Item = Node> {
+        self.nodes.into_values().flat_map(|v| v.into_iter())
     }
 
     /// Iterate over nodes starting at or after the given position.
