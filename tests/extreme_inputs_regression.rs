@@ -164,6 +164,7 @@ fn test_real_world_event_listing_exact_entities() {
     fn num(v: f64) -> DimensionValue {
         DimensionValue::Numeral(v)
     }
+    #[allow(clippy::too_many_arguments)]
     fn time_single(
         y: i32,
         m: u32,

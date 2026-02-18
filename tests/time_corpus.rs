@@ -3241,7 +3241,7 @@ fn test_last_april_first_march_2018_ref() {
     let locale = Locale::new(Lang::EN, None);
     let context = Context {
         reference_time: Utc.with_ymd_and_hms(2018, 3, 15, 12, 0, 0).unwrap(),
-        locale: locale.clone(),
+        locale,
         timezone_offset_minutes: 0,
     };
     let options = Options::default();
