@@ -14,14 +14,15 @@ use chrono::NaiveDate;
 /// Each group is (Vec<text>, check_fn) — multiple texts that should all pass
 /// the same predicate. This mirrors Haskell's `examples` helper which maps
 /// a single predicate over multiple texts.
+#[allow(clippy::type_complexity)]
 pub fn build_corpus(
     context: Context,
     groups: Vec<(Vec<&str>, Box<dyn Fn(&Entity) -> bool>)>,
 ) -> TrainingCorpus {
     let mut examples: Vec<(String, Box<dyn Fn(&Entity) -> bool>)> = Vec::new();
     for (texts, check) in groups {
-        // We need to share the check across texts. Use Rc-like pattern.
-        let check = std::sync::Arc::new(check);
+        // We need to share the check across texts. Use Rc.
+        let check = std::rc::Rc::new(check);
         for text in texts {
             let check = check.clone();
             examples.push((text.to_string(), Box::new(move |e: &Entity| check(e))));
@@ -68,6 +69,7 @@ pub fn datetime(y: i32, m: u32, d: u32, h: u32, mi: u32, s: u32, grain: Grain) -
 /// Same as datetime but also checks holiday name in the entity body (we ignore
 /// the holiday name check since Rust entities don't carry it separately — the
 /// match on datetime is sufficient for training).
+#[allow(clippy::too_many_arguments)]
 pub fn datetime_holiday(
     y: i32,
     m: u32,
@@ -82,6 +84,7 @@ pub fn datetime_holiday(
 }
 
 /// Port of Haskell's `datetimeInterval` check.
+#[allow(clippy::too_many_arguments)]
 pub fn datetime_interval(
     y1: i32,
     m1: u32,
@@ -128,6 +131,7 @@ pub fn datetime_interval(
 }
 
 /// Port of Haskell's `datetimeIntervalHoliday` check.
+#[allow(clippy::too_many_arguments)]
 pub fn datetime_interval_holiday(
     y1: i32,
     m1: u32,

@@ -101,7 +101,7 @@ fn make_dataset1(
     }
 
     // Update dataset with OK nodes
-    for (_, node) in &ok_nodes {
+    for node in ok_nodes.values() {
         if let Some(rule) = &node.rule_name {
             let feats = extract_features(node);
             dataset.entry(rule.clone()).or_default().push((feats, true));
@@ -109,7 +109,7 @@ fn make_dataset1(
     }
 
     // Update dataset with KO nodes
-    for (_, node) in &ko_nodes {
+    for node in ko_nodes.values() {
         if let Some(rule) = &node.rule_name {
             let feats = extract_features(node);
             dataset
@@ -155,14 +155,16 @@ fn train(datums: &[Datum]) -> Classifier {
     let mut ok_counts: HashMap<String, i32> = HashMap::new();
     for (feats, _) in &ok {
         for (f, &count) in feats {
-            *ok_counts.entry(f.clone()).or_insert(0) += count;
+            let entry = ok_counts.entry(f.clone()).or_insert(0);
+            *entry = entry.saturating_add(count);
         }
     }
 
     let mut ko_counts: HashMap<String, i32> = HashMap::new();
     for (feats, _) in &ko {
         for (f, &count) in feats {
-            *ko_counts.entry(f.clone()).or_insert(0) += count;
+            let entry = ko_counts.entry(f.clone()).or_insert(0);
+            *entry = entry.saturating_add(count);
         }
     }
 
@@ -184,6 +186,7 @@ pub struct TrainingCorpus {
     /// Parsing options.
     pub options: Options,
     /// Each example is `(text, predicate)` where the predicate checks the resolved entity.
+    #[allow(clippy::type_complexity)]
     pub examples: Vec<(String, Box<dyn Fn(&Entity) -> bool>)>,
 }
 
