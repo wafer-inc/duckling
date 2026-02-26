@@ -30,6 +30,10 @@ impl Stash {
         self.count == 0
     }
 
+    pub fn len(&self) -> usize {
+        self.count
+    }
+
     pub fn merge_from(&mut self, other: Stash) {
         for (_pos, nodes) in other.nodes {
             for node in nodes {

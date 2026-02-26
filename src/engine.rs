@@ -15,6 +15,27 @@ use crate::types::{
 type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
 type SeenKey = (usize, usize, Option<String>, u64);
 
+#[derive(Debug, Clone, Copy)]
+struct ParseLimits {
+    max_regex_matches_per_rule: usize,
+    max_rule_results: usize,
+    max_new_nodes_per_iteration: usize,
+    max_nodes: usize,
+    max_iterations: usize,
+}
+
+impl ParseLimits {
+    fn for_text_len(_text_len: usize) -> Self {
+        Self {
+            max_regex_matches_per_rule: 256,
+            max_rule_results: 256,
+            max_new_nodes_per_iteration: 1_024,
+            max_nodes: 3_000,
+            max_iterations: 24,
+        }
+    }
+}
+
 /// Parse text and resolve all entities.
 #[allow(dead_code)]
 pub fn parse_and_resolve(
@@ -78,6 +99,7 @@ pub fn parse_and_resolve_with_nodes(
 pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let doc = Document::new(text);
     let mut stash = Stash::new();
+    let limits = ParseLimits::for_text_len(text.len());
 
     // Pre-compute regex matches for all regex-leading rules once.
     // Regex matches against document text never change between iterations.
@@ -88,7 +110,11 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
                 return None;
             }
             if let PatternItem::Regex(ref re) = rule.pattern[0] {
-                Some(find_regex_matches(&doc, re))
+                Some(find_regex_matches(
+                    &doc,
+                    re,
+                    limits.max_regex_matches_per_rule,
+                ))
             } else {
                 None
             }
@@ -100,18 +126,29 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let mut seen: HashSet<SeenKey> = HashSet::new();
 
     // Phase 1: Apply all regex-leading rules to find initial tokens
-    let initial = apply_regex_rules(rules, &regex_cache);
+    let initial = apply_regex_rules(rules, &regex_cache, &limits);
     for node in initial.all_nodes() {
+        if seen.len() >= limits.max_nodes {
+            break;
+        }
         let key = dedup_key(node);
         seen.insert(key);
     }
     stash.merge_from(initial);
 
     // Phase 2: Saturation loop - keep applying rules until no new tokens
+    let mut iterations = 0usize;
     loop {
-        let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache);
+        if iterations >= limits.max_iterations || seen.len() >= limits.max_nodes {
+            break;
+        }
+        iterations = iterations.saturating_add(1);
+        let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache, &seen, &limits);
         let mut actually_new = Stash::new();
         for node in new_stash.into_nodes() {
+            if seen.len() >= limits.max_nodes {
+                break;
+            }
             let key = dedup_key(&node);
             if seen.insert(key) {
                 actually_new.add(node);
@@ -165,10 +202,17 @@ fn safe_production(rule: &Rule, nodes: &[&Node]) -> Option<TokenData> {
 
 /// Apply regex-leading rules to the document to find initial tokens.
 /// Uses pre-computed regex cache.
-fn apply_regex_rules(rules: &[Rule], regex_cache: &[Option<RegexMatches>]) -> Stash {
+fn apply_regex_rules(
+    rules: &[Rule],
+    regex_cache: &[Option<RegexMatches>],
+    limits: &ParseLimits,
+) -> Stash {
     let mut stash = Stash::new();
 
     for (i, rule) in rules.iter().enumerate() {
+        if stash.len() >= limits.max_nodes {
+            break;
+        }
         if rule.pattern.is_empty() {
             continue;
         }
@@ -178,6 +222,9 @@ fn apply_regex_rules(rules: &[Rule], regex_cache: &[Option<RegexMatches>]) -> St
                 None => continue,
             };
             for (range, groups) in matches {
+                if stash.len() >= limits.max_nodes {
+                    break;
+                }
                 let regex_node = Node {
                     range: *range,
                     token_data: TokenData::RegexMatch(RegexMatchData {
@@ -213,10 +260,18 @@ fn apply_all_rules(
     rules: &[Rule],
     stash: &Stash,
     regex_cache: &[Option<RegexMatches>],
+    seen: &HashSet<SeenKey>,
+    limits: &ParseLimits,
 ) -> Stash {
     let mut new_stash = Stash::new();
+    let mut local_seen: HashSet<SeenKey> = HashSet::new();
 
     for (i, rule) in rules.iter().enumerate() {
+        if new_stash.len() >= limits.max_new_nodes_per_iteration
+            || seen.len().saturating_add(new_stash.len()) >= limits.max_nodes
+        {
+            break;
+        }
         // Skip single-pattern regex rules - already fully handled in phase 1
         if rule.pattern.len() == 1 {
             if let PatternItem::Regex(_) = &rule.pattern[0] {
@@ -224,9 +279,18 @@ fn apply_all_rules(
             }
         }
         let cached = regex_cache[i].as_ref();
-        let produced = match_rule(doc, rule, stash, cached);
+        let produced = match_rule(doc, rule, stash, cached, limits);
         for node in produced {
+            let key = dedup_key(&node);
+            if seen.contains(&key) || !local_seen.insert(key) {
+                continue;
+            }
             new_stash.add(node);
+            if new_stash.len() >= limits.max_new_nodes_per_iteration
+                || seen.len().saturating_add(new_stash.len()) >= limits.max_nodes
+            {
+                break;
+            }
         }
     }
 
@@ -240,6 +304,7 @@ fn match_rule(
     rule: &Rule,
     stash: &Stash,
     cached_regex: Option<&RegexMatches>,
+    limits: &ParseLimits,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
@@ -255,6 +320,9 @@ fn match_rule(
                 None => return results,
             };
             for (range, groups) in matches {
+                if results.len() >= limits.max_rule_results {
+                    break;
+                }
                 let regex_node = Node {
                     range: *range,
                     token_data: TokenData::RegexMatch(RegexMatchData {
@@ -274,14 +342,17 @@ fn match_rule(
                 } else {
                     // Continue matching remaining patterns
                     let continuations =
-                        match_remaining(doc, rule, stash, 1, range.end, vec![regex_node]);
-                    results.extend(continuations);
+                        match_remaining(doc, rule, stash, 1, range.end, vec![regex_node], limits);
+                    extend_with_limit(&mut results, continuations, limits.max_rule_results);
                 }
             }
         }
         PatternItem::Dimension(dim) => {
             // Start with dimension matches from the stash
             for node in stash.all_nodes() {
+                if results.len() >= limits.max_rule_results {
+                    break;
+                }
                 if node.token_data.dimension_kind() == Some(*dim) {
                     if rule.pattern.len() == 1 {
                         if let Some(token_data) = safe_production(rule, &[node]) {
@@ -298,14 +369,18 @@ fn match_rule(
                             1,
                             node.range.end,
                             vec![node.clone()],
+                            limits,
                         );
-                        results.extend(continuations);
+                        extend_with_limit(&mut results, continuations, limits.max_rule_results);
                     }
                 }
             }
         }
         PatternItem::Predicate(pred) => {
             for node in stash.all_nodes() {
+                if results.len() >= limits.max_rule_results {
+                    break;
+                }
                 if pred(&node.token_data) {
                     if rule.pattern.len() == 1 {
                         if let Some(token_data) = safe_production(rule, &[node]) {
@@ -322,8 +397,9 @@ fn match_rule(
                             1,
                             node.range.end,
                             vec![node.clone()],
+                            limits,
                         );
-                        results.extend(continuations);
+                        extend_with_limit(&mut results, continuations, limits.max_rule_results);
                     }
                 }
             }
@@ -331,6 +407,17 @@ fn match_rule(
     }
 
     results
+}
+
+fn extend_with_limit<T>(dst: &mut Vec<T>, mut src: Vec<T>, limit: usize) {
+    let remaining = limit.saturating_sub(dst.len());
+    if remaining == 0 {
+        return;
+    }
+    if src.len() > remaining {
+        src.truncate(remaining);
+    }
+    dst.extend(src);
 }
 
 /// Continue matching the remaining pattern items after a partial match.
@@ -342,6 +429,7 @@ fn match_remaining(
     pattern_idx: usize,
     after_pos: usize,
     mut matched_so_far: Vec<Node>,
+    limits: &ParseLimits,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
@@ -400,8 +488,9 @@ fn match_remaining(
                             pattern_idx.saturating_add(1),
                             abs_end,
                             matched_so_far,
+                            limits,
                         );
-                        results.extend(cont);
+                        extend_with_limit(&mut results, cont, limits.max_rule_results);
                     }
                 }
             }
@@ -417,6 +506,9 @@ fn match_remaining(
                 .collect();
             let last_idx = matching.len().saturating_sub(1);
             for (i, node) in matching.into_iter().enumerate() {
+                if results.len() >= limits.max_rule_results {
+                    break;
+                }
                 let mut next_matched = if i == last_idx {
                     std::mem::take(&mut matched_so_far)
                 } else {
@@ -430,8 +522,9 @@ fn match_remaining(
                     pattern_idx.saturating_add(1),
                     node.range.end,
                     next_matched,
+                    limits,
                 );
-                results.extend(cont);
+                extend_with_limit(&mut results, cont, limits.max_rule_results);
             }
         }
         PatternItem::Predicate(pred) => {
@@ -444,6 +537,9 @@ fn match_remaining(
                 .collect();
             let last_idx = matching.len().saturating_sub(1);
             for (i, node) in matching.into_iter().enumerate() {
+                if results.len() >= limits.max_rule_results {
+                    break;
+                }
                 let mut next_matched = if i == last_idx {
                     std::mem::take(&mut matched_so_far)
                 } else {
@@ -457,8 +553,9 @@ fn match_remaining(
                     pattern_idx.saturating_add(1),
                     node.range.end,
                     next_matched,
+                    limits,
                 );
-                results.extend(cont);
+                extend_with_limit(&mut results, cont, limits.max_rule_results);
             }
         }
     }
@@ -469,11 +566,15 @@ fn match_remaining(
 /// Find all regex matches in the document.
 /// Matches against the original text and extracts captured groups from the
 /// original text to preserve case (important for email, URL, etc.).
-fn find_regex_matches(doc: &Document, re: &Regex) -> Vec<(Range, Vec<Option<String>>)> {
+fn find_regex_matches(
+    doc: &Document,
+    re: &Regex,
+    max_matches: usize,
+) -> Vec<(Range, Vec<Option<String>>)> {
     let original = doc.text();
     let mut matches = Vec::new();
 
-    for caps in re.captures_iter(original) {
+    for caps in re.captures_iter(original).take(max_matches) {
         let m = caps.get(0).unwrap();
         let range = Range::new(m.start(), m.end());
         let groups = extract_groups(&caps, original);
