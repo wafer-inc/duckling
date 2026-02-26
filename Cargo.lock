@@ -73,6 +73,7 @@ name = "duckling"
 version = "0.3.0"
 dependencies = [
  "chrono",
+ "log",
  "once_cell",
  "regex",
  "serde",

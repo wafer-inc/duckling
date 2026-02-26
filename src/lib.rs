@@ -2,6 +2,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::arithmetic_side_effects)]
 
+use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 pub(crate) mod dimensions;
@@ -74,10 +75,18 @@ pub fn parse(
     context: &Context,
     options: &Options,
 ) -> Vec<Entity> {
-    catch_unwind(AssertUnwindSafe(|| {
+    match catch_unwind(AssertUnwindSafe(|| {
         parse_inner(text, locale, dims, context, options)
-    }))
-    .unwrap_or_default()
+    })) {
+        Ok(entities) => entities,
+        Err(payload) => {
+            log::error!(
+                "duckling::parse panicked: {}",
+                panic_payload_message(&payload)
+            );
+            Vec::new()
+        }
+    }
 }
 
 fn parse_inner(
@@ -114,6 +123,16 @@ fn parse_inner(
     let ranked = ranking::rank_resolved(resolved_tokens, locale, dims);
     let entities: Vec<Entity> = ranked.into_iter().map(|rt| rt.entity).collect();
     ranking::remove_overlapping(entities)
+}
+
+fn panic_payload_message(payload: &Box<dyn Any + Send>) -> String {
+    if let Some(message) = payload.downcast_ref::<&str>() {
+        return (*message).to_string();
+    }
+    if let Some(message) = payload.downcast_ref::<String>() {
+        return message.clone();
+    }
+    "non-string panic payload".to_string()
 }
 
 /// Convenience function to parse text with default settings for English.

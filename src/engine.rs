@@ -355,7 +355,6 @@ fn match_remaining(
             // Try to match regex starting near after_pos
             // At most one match, so we can move matched_so_far directly
             let text = doc.text();
-            let original = doc.text();
             if after_pos <= text.len() {
                 let search_text = &text[after_pos..];
                 if let Some(m) = re.find(search_text) {
@@ -371,7 +370,7 @@ fn match_remaining(
                                     g.push(c.get(i).map(|m2| {
                                         let s = after_pos.saturating_add(m2.start());
                                         let e = after_pos.saturating_add(m2.end());
-                                        original[s..e].to_string()
+                                        text[s..e].to_string()
                                     }));
                                 }
                                 g
