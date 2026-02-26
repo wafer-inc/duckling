@@ -2,7 +2,7 @@ use crate::types::{DimensionKind, PatternItem, TokenData};
 use regex::Regex;
 
 /// Create a regex pattern item. The pattern is matched case-insensitively
-/// against the lowercased document text.
+/// against the original document text.
 pub fn regex(pattern: &str) -> PatternItem {
     let full = format!("(?i){}", pattern);
     PatternItem::Regex(

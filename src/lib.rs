@@ -2,6 +2,8 @@
 #![warn(missing_docs)]
 #![warn(clippy::arithmetic_side_effects)]
 
+use std::panic::{catch_unwind, AssertUnwindSafe};
+
 pub(crate) mod dimensions;
 pub(crate) mod document;
 pub(crate) mod engine;
@@ -66,6 +68,19 @@ pub fn train_classifiers(
 /// assert!(!entities.is_empty());
 /// ```
 pub fn parse(
+    text: &str,
+    locale: &Locale,
+    dims: &[DimensionKind],
+    context: &Context,
+    options: &Options,
+) -> Vec<Entity> {
+    catch_unwind(AssertUnwindSafe(|| {
+        parse_inner(text, locale, dims, context, options)
+    }))
+    .unwrap_or_default()
+}
+
+fn parse_inner(
     text: &str,
     locale: &Locale,
     dims: &[DimensionKind],

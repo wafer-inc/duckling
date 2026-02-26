@@ -4,7 +4,6 @@
 #[derive(Debug, Clone)]
 pub struct Document {
     text: String,
-    lower: String,
     /// first_non_adjacent[i] = index of first non-whitespace byte at or after position i.
     /// If none exists, equals byte_len. Used for O(1) adjacency checks.
     first_non_adjacent: Vec<usize>,
@@ -12,7 +11,6 @@ pub struct Document {
 
 impl Document {
     pub fn new(text: &str) -> Self {
-        let lower = text.to_lowercase();
         let byte_len = text.len();
 
         // Precompute first_non_adjacent: for each byte position, the index of the
@@ -35,17 +33,12 @@ impl Document {
 
         Document {
             text: text.to_string(),
-            lower,
             first_non_adjacent,
         }
     }
 
     pub fn text(&self) -> &str {
         &self.text
-    }
-
-    pub fn lower(&self) -> &str {
-        &self.lower
     }
 
     /// Check if two ranges are adjacent (no non-whitespace between them).
@@ -66,7 +59,6 @@ mod tests {
     fn test_basic_document() {
         let doc = Document::new("hello world");
         assert_eq!(doc.text(), "hello world");
-        assert_eq!(doc.lower(), "hello world");
     }
 
     #[test]

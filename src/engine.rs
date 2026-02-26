@@ -354,7 +354,7 @@ fn match_remaining(
         PatternItem::Regex(re) => {
             // Try to match regex starting near after_pos
             // At most one match, so we can move matched_so_far directly
-            let text = doc.lower();
+            let text = doc.text();
             let original = doc.text();
             if after_pos <= text.len() {
                 let search_text = &text[after_pos..];
@@ -459,14 +459,13 @@ fn match_remaining(
 }
 
 /// Find all regex matches in the document.
-/// Matches against the lowered text but extracts captured groups from the
+/// Matches against the original text and extracts captured groups from the
 /// original text to preserve case (important for email, URL, etc.).
 fn find_regex_matches(doc: &Document, re: &Regex) -> Vec<(Range, Vec<Option<String>>)> {
-    let lower = doc.lower();
     let original = doc.text();
     let mut matches = Vec::new();
 
-    for caps in re.captures_iter(lower) {
+    for caps in re.captures_iter(original) {
         let m = caps.get(0).unwrap();
         let range = Range::new(m.start(), m.end());
         let groups = extract_groups(&caps, original);
@@ -569,6 +568,38 @@ mod tests {
             has_ordinal_2,
             "Expected ordinal(2) from alternate derivation, got: {:?}",
             entities
+        );
+    }
+
+    #[test]
+    fn unicode_casefold_expansion_does_not_panic_for_regex_cache_matches() {
+        let rules = vec![Rule {
+            name: "seed".to_string(),
+            pattern: vec![regex(r".")],
+            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(1.0)))),
+        }];
+
+        let stash = parse_string("İ", &rules);
+        assert!(
+            !stash.is_empty(),
+            "Expected at least one match for Unicode input"
+        );
+    }
+
+    #[test]
+    fn unicode_casefold_expansion_does_not_panic_in_match_remaining_regex() {
+        let rules = vec![Rule {
+            name: "two-regex".to_string(),
+            pattern: vec![regex(r"a"), regex(r".")],
+            production: Box::new(|_| Some(TokenData::Numeral(NumeralData::new(1.0)))),
+        }];
+
+        let stash = parse_string("aİ", &rules);
+        assert!(
+            stash
+                .all_nodes()
+                .any(|n| n.rule_name.as_deref() == Some("two-regex")),
+            "Expected multi-pattern regex rule to produce a node"
         );
     }
 }
