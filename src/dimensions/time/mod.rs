@@ -32,6 +32,7 @@ use crate::dimensions::time_grain::Grain;
 use crate::resolve::Context;
 use crate::types::{DimensionValue, IntervalEndpoints, TimePoint, TimeValue};
 use chrono::{DateTime, Datelike, Duration, NaiveDate, Timelike, Utc};
+#[cfg(not(debug_assertions))]
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -416,10 +417,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
 
     // 1. Open intervals (ASAP, after/before/since/until + time)
     if let Some(dir) = data.open_interval_direction {
-        let (dt, grain_str) = catch_unwind(AssertUnwindSafe(|| {
-            resolve_simple_datetime(&data.form, ref_time, data.direction)
-        }))
-        .ok()??;
+        let (dt, grain_str) = safe_resolve_simple_datetime(&data.form, ref_time, data.direction)?;
         let grain = if has_tz {
             Grain::Minute
         } else {
@@ -459,12 +457,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     }
 
     // 2. Try to resolve as interval (pass context for per-endpoint timezone)
-    if let Some(mut tv) = catch_unwind(AssertUnwindSafe(|| {
-        try_resolve_as_interval(data, ref_time, context)
-    }))
-    .ok()
-    .flatten()
-    {
+    if let Some(mut tv) = safe_try_resolve_as_interval(data, ref_time, context) {
         // Propagate holiday from TimeData into the resolved TimeValue
         if data.holiday.is_some() {
             match &mut tv {
@@ -479,10 +472,7 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
     }
 
     // 3. Simple value
-    let (dt, grain_str) = catch_unwind(AssertUnwindSafe(|| {
-        resolve_simple_datetime(&data.form, ref_time, data.direction)
-    }))
-    .ok()??;
+    let (dt, grain_str) = safe_resolve_simple_datetime(&data.form, ref_time, data.direction)?;
     let grain = if has_tz {
         Grain::Minute
     } else {
@@ -507,6 +497,46 @@ pub fn resolve(data: &TimeData, context: &Context, with_latent: bool) -> Option<
         values: extra_values,
         holiday: data.holiday.clone(),
     }))
+}
+
+fn safe_try_resolve_as_interval(
+    data: &TimeData,
+    ref_time: DateTime<Utc>,
+    context: &Context,
+) -> Option<TimeValue> {
+    #[cfg(debug_assertions)]
+    {
+        try_resolve_as_interval(data, ref_time, context)
+    }
+
+    #[cfg(not(debug_assertions))]
+    {
+        catch_unwind(AssertUnwindSafe(|| {
+            try_resolve_as_interval(data, ref_time, context)
+        }))
+        .ok()
+        .flatten()
+    }
+}
+
+fn safe_resolve_simple_datetime(
+    form: &TimeForm,
+    ref_time: DateTime<Utc>,
+    direction: Option<Direction>,
+) -> Option<(DateTime<Utc>, &'static str)> {
+    #[cfg(debug_assertions)]
+    {
+        resolve_simple_datetime(form, ref_time, direction)
+    }
+
+    #[cfg(not(debug_assertions))]
+    {
+        catch_unwind(AssertUnwindSafe(|| {
+            resolve_simple_datetime(form, ref_time, direction)
+        }))
+        .ok()
+        .flatten()
+    }
 }
 
 fn duration_for_grain(n: i64, grain: Grain) -> Option<Duration> {

@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
+#[cfg(not(debug_assertions))]
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use regex::Regex;
@@ -149,9 +150,17 @@ fn dedup_key(node: &Node) -> SeenKey {
 }
 
 fn safe_production(rule: &Rule, nodes: &[&Node]) -> Option<TokenData> {
-    catch_unwind(AssertUnwindSafe(|| (rule.production)(nodes)))
-        .ok()
-        .flatten()
+    #[cfg(debug_assertions)]
+    {
+        (rule.production)(nodes)
+    }
+
+    #[cfg(not(debug_assertions))]
+    {
+        catch_unwind(AssertUnwindSafe(|| (rule.production)(nodes)))
+            .ok()
+            .flatten()
+    }
 }
 
 /// Apply regex-leading rules to the document to find initial tokens.

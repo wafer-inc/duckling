@@ -2,6 +2,7 @@ use crate::dimensions;
 use crate::locale::Locale;
 use crate::types::{DimensionValue, Entity, Node, TokenData};
 use chrono::{DateTime, Utc};
+#[cfg(not(debug_assertions))]
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Context for resolving parsed tokens into structured values.
@@ -52,25 +53,55 @@ fn resolve_token(
     context: &Context,
     options: &Options,
 ) -> Option<DimensionValue> {
-    catch_unwind(AssertUnwindSafe(|| match token {
-        TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
-        TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
-        TokenData::Temperature(data) => dimensions::temperature::resolve(data),
-        TokenData::Distance(data) => dimensions::distance::resolve(data),
-        TokenData::Volume(data) => dimensions::volume::resolve(data),
-        TokenData::Quantity(data) => dimensions::quantity::resolve(data),
-        TokenData::AmountOfMoney(data) => {
-            dimensions::amount_of_money::resolve(data, options.with_latent)
+    #[cfg(debug_assertions)]
+    {
+        match token {
+            TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
+            TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
+            TokenData::Temperature(data) => dimensions::temperature::resolve(data),
+            TokenData::Distance(data) => dimensions::distance::resolve(data),
+            TokenData::Volume(data) => dimensions::volume::resolve(data),
+            TokenData::Quantity(data) => dimensions::quantity::resolve(data),
+            TokenData::AmountOfMoney(data) => {
+                dimensions::amount_of_money::resolve(data, options.with_latent)
+            }
+            TokenData::Email(data) => Some(dimensions::email::resolve(data)),
+            TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
+            TokenData::Url(data) => Some(dimensions::url::resolve(data)),
+            TokenData::CreditCardNumber(data) => {
+                Some(dimensions::credit_card_number::resolve(data))
+            }
+            TokenData::TimeGrain(grain) => Some(dimensions::time_grain::resolve(grain)),
+            TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
+            TokenData::Time(data) => dimensions::time::resolve(data, context, options.with_latent),
+            TokenData::RegexMatch(_) => None,
         }
-        TokenData::Email(data) => Some(dimensions::email::resolve(data)),
-        TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
-        TokenData::Url(data) => Some(dimensions::url::resolve(data)),
-        TokenData::CreditCardNumber(data) => Some(dimensions::credit_card_number::resolve(data)),
-        TokenData::TimeGrain(grain) => Some(dimensions::time_grain::resolve(grain)),
-        TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
-        TokenData::Time(data) => dimensions::time::resolve(data, context, options.with_latent),
-        TokenData::RegexMatch(_) => None,
-    }))
-    .ok()
-    .flatten()
+    }
+
+    #[cfg(not(debug_assertions))]
+    {
+        catch_unwind(AssertUnwindSafe(|| match token {
+            TokenData::Numeral(data) => Some(dimensions::numeral::resolve(data)),
+            TokenData::Ordinal(data) => Some(dimensions::ordinal::resolve(data)),
+            TokenData::Temperature(data) => dimensions::temperature::resolve(data),
+            TokenData::Distance(data) => dimensions::distance::resolve(data),
+            TokenData::Volume(data) => dimensions::volume::resolve(data),
+            TokenData::Quantity(data) => dimensions::quantity::resolve(data),
+            TokenData::AmountOfMoney(data) => {
+                dimensions::amount_of_money::resolve(data, options.with_latent)
+            }
+            TokenData::Email(data) => Some(dimensions::email::resolve(data)),
+            TokenData::PhoneNumber(data) => Some(dimensions::phone_number::resolve(data)),
+            TokenData::Url(data) => Some(dimensions::url::resolve(data)),
+            TokenData::CreditCardNumber(data) => {
+                Some(dimensions::credit_card_number::resolve(data))
+            }
+            TokenData::TimeGrain(grain) => Some(dimensions::time_grain::resolve(grain)),
+            TokenData::Duration(data) => Some(dimensions::duration::resolve(data)),
+            TokenData::Time(data) => dimensions::time::resolve(data, context, options.with_latent),
+            TokenData::RegexMatch(_) => None,
+        }))
+        .ok()
+        .flatten()
+    }
 }

@@ -2,7 +2,9 @@
 #![warn(missing_docs)]
 #![warn(clippy::arithmetic_side_effects)]
 
+#[cfg(not(debug_assertions))]
 use std::any::Any;
+#[cfg(not(debug_assertions))]
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 pub(crate) mod dimensions;
@@ -75,16 +77,24 @@ pub fn parse(
     context: &Context,
     options: &Options,
 ) -> Vec<Entity> {
-    match catch_unwind(AssertUnwindSafe(|| {
+    #[cfg(debug_assertions)]
+    {
         parse_inner(text, locale, dims, context, options)
-    })) {
-        Ok(entities) => entities,
-        Err(payload) => {
-            log::error!(
-                "duckling::parse panicked: {}",
-                panic_payload_message(&payload)
-            );
-            Vec::new()
+    }
+
+    #[cfg(not(debug_assertions))]
+    {
+        match catch_unwind(AssertUnwindSafe(|| {
+            parse_inner(text, locale, dims, context, options)
+        })) {
+            Ok(entities) => entities,
+            Err(payload) => {
+                log::error!(
+                    "duckling::parse panicked: {}",
+                    panic_payload_message(&payload)
+                );
+                Vec::new()
+            }
         }
     }
 }
@@ -125,6 +135,7 @@ fn parse_inner(
     ranking::remove_overlapping(entities)
 }
 
+#[cfg(not(debug_assertions))]
 fn panic_payload_message(payload: &Box<dyn Any + Send>) -> String {
     if let Some(message) = payload.downcast_ref::<&str>() {
         return (*message).to_string();
