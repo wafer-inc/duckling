@@ -1,8 +1,11 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 #[cfg(not(debug_assertions))]
 use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::rc::Rc;
+use std::sync::Mutex;
 
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::document::Document;
@@ -14,6 +17,12 @@ use crate::types::{
 
 type RegexMatches = Vec<(Range, Vec<Option<String>>)>;
 type SeenKey = (usize, usize, Option<String>, u64);
+
+/// Cache for regex evaluations in match_remaining, keyed by (pattern_string, after_pos).
+/// Two-level HashMap so cache hits only need a `&str` borrow (no String allocation).
+/// This deduplicates across different Rule objects that share the same regex pattern,
+/// which is common (e.g. `\bof|in\b` appears in 7 rules, `\bthe\b` in 7, etc.).
+type PositionRegexCache = HashMap<String, HashMap<usize, Option<(Range, Vec<Option<String>>)>>>;
 
 #[derive(Debug, Clone, Copy)]
 struct ParseLimits {
@@ -34,6 +43,55 @@ impl ParseLimits {
             max_iterations: 24,
         }
     }
+}
+
+/// Cached RegexSet built from all unique regex patterns in a rule set.
+/// Used as a negative filter: if a pattern doesn't match anywhere in the text,
+/// we can skip it everywhere (first-pattern cache + match_remaining).
+struct CachedRegexSet {
+    set: regex::RegexSet,
+    /// Map from pattern string → index in the RegexSet, for O(1) match checks.
+    pattern_to_idx: HashMap<String, usize>,
+}
+
+/// Global cache of RegexSets, keyed by rules slice pointer.
+/// Safe because rules are `&'static [Rule]` (leaked by `lang::rules_for`).
+static REGEX_SET_CACHE: Lazy<Mutex<HashMap<usize, &'static CachedRegexSet>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
+
+fn get_or_build_regex_set(rules: &[Rule]) -> &'static CachedRegexSet {
+    let key = rules.as_ptr() as usize;
+    {
+        let cache = REGEX_SET_CACHE.lock().unwrap();
+        if let Some(cached) = cache.get(&key) {
+            return cached;
+        }
+    }
+
+    // Collect unique regex patterns across all rule positions
+    let mut patterns: Vec<String> = Vec::new();
+    let mut pattern_to_idx: HashMap<String, usize> = HashMap::new();
+    for rule in rules {
+        for item in &rule.pattern {
+            if let PatternItem::Regex(re) = item {
+                let pat = re.as_str().to_string();
+                if !pattern_to_idx.contains_key(&pat) {
+                    let idx = patterns.len();
+                    patterns.push(pat.clone());
+                    pattern_to_idx.insert(pat, idx);
+                }
+            }
+        }
+    }
+
+    let set = regex::RegexSet::new(&patterns).expect("all patterns should be valid regexes");
+    let cached = Box::leak(Box::new(CachedRegexSet {
+        set,
+        pattern_to_idx,
+    }));
+
+    REGEX_SET_CACHE.lock().unwrap().insert(key, cached);
+    cached
 }
 
 /// Parse text and resolve all entities.
@@ -101,8 +159,15 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     let mut stash = Stash::new();
     let limits = ParseLimits::for_text_len(text.len());
 
+    // Use a cached RegexSet to quickly determine which patterns match anywhere
+    // in the text. Patterns that don't match at all can be skipped everywhere.
+    let regex_set = get_or_build_regex_set(rules);
+    let set_matches = regex_set.set.matches(text);
+
     // Pre-compute regex matches for all regex-leading rules once.
-    // Regex matches against document text never change between iterations.
+    // Skip patterns the RegexSet says don't match anywhere.
+    // Deduplicate by pattern string so shared patterns only run once.
+    let mut pattern_cache: HashMap<String, RegexMatches> = HashMap::new();
     let regex_cache: Vec<Option<RegexMatches>> = rules
         .iter()
         .map(|rule| {
@@ -110,16 +175,28 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
                 return None;
             }
             if let PatternItem::Regex(ref re) = rule.pattern[0] {
-                Some(find_regex_matches(
-                    &doc,
-                    re,
-                    limits.max_regex_matches_per_rule,
-                ))
+                let pat = re.as_str();
+                // Skip if RegexSet says this pattern doesn't match anywhere
+                if let Some(&idx) = regex_set.pattern_to_idx.get(pat) {
+                    if !set_matches.matched(idx) {
+                        return Some(Vec::new());
+                    }
+                }
+                let key = pat.to_string();
+                Some(
+                    pattern_cache
+                        .entry(key)
+                        .or_insert_with(|| {
+                            find_regex_matches(&doc, re, limits.max_regex_matches_per_rule)
+                        })
+                        .clone(),
+                )
             } else {
                 None
             }
         })
         .collect();
+    drop(pattern_cache);
 
     // Track seen nodes to deduplicate while preserving alternative parses
     // with different token payloads at the same span/rule.
@@ -136,6 +213,10 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
     }
     stash.merge_from(initial);
 
+    // Cache for regex evaluations in match_remaining so the same regex at the same
+    // position is never run twice across different rules or iterations.
+    let mut pos_cache = PositionRegexCache::new();
+
     // Phase 2: Saturation loop - keep applying rules until no new tokens
     let mut iterations = 0usize;
     loop {
@@ -143,7 +224,15 @@ pub fn parse_string(text: &str, rules: &[Rule]) -> Stash {
             break;
         }
         iterations = iterations.saturating_add(1);
-        let new_stash = apply_all_rules(&doc, rules, &stash, &regex_cache, &seen, &limits);
+        let new_stash = apply_all_rules(
+            &doc,
+            rules,
+            &stash,
+            &regex_cache,
+            &seen,
+            &limits,
+            &mut pos_cache,
+        );
         let mut actually_new = Stash::new();
         for node in new_stash.into_nodes() {
             if seen.len() >= limits.max_nodes {
@@ -239,7 +328,7 @@ fn apply_regex_rules(
                     if let Some(token_data) = safe_production(rule, &[&regex_node]) {
                         let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
-                        node.children = vec![regex_node];
+                        node.children = vec![Rc::new(regex_node)];
                         stash.add(node);
                     }
                 } else {
@@ -262,6 +351,7 @@ fn apply_all_rules(
     regex_cache: &[Option<RegexMatches>],
     seen: &HashSet<SeenKey>,
     limits: &ParseLimits,
+    pos_cache: &mut PositionRegexCache,
 ) -> Stash {
     let mut new_stash = Stash::new();
     let mut local_seen: HashSet<SeenKey> = HashSet::new();
@@ -279,7 +369,7 @@ fn apply_all_rules(
             }
         }
         let cached = regex_cache[i].as_ref();
-        let produced = match_rule(doc, rule, stash, cached, limits);
+        let produced = match_rule(doc, rule, stash, cached, limits, pos_cache);
         for node in produced {
             let key = dedup_key(&node);
             if seen.contains(&key) || !local_seen.insert(key) {
@@ -305,6 +395,7 @@ fn match_rule(
     stash: &Stash,
     cached_regex: Option<&RegexMatches>,
     limits: &ParseLimits,
+    pos_cache: &mut PositionRegexCache,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
@@ -336,13 +427,21 @@ fn match_rule(
                     if let Some(token_data) = safe_production(rule, &[&regex_node]) {
                         let mut node = Node::new(*range, token_data);
                         node.rule_name = Some(rule.name.clone());
-                        node.children = vec![regex_node];
+                        node.children = vec![Rc::new(regex_node)];
                         results.push(node);
                     }
                 } else {
                     // Continue matching remaining patterns
-                    let continuations =
-                        match_remaining(doc, rule, stash, 1, range.end, vec![regex_node], limits);
+                    let continuations = match_remaining(
+                        doc,
+                        rule,
+                        stash,
+                        1,
+                        range.end,
+                        vec![Rc::new(regex_node)],
+                        limits,
+                        pos_cache,
+                    );
                     extend_with_limit(&mut results, continuations, limits.max_rule_results);
                 }
             }
@@ -358,7 +457,7 @@ fn match_rule(
                         if let Some(token_data) = safe_production(rule, &[node]) {
                             let mut new_node = Node::new(node.range, token_data);
                             new_node.rule_name = Some(rule.name.clone());
-                            new_node.children = vec![node.clone()];
+                            new_node.children = vec![Rc::new(node.clone())];
                             results.push(new_node);
                         }
                     } else {
@@ -368,8 +467,9 @@ fn match_rule(
                             stash,
                             1,
                             node.range.end,
-                            vec![node.clone()],
+                            vec![Rc::new(node.clone())],
                             limits,
+                            pos_cache,
                         );
                         extend_with_limit(&mut results, continuations, limits.max_rule_results);
                     }
@@ -386,7 +486,7 @@ fn match_rule(
                         if let Some(token_data) = safe_production(rule, &[node]) {
                             let mut new_node = Node::new(node.range, token_data);
                             new_node.rule_name = Some(rule.name.clone());
-                            new_node.children = vec![node.clone()];
+                            new_node.children = vec![Rc::new(node.clone())];
                             results.push(new_node);
                         }
                     } else {
@@ -396,8 +496,9 @@ fn match_rule(
                             stash,
                             1,
                             node.range.end,
-                            vec![node.clone()],
+                            vec![Rc::new(node.clone())],
                             limits,
+                            pos_cache,
                         );
                         extend_with_limit(&mut results, continuations, limits.max_rule_results);
                     }
@@ -422,20 +523,22 @@ fn extend_with_limit<T>(dst: &mut Vec<T>, mut src: Vec<T>, limit: usize) {
 
 /// Continue matching the remaining pattern items after a partial match.
 /// Uses position-filtered stash iteration for efficiency.
+/// Uses `pos_cache` to memoize regex evaluations by (pattern, position).
 fn match_remaining(
     doc: &Document,
     rule: &Rule,
     stash: &Stash,
     pattern_idx: usize,
     after_pos: usize,
-    mut matched_so_far: Vec<Node>,
+    mut matched_so_far: Vec<Rc<Node>>,
     limits: &ParseLimits,
+    pos_cache: &mut PositionRegexCache,
 ) -> Vec<Node> {
     let mut results = Vec::new();
 
     if pattern_idx >= rule.pattern.len() {
         // All patterns matched - produce the result
-        let refs: Vec<&Node> = matched_so_far.iter().collect();
+        let refs: Vec<&Node> = matched_so_far.iter().map(|rc| rc.as_ref()).collect();
         if let Some(token_data) = safe_production(rule, &refs) {
             let start = matched_so_far.first().unwrap().range.start;
             let end = matched_so_far.last().unwrap().range.end;
@@ -449,49 +552,56 @@ fn match_remaining(
 
     match &rule.pattern[pattern_idx] {
         PatternItem::Regex(re) => {
-            // Try to match regex starting near after_pos
-            // At most one match, so we can move matched_so_far directly
-            let text = doc.text();
-            if after_pos <= text.len() {
-                let search_text = &text[after_pos..];
-                if let Some(m) = re.find(search_text) {
-                    let abs_start = after_pos.saturating_add(m.start());
-                    let abs_end = after_pos.saturating_add(m.end());
-                    // Must be adjacent
-                    if doc.is_adjacent(after_pos, abs_start) {
-                        let caps = re.captures(search_text);
-                        let groups = match &caps {
-                            Some(c) => {
-                                let mut g = Vec::new();
-                                for i in 0..c.len() {
-                                    g.push(c.get(i).map(|m2| {
-                                        let s = after_pos.saturating_add(m2.start());
-                                        let e = after_pos.saturating_add(m2.end());
-                                        text[s..e].to_string()
-                                    }));
-                                }
-                                g
-                            }
-                            None => Vec::new(),
-                        };
-                        let regex_node = Node {
-                            range: Range::new(abs_start, abs_end),
-                            token_data: TokenData::RegexMatch(RegexMatchData { groups }),
-                            children: Vec::new(),
-                            rule_name: None,
-                        };
-                        matched_so_far.push(regex_node);
-                        let cont = match_remaining(
-                            doc,
-                            rule,
-                            stash,
-                            pattern_idx.saturating_add(1),
-                            abs_end,
-                            matched_so_far,
-                            limits,
-                        );
-                        extend_with_limit(&mut results, cont, limits.max_rule_results);
-                    }
+            // Use position cache to avoid re-running the same regex at the same position.
+            // Lookup uses &str borrow (no allocation); only inserts allocate.
+            let pattern = re.as_str();
+            let cached = pos_cache
+                .get(pattern)
+                .and_then(|inner| inner.get(&after_pos))
+                .cloned();
+            let result = match cached {
+                Some(r) => r,
+                None => {
+                    let text = doc.text();
+                    let r = if after_pos <= text.len() {
+                        let search_text = &text[after_pos..];
+                        re.captures(search_text).map(|caps| {
+                            let m = caps.get(0).unwrap();
+                            let abs_start = after_pos.saturating_add(m.start());
+                            let abs_end = after_pos.saturating_add(m.end());
+                            let groups = extract_groups_with_offset(&caps, text, after_pos);
+                            (Range::new(abs_start, abs_end), groups)
+                        })
+                    } else {
+                        None
+                    };
+                    pos_cache
+                        .entry(pattern.to_string())
+                        .or_default()
+                        .insert(after_pos, r.clone());
+                    r
+                }
+            };
+            if let Some((range, groups)) = result {
+                if doc.is_adjacent(after_pos, range.start) {
+                    let regex_node = Node {
+                        range,
+                        token_data: TokenData::RegexMatch(RegexMatchData { groups }),
+                        children: Vec::new(),
+                        rule_name: None,
+                    };
+                    matched_so_far.push(Rc::new(regex_node));
+                    let cont = match_remaining(
+                        doc,
+                        rule,
+                        stash,
+                        pattern_idx.saturating_add(1),
+                        range.end,
+                        matched_so_far,
+                        limits,
+                        pos_cache,
+                    );
+                    extend_with_limit(&mut results, cont, limits.max_rule_results);
                 }
             }
         }
@@ -514,7 +624,7 @@ fn match_remaining(
                 } else {
                     matched_so_far.clone()
                 };
-                next_matched.push(node.clone());
+                next_matched.push(Rc::new(node.clone()));
                 let cont = match_remaining(
                     doc,
                     rule,
@@ -523,6 +633,7 @@ fn match_remaining(
                     node.range.end,
                     next_matched,
                     limits,
+                    pos_cache,
                 );
                 extend_with_limit(&mut results, cont, limits.max_rule_results);
             }
@@ -545,7 +656,7 @@ fn match_remaining(
                 } else {
                     matched_so_far.clone()
                 };
-                next_matched.push(node.clone());
+                next_matched.push(Rc::new(node.clone()));
                 let cont = match_remaining(
                     doc,
                     rule,
@@ -554,6 +665,7 @@ fn match_remaining(
                     node.range.end,
                     next_matched,
                     limits,
+                    pos_cache,
                 );
                 extend_with_limit(&mut results, cont, limits.max_rule_results);
             }
@@ -590,6 +702,24 @@ fn extract_groups(caps: &regex::Captures, original: &str) -> Vec<Option<String>>
         groups.push(caps.get(i).map(|m| {
             // Extract text from original (preserves case) using byte offsets
             original[m.start()..m.end()].to_string()
+        }));
+    }
+    groups
+}
+
+/// Extract capture groups from a regex match on a substring, mapping offsets back to the
+/// full text for text extraction.
+fn extract_groups_with_offset(
+    caps: &regex::Captures,
+    full_text: &str,
+    offset: usize,
+) -> Vec<Option<String>> {
+    let mut groups = Vec::new();
+    for i in 0..caps.len() {
+        groups.push(caps.get(i).map(|m| {
+            let s = offset.saturating_add(m.start());
+            let e = offset.saturating_add(m.end());
+            full_text[s..e].to_string()
         }));
     }
     groups

@@ -1,4 +1,5 @@
 use std::fmt;
+use std::rc::Rc;
 
 use crate::dimensions::amount_of_money::AmountOfMoneyData;
 use crate::dimensions::credit_card_number::CreditCardNumberData;
@@ -404,7 +405,7 @@ impl Range {
 pub(crate) struct Node {
     pub(crate) range: Range,
     pub(crate) token_data: TokenData,
-    pub(crate) children: Vec<Node>,
+    pub(crate) children: Vec<Rc<Node>>,
     pub(crate) rule_name: Option<String>,
 }
 
