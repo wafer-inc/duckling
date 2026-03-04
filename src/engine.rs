@@ -75,11 +75,11 @@ fn get_or_build_regex_set(rules: &[Rule]) -> &'static CachedRegexSet {
         for item in &rule.pattern {
             if let PatternItem::Regex(re) = item {
                 let pat = re.as_str().to_string();
-                if !pattern_to_idx.contains_key(&pat) {
+                pattern_to_idx.entry(pat).or_insert_with_key(|pat| {
                     let idx = patterns.len();
                     patterns.push(pat.clone());
-                    pattern_to_idx.insert(pat, idx);
-                }
+                    idx
+                });
             }
         }
     }
@@ -524,6 +524,7 @@ fn extend_with_limit<T>(dst: &mut Vec<T>, mut src: Vec<T>, limit: usize) {
 /// Continue matching the remaining pattern items after a partial match.
 /// Uses position-filtered stash iteration for efficiency.
 /// Uses `pos_cache` to memoize regex evaluations by (pattern, position).
+#[allow(clippy::too_many_arguments)]
 fn match_remaining(
     doc: &Document,
     rule: &Rule,
